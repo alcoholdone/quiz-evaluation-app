@@ -2784,25 +2784,184 @@ body {
   margin-left: 4px;
 }
 
+/* Tab label parts — desktop default: "📖 โหมดฝึกสะกดคำ" (short label hidden) */
+.tab-btn .t-ico { margin-right: 6px; }
+.tab-btn .t-short { display: none; }
+
 /* ============================================================
-   Header — mobile collision-proofing (Phase 3)
-   The fixed #cloud-sync-bar (viewport top-left) and the absolute voice
-   button (header top-right) must never overlap the title/badge on phones.
+   MOBILE REDESIGN (<= 640px) — plan items 1, 3, 6, 8
+   CSS-only; no JS/ID changes.
    ============================================================ */
 @media (max-width: 640px) {
-  /* reserve top room so the fixed sync bar clears the title */
+
+  /* --- item 8: hide decorative background blobs (perf + clarity) --- */
+  .bubble { display: none; }
+
+  /* --- item 6: collapse header (also clears fixed sync bar / voice button) --- */
   .app-header {
-    padding-top: 56px;
+    padding-top: 52px;
+    padding-bottom: 16px;
   }
-  /* keep the (wrapping) title clear of the 42px voice button on the right;
-     symmetric inline padding keeps it visually centered */
-  .app-header h1 {
-    padding-inline: 46px;
-  }
-  /* let the stars badge wrap instead of overflowing the pill off-screen */
+  .app-header h1 { padding-inline: 46px; }
   #total-stars-badge {
     flex-wrap: wrap;
     justify-content: center;
     max-width: 100%;
+    font-size: var(--fs-xs);
+    padding: 5px 12px;
+  }
+
+  /* --- item 1: bottom tab bar --- */
+  .tab-container {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 1000;
+    justify-content: space-around;
+    gap: 0;
+    flex-wrap: nowrap;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    background: #ffffff;
+    border-top: 1px solid #e7ebf0;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.07);
+  }
+  .tab-btn {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 2px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 12px;
+    min-height: 0;
+    transition: none;
+    color: var(--text-muted);
+  }
+  .tab-btn.active {
+    background: var(--primary-light);
+    color: var(--primary-hover);
+    transform: none;
+  }
+  .tab-btn .t-ico { margin-right: 0; font-size: 1.35rem; line-height: 1; }
+  .tab-btn .t-full { display: none; }
+  .tab-btn .t-short { display: block; font-size: 0.62rem; font-weight: 700; }
+  .tab-btn.cs-locked::after { font-size: 0.6em; margin-left: 0; }
+
+  /* keep page content clear of the fixed bottom bar */
+  .main-panel-container {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  /* --- item 3: tighter cards on small screens --- */
+  .card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+  }
+}
+
+/* ============================================================
+   MOBILE REDESIGN (<= 640px) — item 4: modal -> bottom sheet
+   ============================================================ */
+@keyframes sheet-up-modal {
+  from { transform: translateY(100%); opacity: 0.5; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@media (max-width: 640px) {
+  .spelling-modal-overlay { align-items: flex-end; }
+  .spelling-modal-content {
+    width: 100%;
+    max-width: none;
+    border-radius: 22px 22px 0 0;     /* rounded top only — sheet sitting on the bottom edge */
+    padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: sheet-up-modal 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* ============================================================
+   MOBILE REDESIGN (<= 640px) — item 5: tables -> stacked cards
+   Each row becomes a card; each cell shows its column name via data-label.
+   !important overrides inline td styles + the JS-set table display:table.
+   ============================================================ */
+@media (max-width: 640px) {
+  .vocab-table-wrapper { overflow-x: visible; }
+
+  .vocab-table,
+  .vocab-table tbody,
+  .vocab-table tr,
+  .vocab-table td {
+    display: block !important;
+    width: 100%;
+  }
+  .vocab-table thead { display: none; }   /* column names move into each cell */
+
+  .vocab-table tr {
+    height: auto !important;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border: 1.5px solid #e7ebf0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .vocab-table td {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: auto;
+    padding: 7px 0 !important;
+    text-align: right !important;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .vocab-table tr td:last-child { border-bottom: none; }
+
+  .vocab-table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-align: left;
+    white-space: nowrap;
+  }
+}
+
+/* ============================================================
+   MOBILE REDESIGN (<= 640px) — dashboard subtabs: 4-in-a-row -> 2x2 grid
+   flex:1 in one row squeezed the uneven-length Thai labels and looked
+   unbalanced; a 2x2 grid keeps equal, readable, aligned cells.
+   ============================================================ */
+@media (max-width: 640px) {
+  .dashboard-subtabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .subtab-btn {
+    font-size: 0.82rem;
+    padding: 10px 8px;
+    line-height: 1.25;
+  }
+}
+
+/* ============================================================
+   MOBILE FIX (<= 640px) — vocab manager form overflow
+   The textarea's inline `grid-column: span 2` forced 2 tracks of
+   minmax(220px,1fr) = >=440px wide, overflowing narrow screens.
+   Collapse to one column, neutralise the span, let fields shrink.
+   ============================================================ */
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid > .form-group { grid-column: auto !important; }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    min-width: 0;
   }
 }
