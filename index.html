@@ -92,8 +92,8 @@
       <section id="game-panel" class="panel">
         <!-- Game Start Screen -->
         <div id="game-start-screen" class="game-start-screen card text-center">
-          <div class="empty-icon" style="font-size: 4rem; margin-bottom: 15px;">🎮</div>
-          <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: var(--dark-2); margin-bottom: 10px;">ภารกิจเกมท้าทายสะกดคำ!</h2>
+          <div class="empty-icon" style="font-size: clamp(2.5rem, 10vw, 4rem); margin-bottom: 15px;">🎮</div>
+          <h2 style="font-family: var(--font-display); font-size: var(--fs-lg); color: var(--dark-2); margin-bottom: 10px;">ภารกิจเกมท้าทายสะกดคำ!</h2>
           <p style="color: var(--text-muted); max-width: 440px; margin: 0 auto 20px; line-height: 1.6;">
             น้องๆ จะต้องตอบคำถามทั้งหมด 10 ข้อ โดยมีทั้งการฟังเสียง การเลือกคำอังกฤษ และการเชื่อมโยงภาพความหมายภาษาไทยจ้า
           </p>
@@ -186,8 +186,8 @@
       <section id="dictation-panel" class="panel">
         <!-- Dictation Start Screen -->
         <div id="dictation-start-screen" class="game-start-screen card text-center">
-          <div class="empty-icon" style="font-size: 4rem; margin-bottom: 15px;">📝</div>
-          <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: var(--dark-2); margin-bottom: 10px;">ฝึกเขียนตามคำบอก (Dictation)</h2>
+          <div class="empty-icon" style="font-size: clamp(2.5rem, 10vw, 4rem); margin-bottom: 15px;">📝</div>
+          <h2 style="font-family: var(--font-display); font-size: var(--fs-lg); color: var(--dark-2); margin-bottom: 10px;">ฝึกเขียนตามคำบอก (Dictation)</h2>
           <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 20px; line-height: 1.6;">
             มารอบที่ 1 ฝึกเขียนตามคำบอก 5 คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ
           </p>
@@ -235,7 +235,7 @@
             <div class="game-mode-title" style="font-weight: 700; background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-color: #bae6fd; color: #0369a1;">✍️ สะกดคำศัพท์ให้ถูกต้องนะจ๊ะ</div>
             
             <div class="question-area" style="flex-direction: column; gap: 15px; width: 100%; min-height: 140px; display: flex; align-items: center; justify-content: center;">
-              <div id="dictation-visual-clue" class="question-visual" style="font-size: 6rem; margin: 10px 0;">❓</div>
+              <div id="dictation-visual-clue" class="question-visual" style="font-size: clamp(3rem, 14vw, 6rem); margin: 10px 0;">❓</div>
               
               <div style="display: flex; gap: 12px; justify-content: center; width: 100%; flex-wrap: wrap;">
                 <button id="btn-dictation-speak" class="play-btn" style="margin-bottom: 0;">
@@ -269,13 +269,13 @@
 
         <!-- Dictation Result Screen (Hidden by default) -->
         <div id="dictation-result-screen" class="card text-center" style="display: none; padding: 36px 28px;">
-          <div class="empty-icon" style="font-size: 5rem; margin-bottom: 10px;">🏆</div>
-          <h2 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--dark-2); margin-bottom: 10px;">เก่งมากเลยจ้า!</h2>
+          <div class="empty-icon" style="font-size: clamp(3rem, 12vw, 5rem); margin-bottom: 10px;">🏆</div>
+          <h2 style="font-family: var(--font-display); font-size: var(--fs-lg); color: var(--dark-2); margin-bottom: 10px;">เก่งมากเลยจ้า!</h2>
           <p style="color: var(--text-muted); margin-bottom: 25px;">น้องทำแบบทดสอบเขียนตามคำบอก รอบที่ 1 สำเร็จแล้ว</p>
 
           <div style="max-width: 320px; margin: 0 auto 30px; background: var(--primary-light); border: 2px solid var(--primary-border); padding: 20px; border-radius: 20px;">
             <div style="font-size: 0.95rem; color: var(--primary-dark); font-weight: 700;">คะแนนที่ได้</div>
-            <div style="font-family: var(--font-display); font-size: 3.5rem; font-weight: 700; color: var(--primary-hover); margin: 10px 0;">
+            <div style="font-family: var(--font-display); font-size: clamp(2.2rem, 9vw, 3.5rem); font-weight: 700; color: var(--primary-hover); margin: 10px 0;">
               <span id="dictation-result-score">0</span> / 5
             </div>
             <div style="font-size: 0.85rem; color: var(--text-muted);" id="dictation-result-message">ดีมากจ้า พยายามต่อไปนะ!</div>
@@ -528,7 +528,7 @@
                 <!-- Current Stars & Exchange Settings Card -->
                 <div class="card" style="flex: 1; min-width: 250px; background: white; border: 1.5px solid #fef08a; padding: 20px; border-radius: 18px; text-align: center; box-shadow: 0 4px 6px rgba(251, 191, 36, 0.05);">
                   <div style="font-size: 0.9rem; color: #78350f; font-weight: 700;">🌟 ดาวทองที่มีตอนนี้</div>
-                  <div style="font-family: var(--font-display); font-size: 3rem; font-weight: 800; color: #eab308; margin: 10px 0; display: flex; justify-content: center; align-items: center; gap: 6px;">
+                  <div style="font-family: var(--font-display); font-size: clamp(2rem, 8vw, 3rem); font-weight: 800; color: #eab308; margin: 10px 0; display: flex; justify-content: center; align-items: center; gap: 6px;">
                     ⭐ <span id="rewards-stars-count">0</span> ดวง
                   </div>
                   
