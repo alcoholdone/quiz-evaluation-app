@@ -317,7 +317,7 @@ function showUpdateToast(onApply) {
   t.innerHTML = `🔄 มีข้อมูลใหม่จากอีกเครื่อง <button type="button">อัปเดตเลย</button>`;
   document.body.appendChild(t);
   t.querySelector("button").addEventListener("click", onApply);
-  setTimeout(() => { if (t) t.remove(); }, 15000);
+  // ไม่หายเอง: ค้างไว้จนกว่าจะกด "อัปเดตเลย" เพื่อไม่ให้พลาดข้อมูลใหม่จากอีกเครื่อง
 }
 
 // ---- go ----------------------------------------------------------------------
