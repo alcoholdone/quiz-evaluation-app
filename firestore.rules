@@ -1,0 +1,13 @@
+// Firestore Security Rules — วางใน Firebase Console → Firestore Database → Rules → Publish
+//
+// อนุญาตให้ "เจ้าของบัญชีที่ล็อกอินแล้ว" อ่าน/เขียนได้เฉพาะเอกสารของตัวเองเท่านั้น
+// คนอื่น (แม้รู้ URL) แตะข้อมูลไม่ได้เลย — เหมาะกับเคส 1 user/บัญชีเดียว
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

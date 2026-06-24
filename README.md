@@ -38,6 +38,33 @@ python3 -m http.server 8000
 
 ทั้งสามเจ้าให้ HTTPS ฟรี (จำเป็นสำหรับ `speechSynthesis` บน iOS)
 
+## ☁️ ระบบ Login + Sync ดาวข้ามเครื่อง (Firebase)
+
+แอปนี้ซิงค์ความก้าวหน้า (ดาวสะสม, ประวัติ, รายงาน) ระหว่าง iPad ↔ คอม ผ่าน
+Google sign-in + Firestore โดย **ไม่ต้องมี backend** — ถ้ายังไม่ตั้งค่า แอปจะทำงาน
+แบบ offline ปกติ (เก็บข้อมูลในเครื่อง)
+
+ไฟล์ที่เกี่ยวข้อง: `firebase-config.js` (ใส่ค่า), `sync.js` (เลเยอร์ซิงค์), `firestore.rules`
+
+### ตั้งค่า Firebase (ครั้งเดียว ~5 นาที)
+1. ไปที่ https://console.firebase.google.com → **Add project** (ปิด Google Analytics ได้)
+2. **Authentication** → Get started → แท็บ Sign-in method → เปิด **Google** → Save
+3. **Firestore Database** → Create database → เลือก region (เช่น `asia-southeast1`) → Production mode
+4. แท็บ **Rules** → วางเนื้อหาจากไฟล์ `firestore.rules` → **Publish**
+5. **Project settings (⚙️)** → ส่วน *Your apps* → กดไอคอน **Web `</>`** → ตั้งชื่อ →
+   คัดลอกค่าใน `firebaseConfig` มาวางทับใน **`firebase-config.js`**
+6. **Authentication → Settings → Authorized domains** → กด *Add domain* แล้วใส่โดเมนที่ deploy
+   (เช่น `your-app.vercel.app`, `<username>.github.io`) — ไม่งั้น Google login จะถูกบล็อก
+
+### วิธีใช้
+- กดปุ่ม **"เข้าสู่ระบบ"** (มุมซ้ายบน) → ล็อกอินด้วยบัญชี Google ของคุณ
+- จุดสีเขียว = ซิงค์อยู่ การเปลี่ยนแปลงจะ push ขึ้น cloud อัตโนมัติ
+- เปิดอีกเครื่อง ล็อกอินบัญชีเดียวกัน → ข้อมูลตามมา; ถ้ามีอัปเดตระหว่างเล่นจะเด้ง toast ให้กดอัปเดต
+
+> ⚠️ **ครั้งแรกที่เชื่อม 2 เครื่อง:** ให้ล็อกอินที่เครื่องที่ "มีความก้าวหน้ามากกว่า" ก่อน
+> (ระบบ push ของเครื่องแรกขึ้น cloud) แล้วค่อยล็อกอินเครื่องที่สอง (จะดึงข้อมูลลงมาทับ)
+> เพราะการซิงค์เป็นแบบ last-write-wins ทั้งก้อน ไม่ได้ merge ทีละรายการ
+
 ## หมายเหตุสำหรับการใช้บน iPad
 - เพิ่มลงหน้าจอโฮม (Share → "เพิ่มไปยังหน้าจอโฮม") เพื่อเปิดแบบเต็มจอเหมือนแอป
 - ต้องเปิดผ่าน **HTTPS** เสียงอ่านออกเสียงถึงจะทำงานบน Safari
