@@ -27,6 +27,9 @@ const PUSH_DEBOUNCE_MS = 1500;
 const cfg = window.FIREBASE_CONFIG || {};
 const configured = cfg.apiKey && !String(cfg.apiKey).startsWith("PASTE_");
 
+// แท็บที่ต้องล็อกอินก่อนถึงใช้ได้ (โหมดฝึกสะกดคำ = tab-learn เปิดให้เล่นได้เลย)
+const LOCKED_TABS = ["tab-game", "tab-dictation", "tab-dashboard"];
+
 // ---- per-browser id (เพื่อไม่ apply echo การเขียนของตัวเอง) -----------------
 function clientId() {
   let id = localStorage.getItem("aura_kids_client_id");
@@ -253,6 +256,8 @@ async function doSignOut() {
 function init() {
   installHook();
   buildUI();
+  installTabGate();
+  updateTabLocks(); // ล็อกไว้ก่อนจนกว่า auth จะยืนยันว่าล็อกอินอยู่
 
   if (!configured) {
     setStatus("offline");
@@ -286,7 +291,56 @@ function init() {
       setBar("☁️ เข้าสู่ระบบเพื่อซิงค์ดาวข้ามเครื่อง", false);
       setStatus("idle");
     }
+    updateTabLocks();
   });
+}
+
+// =============================================================================
+//  Feature gate — ยังไม่ล็อกอิน = ใช้ได้แค่ "โหมดฝึกสะกดคำ"
+//  ทำงานนอก app.js: ดักคลิกแท็บที่ล็อกในช่วง capture เพื่อบล็อกก่อน handler เดิม
+// =============================================================================
+function tabLocked() {
+  return configured && !currentUser; // offline build (ไม่ตั้งค่า cloud) = ไม่ล็อกอะไร
+}
+
+function gateClickHandler(e) {
+  if (!tabLocked()) return; // ล็อกอินแล้ว/offline → ปล่อยผ่านไป switchTab เดิม
+  e.stopImmediatePropagation();
+  e.preventDefault();
+  showSignInPrompt();
+}
+
+function installTabGate() {
+  LOCKED_TABS.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", gateClickHandler, true); // capture = รันก่อน listener ของ app.js
+  });
+}
+
+function updateTabLocks() {
+  const locked = tabLocked();
+  LOCKED_TABS.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle("cs-locked", locked);
+    el.setAttribute("aria-disabled", locked ? "true" : "false");
+  });
+  // ถ้าเพิ่ง logout ขณะอยู่บนแท็บที่ล็อก → เด้งกลับมาโหมดฝึกสะกดคำ
+  if (locked && typeof window.switchTab === "function") {
+    const active = document.querySelector(".tab-btn.active");
+    if (active && LOCKED_TABS.includes(active.id)) window.switchTab("learn");
+  }
+}
+
+function showSignInPrompt() {
+  let t = document.getElementById("cs-toast");
+  if (t) t.remove();
+  t = document.createElement("div");
+  t.id = "cs-toast";
+  t.innerHTML = `🔒 เข้าสู่ระบบเพื่อใช้โหมดนี้ <button type="button">เข้าสู่ระบบ</button>`;
+  document.body.appendChild(t);
+  t.querySelector("button").addEventListener("click", () => { t.remove(); doSignIn(); });
+  setTimeout(() => { if (t?.parentNode) t.remove(); }, 8000);
 }
 
 // =============================================================================

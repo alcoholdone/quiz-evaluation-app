@@ -2726,3 +2726,16 @@ body {
   #cloud-sync-bar { font-size: 0.72rem; padding: 5px 8px 5px 10px; }
   #cloud-sync-bar #cs-label { max-width: 38vw; }
 }
+
+/* ============================================================
+   Locked tabs (feature gate — require sign-in), toggled by sync.js
+   ============================================================ */
+.tab-btn.cs-locked {
+  opacity: 0.55;
+  position: relative;
+}
+.tab-btn.cs-locked::after {
+  content: "🔒";
+  font-size: 0.8em;
+  margin-left: 4px;
+}
