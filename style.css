@@ -385,7 +385,9 @@ body {
   }
 }
 
-@media (min-width: 768px) {
+/* 4 คอลัมน์เฉพาะ iPad Pro 12.9" (1024) ขึ้นไป + desktop
+   iPad mini (768) / Air (820) / Pro 11" (834) คงไว้ 3 คอลัมน์ — การ์ดกว้างกว่า อ่าน/แตะง่ายกว่า */
+@media (min-width: 1024px) {
   .vocab-grid {
     grid-template-columns: repeat(4, 1fr);
   }
