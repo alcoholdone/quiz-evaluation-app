@@ -63,6 +63,28 @@
   /* Typography */
   --font-display: 'Fredoka', 'Sarabun', sans-serif;
   --font-body: 'Sarabun', 'Fredoka', sans-serif;
+
+  /* ----------------------------------------------------------
+     Responsive foundation (Phase 1)
+     Canonical breakpoints used across the app:
+       mobile   : < 640px
+       tablet   : 640px – 1024px   (iPad ~768/1024)
+       desktop  : > 1024px
+     Fluid type scale: scales smoothly between ~360px and ~1100px
+     viewport so text never overflows on phones nor looks tiny on desktop.
+     ---------------------------------------------------------- */
+  --fs-xs:   clamp(0.72rem, 0.68rem + 0.20vw, 0.82rem);
+  --fs-sm:   clamp(0.82rem, 0.76rem + 0.30vw, 0.95rem);
+  --fs-base: clamp(0.92rem, 0.86rem + 0.35vw, 1.05rem);
+  --fs-md:   clamp(1.02rem, 0.92rem + 0.55vw, 1.30rem);
+  --fs-lg:   clamp(1.20rem, 1.00rem + 1.10vw, 1.70rem);
+  --fs-xl:   clamp(1.55rem, 1.15rem + 2.20vw, 2.40rem);
+
+  /* Fluid spacing for panel/section padding */
+  --space-panel: clamp(16px, 4vw, 32px);
+
+  /* Minimum comfortable touch target */
+  --tap-min: 44px;
 }
 
 /* ============================================================
@@ -104,6 +126,20 @@ label,
   user-select: none;
 }
 
+/* ----- Responsive guards (Phase 1) -----
+   Stop wide media/long words from forcing horizontal scroll on phones. */
+img, canvas, svg, video, table {
+  max-width: 100%;
+}
+
+/* Comfortable touch targets for the main action buttons on touch devices */
+@media (pointer: coarse) {
+  .btn,
+  .tab-btn {
+    min-height: var(--tap-min);
+  }
+}
+
 body {
   background: var(--bg-app);
   color: var(--dark);
@@ -117,6 +153,8 @@ body {
   justify-content: center;
   position: relative;
   overflow-x: hidden;
+  /* break long words instead of forcing horizontal scroll on phones */
+  overflow-wrap: break-word;
   /* stop the whole page from rubber-band scrolling on iOS */
   overscroll-behavior-y: none;
 }
@@ -184,7 +222,7 @@ body {
    ============================================================ */
 .app-header {
   background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c2340 100%);
-  padding: 36px 32px 28px;
+  padding: clamp(24px, 5vw, 36px) var(--space-panel) clamp(20px, 4vw, 28px);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -218,7 +256,7 @@ body {
 .app-header h1 {
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: 2.2rem;
+  font-size: var(--fs-xl);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -233,7 +271,7 @@ body {
 .subtitle {
   color: rgba(255,255,255,0.65);
   margin-top: 8px;
-  font-size: 1rem;
+  font-size: var(--fs-base);
   font-weight: 500;
   position: relative;
   z-index: 1;
