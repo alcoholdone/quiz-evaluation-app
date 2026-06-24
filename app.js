@@ -611,11 +611,13 @@ window.testAndResetVoice = function() {
 };
 
 function speakEN(text, rate = 0.8) {
-  if (!('speechSynthesis' in window)) return;
+  if (!('speechSynthesis' in window)) return null;
   // Always resume before speaking to fix Chrome's engine getting stuck
   window.speechSynthesis.resume();
-  window.speechSynthesis.speak(makeUtterance(text, 'en-US', rate));
+  const u = makeUtterance(text, 'en-US', rate);
+  window.speechSynthesis.speak(u);
   startSpeechKeepAlive();
+  return u; // let callers wait for this letter/word to finish before advancing
 }
 
 function speakTH(text) {
@@ -1673,7 +1675,7 @@ function renderQuestion(index) {
         }
 
         // Always speak the letter immediately
-        speakEN(letter.toLowerCase(), 0.55);
+        const letterU = speakEN(letter.toLowerCase(), 0.55);
 
         // Check answer when all actual letters placed
         if (selectedLetters.length === correctLetters.length) {
@@ -1683,11 +1685,19 @@ function renderQuestion(index) {
             if (slot.dataset.isSpace) return ' ';
             return slot.textContent;
           }).join('');
-          
-          // Delay check to allow the last letter voice to play completely
-          setTimeout(() => {
-            selectOption({ word: spelled, meaning: q.targetWord.meaning, image: q.targetWord.image });
-          }, 600);
+
+          const reveal = () => selectOption({ word: spelled, meaning: q.targetWord.meaning, image: q.targetWord.image });
+          // Wait for the LAST letter to finish speaking before revealing, so its
+          // sound isn't cut off. Fixed delay was too short for the slow rate.
+          if (letterU && 'speechSynthesis' in window) {
+            let fired = false;
+            const fire = (delay) => { if (fired) return; fired = true; setTimeout(reveal, delay); };
+            letterU.addEventListener('end', () => fire(350));
+            letterU.addEventListener('error', () => fire(150));
+            setTimeout(() => fire(0), 4000); // safety cap if 'end' never fires
+          } else {
+            setTimeout(reveal, 600);
+          }
         }
       });
       lettersContainer.appendChild(btn);
@@ -3320,14 +3330,22 @@ function handlePracticeLetterTap(letter, btn, item) {
   }
   
   // Always speak the tapped letter immediately
-  speakEN(letter.toLowerCase(), 0.55);
-  
+  const letterU = speakEN(letter.toLowerCase(), 0.55);
+
   const correctLettersCount = item.word.split('').filter(c => c !== ' ').length;
   if (practiceSelectedLetters.length === correctLettersCount) {
-    // Delay check so the last letter audio has time to play
-    setTimeout(() => {
-      checkPracticeSpelling(item);
-    }, 600);
+    // Wait for the last letter to finish speaking before checking (fixed 600ms
+    // was too short for the slow rate and cut the sound off).
+    const reveal = () => checkPracticeSpelling(item);
+    if (letterU && 'speechSynthesis' in window) {
+      let fired = false;
+      const fire = (d) => { if (fired) return; fired = true; setTimeout(reveal, d); };
+      letterU.addEventListener('end', () => fire(350));
+      letterU.addEventListener('error', () => fire(150));
+      setTimeout(() => fire(0), 4000); // safety cap if 'end' never fires
+    } else {
+      setTimeout(reveal, 600);
+    }
   }
 }
 
@@ -3531,7 +3549,7 @@ function handleDictationLetterTap(letter, btn, item) {
   if (btn.disabled) return;
 
   // เล่นเสียงอักษรทันที
-  speakEN(letter.toLowerCase(), 0.55);
+  const letterU = speakEN(letter.toLowerCase(), 0.55);
 
   dictationSelectedLetters.push({ letter, btnEl: btn });
   btn.disabled = true;
@@ -3550,10 +3568,17 @@ function handleDictationLetterTap(letter, btn, item) {
   // ตรวจสอบจำนวนอักษรที่กดสะกดเรียง
   const correctLettersCount = item.word.split('').filter(c => c !== ' ').length;
   if (dictationSelectedLetters.length === correctLettersCount) {
-    // หน่วงเวลาสั้นๆ เพื่อให้เสียงพูดตัวอักษรสุดท้ายเล่นจบ
-    setTimeout(() => {
-      checkDictationSpelling(item);
-    }, 600);
+    // รอให้เสียงตัวอักษรสุดท้ายเล่นจบก่อนค่อยเฉลย (เดิมหน่วงคงที่ 600ms ไม่พอ)
+    const reveal = () => checkDictationSpelling(item);
+    if (letterU && 'speechSynthesis' in window) {
+      let fired = false;
+      const fire = (d) => { if (fired) return; fired = true; setTimeout(reveal, d); };
+      letterU.addEventListener('end', () => fire(350));
+      letterU.addEventListener('error', () => fire(150));
+      setTimeout(() => fire(0), 4000); // safety cap if 'end' never fires
+    } else {
+      setTimeout(reveal, 600);
+    }
   }
 }
 
