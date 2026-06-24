@@ -2882,3 +2882,52 @@ body {
     animation: sheet-up-modal 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
+
+/* ============================================================
+   MOBILE REDESIGN (<= 640px) — item 5: tables -> stacked cards
+   Each row becomes a card; each cell shows its column name via data-label.
+   !important overrides inline td styles + the JS-set table display:table.
+   ============================================================ */
+@media (max-width: 640px) {
+  .vocab-table-wrapper { overflow-x: visible; }
+
+  .vocab-table,
+  .vocab-table tbody,
+  .vocab-table tr,
+  .vocab-table td {
+    display: block !important;
+    width: 100%;
+  }
+  .vocab-table thead { display: none; }   /* column names move into each cell */
+
+  .vocab-table tr {
+    height: auto !important;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border: 1.5px solid #e7ebf0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .vocab-table td {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: auto;
+    padding: 7px 0 !important;
+    text-align: right !important;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .vocab-table tr td:last-child { border-bottom: none; }
+
+  .vocab-table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-align: left;
+    white-space: nowrap;
+  }
+}

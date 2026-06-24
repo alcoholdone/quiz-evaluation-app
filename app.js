@@ -3157,10 +3157,10 @@ function renderCustomVocabTable() {
     const imgHtml = item.image.startsWith('<svg') ? item.image : `<span style="font-size:1.5rem;">${item.image}</span>`;
     
     tr.innerHTML = `
-      <td style="padding: 10px; width: 60px;">${imgHtml}</td>
-      <td style="padding: 10px; font-weight:700; color:var(--dark-2);">${escapeHTML(item.word)}</td>
-      <td style="padding: 10px; color:var(--text-muted);">${escapeHTML(item.meaning)}</td>
-      <td style="padding: 10px; text-align: center;">
+      <td data-label="ภาพ" style="padding: 10px; width: 60px;">${imgHtml}</td>
+      <td data-label="อังกฤษ" style="padding: 10px; font-weight:700; color:var(--dark-2);">${escapeHTML(item.word)}</td>
+      <td data-label="แปลไทย" style="padding: 10px; color:var(--text-muted);">${escapeHTML(item.meaning)}</td>
+      <td data-label="จัดการ" style="padding: 10px; text-align: center;">
         <button class="btn-delete-vocab" onclick="deleteCustomVocab(${idx})">ลบ</button>
       </td>
     `;
@@ -4181,10 +4181,10 @@ function renderRedeemHistoryTable() {
     }
     
     tr.innerHTML = `
-      <td style="padding: 10px; color: var(--text-muted); font-size: 0.85rem;">${item.dateTime}</td>
-      <td style="padding: 10px; text-align: center; font-weight: 700; color: #d97706;">⭐ ${item.starsRedeemed} ดวง</td>
-      <td style="padding: 10px; text-align: center; font-weight: 800; color: #16a34a;">${item.amountEarned} บาท</td>
-      <td style="padding: 10px; text-align: center;">
+      <td data-label="วันที่-เวลา" style="padding: 10px; color: var(--text-muted); font-size: 0.85rem;">${item.dateTime}</td>
+      <td data-label="ดาวที่แลก" style="padding: 10px; text-align: center; font-weight: 700; color: #d97706;">⭐ ${item.starsRedeemed} ดวง</td>
+      <td data-label="เงินที่ได้รับ" style="padding: 10px; text-align: center; font-weight: 800; color: #16a34a;">${item.amountEarned} บาท</td>
+      <td data-label="สถานะคุณแม่" style="padding: 10px; text-align: center;">
         <span class="${statusClass}" onclick="toggleRedeemPaidStatus(${idx})">${statusText}</span>
       </td>
     `;
