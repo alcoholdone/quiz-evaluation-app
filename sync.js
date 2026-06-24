@@ -44,6 +44,7 @@ let currentUser = null;
 let skipHook = false;          // true ระหว่าง apply remote (กัน loop)
 let pushTimer = null;
 let initialPullDone = false;
+let cloudBlobStr = null;       // เนื้อหา blob ล่าสุดที่รู้ว่าอยู่บน cloud (stable JSON) — ใช้กัน push ซ้ำ
 
 // =============================================================================
 //  localStorage blob helpers
@@ -57,6 +58,13 @@ function gatherBlob() {
     }
   }
   return blob;
+}
+
+// JSON ที่ key เรียงคงที่ → ใช้เทียบ "เนื้อหาเหมือนกันไหม" ข้ามเครื่องได้ (กันลำดับ key ต่างกัน)
+function stableStringify(obj) {
+  const out = {};
+  for (const k of Object.keys(obj).sort((a, b) => a.localeCompare(b))) out[k] = obj[k];
+  return JSON.stringify(out);
 }
 
 function applyBlob(blob) {
@@ -91,12 +99,15 @@ async function pushNow() {
   if (!currentUser || !userDocRef) return;
   const nowMs = Date.now();
   try {
+    const localStr = stableStringify(gatherBlob());
+    if (localStr === cloudBlobStr) { setStatus("synced"); return; } // เนื้อหาตรงกับ cloud แล้ว → ไม่ต้องเขียนซ้ำ
     await setDoc(userDocRef, {
-      blob: gatherBlob(),
+      blob: JSON.parse(localStr),
       updatedAtMs: nowMs,
       updatedBy: CLIENT,
       updatedAt: serverTimestamp(),
     });
+    cloudBlobStr = localStr;
     localStorage.setItem("aura_kids_last_sync_ms", String(nowMs));
     setStatus("synced");
   } catch (e) {
@@ -135,33 +146,45 @@ function subscribe() {
   unsub = onSnapshot(userDocRef, (snap) => {
     if (!snap.exists()) {
       // ยังไม่เคยมีข้อมูลบน cloud → push ของเครื่องนี้ขึ้นไปเป็นชุดแรก
+      cloudBlobStr = null;
       pushNow();
       initialPullDone = true;
       return;
     }
-    const data = snap.data();
-    if (data.updatedBy === CLIENT) { initialPullDone = true; return; } // echo การเขียนของเราเอง
 
+    const data = snap.data();
+    const remoteStr = stableStringify(data.blob || {});
+    cloudBlobStr = remoteStr;                       // server บอกว่าตอนนี้ cloud มีอะไร
+    const localStr = stableStringify(gatherBlob());
+
+    // ✅ กุญแจกัน loop: ถ้าเนื้อหาตรงกันอยู่แล้ว = sync สมบูรณ์ ไม่ต้องทำอะไร
+    // (ไม่ push, ไม่เด้ง toast) แม้ timestamp/updatedBy จะต่างกันก็ตาม
+    if (remoteStr === localStr) {
+      initialPullDone = true;
+      setStatus("synced");
+      return;
+    }
+
+    // เนื้อหาต่างกันจริง → ตัดสินจากเวลาว่าใครใหม่กว่า
     const localLast = Number(localStorage.getItem("aura_kids_last_sync_ms") || 0);
-    const isNewer = (data.updatedAtMs || 0) > localLast;
+    const remoteNewer = (data.updatedAtMs || 0) > localLast;
 
     if (!initialPullDone) {
-      // ครั้งแรกหลัง login: ถ้า cloud ใหม่กว่า → ดึงลงมาแล้ว reload เพื่อ render ใหม่ทั้งหมด
+      // ครั้งแรกหลัง login
       initialPullDone = true;
-      if (isNewer) {
+      if (remoteNewer) {
         applyBlob(data.blob);
         localStorage.setItem("aura_kids_last_sync_ms", String(data.updatedAtMs || Date.now()));
         setStatus("synced");
         location.reload();
       } else {
-        // เครื่องนี้ใหม่กว่า/เท่ากัน → ดันของเราขึ้นไป
-        schedulePush();
+        schedulePush(); // เครื่องนี้ใหม่กว่า → ดันขึ้น (pushNow จะเขียนเพราะเนื้อหาต่างจริง)
       }
       return;
     }
 
     // เปลี่ยนแปลงระหว่างใช้งานจากอีกเครื่อง → ถามก่อน ไม่ reload ทับงานที่กำลังเล่น
-    if (isNewer) {
+    if (remoteNewer) {
       showUpdateToast(() => {
         applyBlob(data.blob);
         localStorage.setItem("aura_kids_last_sync_ms", String(data.updatedAtMs || Date.now()));
