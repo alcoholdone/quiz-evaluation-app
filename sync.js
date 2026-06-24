@@ -245,9 +245,33 @@ async function doSignIn() {
   }
 }
 
+// ลบข้อมูลแอปในเครื่อง (เก็บ client_id ไว้) — ใช้ตอน logout เพื่อไม่ให้ข้อมูล
+// ของคนก่อนค้างไปปนกับ user คนใหม่ และเพื่อซ่อนดาวเมื่อไม่ได้ล็อกอิน
+function clearLocalAppData() {
+  skipHook = true; // ⚠️ สำคัญ: กันไม่ให้การลบนี้ไป trigger push ค่าว่างทับ cloud
+  try {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(APP_PREFIX) && k !== "aura_kids_client_id") keys.push(k);
+    }
+    keys.forEach((k) => localStorage.removeItem(k));
+  } finally {
+    skipHook = false;
+  }
+  cloudBlobStr = null;
+}
+
 async function doSignOut() {
+  // หยุดฟัง + ยกเลิก push ที่ค้าง ก่อนลบข้อมูล เพื่อไม่ให้ค่าว่างถูกส่งขึ้น cloud
   if (unsub) { unsub(); unsub = null; }
-  await signOut(auth);
+  if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
+  clearLocalAppData();
+  try {
+    await signOut(auth);
+  } finally {
+    location.reload(); // โหลดใหม่ให้ UI กลับเป็นสถานะเปล่า (ดาวหาย, แท็บล็อก)
+  }
 }
 
 // =============================================================================
@@ -325,6 +349,9 @@ function updateTabLocks() {
     el.classList.toggle("cs-locked", locked);
     el.setAttribute("aria-disabled", locked ? "true" : "false");
   });
+  // ซ่อนป้ายดาวสะสมเมื่อยังไม่ล็อกอิน
+  const badge = document.getElementById("total-stars-badge");
+  if (badge) badge.style.display = locked ? "none" : "flex";
   // ถ้าเพิ่ง logout ขณะอยู่บนแท็บที่ล็อก → เด้งกลับมาโหมดฝึกสะกดคำ
   if (locked && typeof window.switchTab === "function") {
     const active = document.querySelector(".tab-btn.active");
@@ -367,7 +394,7 @@ function buildUI() {
       return;
     }
     if (currentUser) {
-      if (confirm("ออกจากระบบ? ข้อมูลในเครื่องนี้ยังอยู่ครบ")) doSignOut();
+      if (confirm("ออกจากระบบ?\n\nข้อมูลถูกสำรองไว้บน cloud แล้ว และจะถูกล้างออกจากเครื่องนี้ — ล็อกอินใหม่เมื่อไหร่ข้อมูลจะกลับมาครบ")) doSignOut();
     } else {
       doSignIn();
     }
