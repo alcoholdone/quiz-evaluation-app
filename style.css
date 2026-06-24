@@ -2777,3 +2777,26 @@ body {
   font-size: 0.8em;
   margin-left: 4px;
 }
+
+/* ============================================================
+   Header — mobile collision-proofing (Phase 3)
+   The fixed #cloud-sync-bar (viewport top-left) and the absolute voice
+   button (header top-right) must never overlap the title/badge on phones.
+   ============================================================ */
+@media (max-width: 640px) {
+  /* reserve top room so the fixed sync bar clears the title */
+  .app-header {
+    padding-top: 56px;
+  }
+  /* keep the (wrapping) title clear of the 42px voice button on the right;
+     symmetric inline padding keeps it visually centered */
+  .app-header h1 {
+    padding-inline: 46px;
+  }
+  /* let the stars badge wrap instead of overflowing the pill off-screen */
+  #total-stars-badge {
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
+  }
+}
