@@ -1209,6 +1209,10 @@ body {
   gap: 14px;
   justify-content: flex-start;
   flex-wrap: wrap;
+  /* แยกออกจากกล่องด้านบน — เดิมไม่มี margin เลยแปะชนจนดูลอยๆ */
+  margin-top: clamp(20px, 4vw, 28px);
+  padding-top: clamp(16px, 3vw, 22px);
+  border-top: 1.5px solid #e2e8f0;
 }
 
 /* ============================================================
