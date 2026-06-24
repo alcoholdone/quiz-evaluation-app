@@ -2862,3 +2862,23 @@ body {
     border-radius: var(--radius-md);
   }
 }
+
+/* ============================================================
+   MOBILE REDESIGN (<= 640px) — item 4: modal -> bottom sheet
+   ============================================================ */
+@keyframes sheet-up-modal {
+  from { transform: translateY(100%); opacity: 0.5; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@media (max-width: 640px) {
+  .spelling-modal-overlay { align-items: flex-end; }
+  .spelling-modal-content {
+    width: 100%;
+    max-width: none;
+    border-radius: 22px 22px 0 0;     /* rounded top only — sheet sitting on the bottom edge */
+    padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: sheet-up-modal 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
