@@ -2931,3 +2931,21 @@ body {
     white-space: nowrap;
   }
 }
+
+/* ============================================================
+   MOBILE REDESIGN (<= 640px) — dashboard subtabs: 4-in-a-row -> 2x2 grid
+   flex:1 in one row squeezed the uneven-length Thai labels and looked
+   unbalanced; a 2x2 grid keeps equal, readable, aligned cells.
+   ============================================================ */
+@media (max-width: 640px) {
+  .dashboard-subtabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .subtab-btn {
+    font-size: 0.82rem;
+    padding: 10px 8px;
+    line-height: 1.25;
+  }
+}
