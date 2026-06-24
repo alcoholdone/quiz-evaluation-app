@@ -13,10 +13,11 @@
 // =============================================================================
 
 window.FIREBASE_CONFIG = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_PROJECT_ID.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID",
+  apiKey: "AIzaSyA6HluvWKezq0QJcGATsAkkioZOWY-lOY8",
+  authDomain: "quiz-evaluation-app.firebaseapp.com",
+  projectId: "quiz-evaluation-app",
+  storageBucket: "quiz-evaluation-app.firebasestorage.app",
+  messagingSenderId: "642874051095",
+  appId: "1:642874051095:web:9a93999ee7a2a1fc87ea52",
+  measurementId: "G-HFP22V29WK"
 };
