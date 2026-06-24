@@ -1,13 +1,30 @@
 // Firestore Security Rules — วางใน Firebase Console → Firestore Database → Rules → Publish
 //
-// อนุญาตให้ "เจ้าของบัญชีที่ล็อกอินแล้ว" อ่าน/เขียนได้เฉพาะเอกสารของตัวเองเท่านั้น
-// คนอื่น (แม้รู้ URL) แตะข้อมูลไม่ได้เลย — เหมาะกับเคส 1 user/บัญชีเดียว
+// แบบ Allowlist: อนุญาตเฉพาะอีเมลในรายชื่อด้านล่างเท่านั้น และแต่ละคนเข้าได้แค่
+// เอกสารของตัวเอง  คนนอกลิสต์ (แม้ล็อกอิน Google สำเร็จ) จะอ่าน/เขียนไม่ได้เลย
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // 👉 แก้รายชื่ออีเมลที่อนุญาตตรงนี้ (เพิ่ม/ลบได้ คั่นด้วยจุลภาค)
+    //    แล้วกด Publish ใหม่ทุกครั้งที่แก้
+    function allowedEmails() {
+      return [
+        'amata.utama1@lotuss.com'
+        // , 'someone-else@gmail.com'   // ← เพิ่มอีเมลคนอื่นแบบนี้
+      ];
+    }
+
+    function isAllowedUser() {
+      return request.auth != null
+        && request.auth.token.email_verified == true        // Google sign-in = verified อยู่แล้ว
+        && request.auth.token.email in allowedEmails();
+    }
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // ต้องอยู่ใน allowlist และเป็นเจ้าของเอกสารของตัวเอง
+      allow read, write: if isAllowedUser() && request.auth.uid == userId;
     }
   }
 }
