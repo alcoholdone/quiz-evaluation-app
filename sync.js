@@ -177,20 +177,45 @@ function subscribe() {
 // =============================================================================
 //  Auth
 // =============================================================================
-function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
-    window.matchMedia("(display-mode: standalone)").matches;
+// แปลง error code ของ Firebase เป็นข้อความไทยที่ช่วยแก้ปัญหาได้
+function explainAuthError(e) {
+  const code = e?.code || "";
+  const map = {
+    "auth/unauthorized-domain":
+      "โดเมนนี้ยังไม่ได้รับอนุญาต\n\nไปที่ Firebase Console → Authentication → Settings → Authorized domains แล้วเพิ่มโดเมนของเว็บนี้:\n" + location.hostname,
+    "auth/operation-not-allowed":
+      "ยังไม่ได้เปิด Google sign-in\n\nไปที่ Firebase Console → Authentication → Sign-in method → เปิด Google",
+    "auth/popup-blocked": "เบราว์เซอร์บล็อก popup — กำลังลองวิธี redirect แทน...",
+    "auth/popup-closed-by-user": "คุณปิดหน้าต่างล็อกอินก่อนเสร็จ ลองกดใหม่อีกครั้ง",
+    "auth/cancelled-popup-request": "",
+    "auth/network-request-failed": "เชื่อมต่อเน็ตไม่ได้ ลองเช็กสัญญาณแล้วกดใหม่",
+  };
+  if (code in map) return map[code];
+  return `เข้าสู่ระบบไม่สำเร็จ\n\n${code || e?.message || e}`;
+}
+
+function reportAuthError(e) {
+  console.warn("[sync] auth error", e);
+  setStatus("error");
+  const msg = explainAuthError(e);
+  if (msg) alert(msg);
 }
 
 async function doSignIn() {
   const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  // popup-first ทุกแพลตฟอร์ม: เสถียรกว่า redirect บน iOS/Safari (ITP บล็อก storage ข้ามโดเมน
+  // ทำให้ redirect กลับมาแล้ว auth หาย → เด้งให้ล็อกอินวนไป)
   try {
-    if (isIOS()) await signInWithRedirect(auth, provider); // popup ไม่ค่อยเสถียรบน iOS/standalone
-    else await signInWithPopup(auth, provider);
+    await signInWithPopup(auth, provider);
   } catch (e) {
-    console.warn("[sync] popup sign-in failed, fallback to redirect", e);
-    try { await signInWithRedirect(auth, provider); } catch (e2) { console.error(e2); setStatus("error"); }
+    const code = e?.code || "";
+    const popupIssue = ["auth/popup-blocked", "auth/operation-not-supported-in-this-environment",
+      "auth/cancelled-popup-request"].includes(code);
+    if (popupIssue) {
+      try { await signInWithRedirect(auth, provider); return; } catch (e2) { reportAuthError(e2); return; }
+    }
+    reportAuthError(e); // unauthorized-domain / operation-not-allowed ฯลฯ → แจ้งสาเหตุชัดๆ
   }
 }
 
@@ -221,7 +246,7 @@ function init() {
     db = initializeFirestore(app, {});
   }
 
-  getRedirectResult(auth).catch((e) => console.warn("[sync] redirect result", e));
+  getRedirectResult(auth).catch((e) => reportAuthError(e));
 
   onAuthStateChanged(auth, (user) => {
     if (unsub) { unsub(); unsub = null; }
