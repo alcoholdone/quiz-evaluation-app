@@ -475,6 +475,9 @@ function switchDashboardTab(subtabId) {
 let currentSpeechToken = null;
 let lastCancelTime = 0;
 let activeUtterances = [];
+// Last utterance queued by playFeedbackSounds — used to advance to the next
+// question only AFTER the feedback finishes speaking (not on a fixed timer).
+let lastFeedbackUtterance = null;
 
 // Preload voices early so they are ready on first click (Chrome loads async)
 if ('speechSynthesis' in window) {
@@ -1963,6 +1966,7 @@ function renderQuestion(index) {
 
 // Play feedback sounds after stopAllSpeech — handles Chrome's post-cancel delay
 function playFeedbackSounds(utterances) {
+  lastFeedbackUtterance = utterances.length ? utterances[utterances.length - 1] : null;
   if (!utterances.length || !('speechSynthesis' in window)) return;
   const doSpeak = () => {
     window.speechSynthesis.resume();
@@ -2074,15 +2078,34 @@ function selectOption(selectedOpt) {
     }
   }
   
-  // Progress to next question or submit after 2 seconds
-  questionTransitionTimeout = setTimeout(() => {
-    questionTransitionTimeout = null;
+  // Progress to next question AFTER the feedback finishes speaking, so long
+  // sentences (e.g. the correct answer being read) aren't cut off mid-way.
+  // Guard so it fires exactly once; a hard fallback prevents a hang if the
+  // 'end' event never arrives (e.g. TTS blocked / unavailable).
+  let advanced = false;
+  const goNext = () => {
+    if (advanced) return;
+    advanced = true;
+    clearTransitionTimeout();
     if (currentQuestionIndex < challengeQuestions.length - 1) {
       renderQuestion(currentQuestionIndex + 1);
     } else {
       submitAssessment();
     }
-  }, 2000);
+  };
+
+  const lastU = lastFeedbackUtterance;
+  if (lastU && 'speechSynthesis' in window) {
+    const afterSpeech = (pauseMs) => () => {
+      clearTransitionTimeout();
+      questionTransitionTimeout = setTimeout(goNext, pauseMs);
+    };
+    lastU.addEventListener('end', afterSpeech(700));   // short beat after it finishes
+    lastU.addEventListener('error', afterSpeech(400));
+    questionTransitionTimeout = setTimeout(goNext, 8000); // safety cap
+  } else {
+    questionTransitionTimeout = setTimeout(goNext, 2000);
+  }
 }
 
 // SKIP QUESTION
