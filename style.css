@@ -2949,3 +2949,19 @@ body {
     line-height: 1.25;
   }
 }
+
+/* ============================================================
+   MOBILE FIX (<= 640px) — vocab manager form overflow
+   The textarea's inline `grid-column: span 2` forced 2 tracks of
+   minmax(220px,1fr) = >=440px wide, overflowing narrow screens.
+   Collapse to one column, neutralise the span, let fields shrink.
+   ============================================================ */
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid > .form-group { grid-column: auto !important; }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    min-width: 0;
+  }
+}
