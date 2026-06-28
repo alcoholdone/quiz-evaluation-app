@@ -728,13 +728,17 @@ body {
   transition: opacity 0.2s;
 }
 
-.option-btn:hover {
-  border-color: var(--primary);
-  transform: translateY(-5px);
-  box-shadow: 0 12px 28px var(--primary-glow);
+/* Hover lift only on devices with a real pointer (mouse). On touch (iPad/phone)
+   :hover sticks after a tap, leaving the previously-chosen option highlighted on
+   the next same-type question — so we gate it behind hover:hover. */
+@media (hover: hover) {
+  .option-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px var(--primary-glow);
+  }
+  .option-btn:hover::before { opacity: 1; }
 }
-
-.option-btn:hover::before { opacity: 1; }
 
 .option-btn:active { transform: translateY(1px); }
 
