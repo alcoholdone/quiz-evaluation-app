@@ -307,6 +307,7 @@ body {
   border-color: #e2e8f0;
 }
 
+@media (hover: hover) {
 .tab-btn:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
@@ -314,6 +315,8 @@ body {
   color: var(--primary-dark);
   background: var(--primary-light);
 }
+}
+
 
 .tab-btn.active {
   background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
@@ -420,15 +423,19 @@ body {
   transition: opacity 0.25s;
 }
 
+@media (hover: hover) {
 .vocab-card:hover {
   border-color: var(--primary-border);
   transform: translateY(-10px) scale(1.02);
   box-shadow: 0 20px 40px var(--primary-glow);
 }
-
+}
+@media (hover: hover) {
 .vocab-card:hover::before {
   opacity: 1;
 }
+}
+
 
 .vocab-image {
   font-size: 70px;
@@ -441,9 +448,12 @@ body {
   transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+@media (hover: hover) {
 .vocab-card:hover .vocab-image {
   transform: scale(1.18) rotate(6deg);
 }
+}
+
 
 /* Speaking State for Active Learning Card */
 .vocab-card.speaking {
@@ -655,10 +665,13 @@ body {
   transition: var(--transition-smooth);
 }
 
+@media (hover: hover) {
 .play-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 14px 30px var(--secondary-glow);
 }
+}
+
 
 .question-area {
   min-height: 120px;
@@ -817,10 +830,13 @@ body {
   box-shadow: 0 8px 20px var(--primary-glow);
 }
 
+@media (hover: hover) {
 .btn-primary:hover {
   transform: translateY(-3px);
   box-shadow: 0 14px 30px var(--primary-glow);
 }
+}
+
 
 .btn-secondary {
   background: #ffffff;
@@ -829,12 +845,15 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+@media (hover: hover) {
 .btn-secondary:hover {
   background: var(--secondary-light);
   border-color: var(--secondary);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
+}
+
 
 .btn-tertiary {
   background: #f1f5f9;
@@ -842,11 +861,14 @@ body {
   border: 1.5px solid #e2e8f0;
 }
 
+@media (hover: hover) {
 .btn-tertiary:hover {
   background: #e2e8f0;
   color: var(--dark-2);
   transform: translateY(-2px);
 }
+}
+
 
 .btn-bounce {
   animation: button-bounce 2.2s infinite ease-in-out;
@@ -918,7 +940,10 @@ body {
   text-align: center;
 }
 
+@media (hover: hover) {
 .subtab-btn:hover { color: var(--dark-2); background: rgba(255,255,255,0.7); }
+}
+
 
 .subtab-btn.active {
   color: var(--secondary-dark);
@@ -1091,10 +1116,13 @@ body {
   border-radius: var(--radius-md) !important;
 }
 
+@media (hover: hover) {
 .mini-stat-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg) !important;
 }
+}
+
 
 .mini-stat-icon {
   width: 50px;
@@ -1147,10 +1175,13 @@ body {
   transition: var(--transition-smooth);
 }
 
+@media (hover: hover) {
 .chart-container:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg) !important;
 }
+}
+
 
 .chart-title {
   font-size: 0.9rem;
@@ -1237,10 +1268,13 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+@media (hover: hover) {
 .review-item-card:hover {
   box-shadow: var(--shadow-md);
   border-color: #cbd5e1;
 }
+}
+
 
 .review-item-header {
   padding: 16px 20px;
@@ -1251,7 +1285,10 @@ body {
   gap: 16px;
 }
 
+@media (hover: hover) {
 .review-item-header:hover { background: #f8fafc; }
+}
+
 
 .review-header-left {
   display: flex;
@@ -1460,11 +1497,14 @@ body {
   transition: all 0.2s ease;
 }
 
+@media (hover: hover) {
 .spell-char.manual-letter-btn:hover {
   background: var(--primary-light);
   color: var(--primary-dark) !important;
   transform: scale(1.25) translateY(-2px);
 }
+}
+
 
 @keyframes letter-pop {
   0% { transform: scale(1.45) translateY(-5px) rotate(-3deg); }
@@ -1564,11 +1604,14 @@ body {
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+@media (hover: hover) {
 .letter-btn:hover {
   transform: translateY(-4px) scale(1.1);
   border-color: var(--secondary);
   box-shadow: 0 6px 12px var(--secondary-glow);
 }
+}
+
 
 .letter-btn:disabled {
   opacity: 0.3;
@@ -1596,10 +1639,13 @@ body {
   gap: 4px;
 }
 
+@media (hover: hover) {
 .slow-spell-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 14px rgba(245, 158, 11, 0.35);
 }
+}
+
 
 
 /* ============================================================
@@ -1655,9 +1701,12 @@ body {
   transition: transform 0.2s ease;
 }
 
+@media (hover: hover) {
 .start-meta-info:hover {
   transform: scale(1.03);
 }
+}
+
 
 .vocab-form {
   margin-top: 15px;
@@ -1734,9 +1783,12 @@ body {
   border-bottom: none;
 }
 
+@media (hover: hover) {
 .vocab-table tbody tr:hover {
   background: var(--secondary-light);
 }
+}
+
 
 .btn-delete-vocab {
   background: #dc2626;
@@ -1753,10 +1805,13 @@ body {
   justify-content: center;
 }
 
+@media (hover: hover) {
 .btn-delete-vocab:hover {
   background: #dc2626;
   transform: scale(1.05);
 }
+}
+
 
 .btn-delete-vocab:active {
   transform: scale(0.95);
@@ -1909,26 +1964,35 @@ body {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+@media (hover: hover) {
 .vs-player-result-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
 }
+}
+
 
 .vs-player-result-card.p1 {
   border-color: var(--secondary-border);
 }
 
+@media (hover: hover) {
 .vs-player-result-card.p1:hover {
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
 }
+}
+
 
 .vs-player-result-card.p2 {
   border-color: #fbcfe8;
 }
 
+@media (hover: hover) {
 .vs-player-result-card.p2:hover {
   box-shadow: 0 10px 25px rgba(236, 72, 153, 0.15);
 }
+}
+
 
 .vs-avatar {
   font-size: 3rem;
@@ -2036,9 +2100,12 @@ body {
   transition: transform 0.2s;
 }
 
+@media (hover: hover) {
 .wt-item:hover {
   transform: translateX(4px);
 }
+}
+
 
 /* Responsive adjustments for VS comparison */
 @media (max-width: 600px) {
@@ -2071,10 +2138,13 @@ body {
   gap: 4px;
 }
 
+@media (hover: hover) {
 .spelling-practice-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 14px rgba(99, 102, 241, 0.35);
 }
+}
+
 
 .vocab-card-actions {
   display: flex;
@@ -2146,11 +2216,14 @@ body {
   transition: var(--transition-fast);
 }
 
+@media (hover: hover) {
 .spelling-modal-close:hover {
   background: #e2e8f0;
   color: var(--danger);
   transform: rotate(90deg);
 }
+}
+
 
 .spelling-modal-header h2 {
   font-family: var(--font-display);
@@ -2379,11 +2452,14 @@ body {
   transition: var(--transition-fast);
 }
 
+@media (hover: hover) {
 .chat-speak-btn:hover {
   background: var(--secondary);
   color: white;
   transform: scale(1.1);
 }
+}
+
 
 .chat-translation {
   font-size: 0.85rem;
@@ -2454,11 +2530,14 @@ body {
   transition: var(--transition-elastic);
 }
 
+@media (hover: hover) {
 .dictation-preview-card:hover {
   border-color: var(--primary);
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
 }
+}
+
 
 .dictation-preview-emoji {
   font-size: 1.8rem;
@@ -2556,12 +2635,15 @@ body {
   overflow: hidden;
 }
 
+@media (hover: hover) {
 #dictation-letters .letter-btn:hover:not(:disabled) {
   border-color: var(--primary);
   color: var(--primary-dark);
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
+}
+
 
 #dictation-letters .letter-btn:disabled {
   background: #f1f5f9;
@@ -2577,11 +2659,14 @@ body {
   to   { transform: scale(1.05); opacity: 1; }
 }
 
+@media (hover: hover) {
 /* --- AURA Kids Star System --- */
 .total-stars-badge:hover {
   transform: scale(1.05) rotate(1deg);
   box-shadow: 0 6px 15px rgba(234, 179, 8, 0.4);
 }
+}
+
 
 .total-stars-badge:active {
   transform: scale(0.95);
@@ -2645,10 +2730,13 @@ body {
   text-align: center;
 }
 
+@media (hover: hover) {
 .status-unpaid:hover {
   background-color: #fee2e2;
   transform: scale(1.05);
 }
+}
+
 
 .status-paid {
   display: inline-block;
@@ -2664,10 +2752,13 @@ body {
   text-align: center;
 }
 
+@media (hover: hover) {
 .status-paid:hover {
   background-color: #dcfce7;
   transform: scale(1.05);
 }
+}
+
 
 @keyframes pulse-gold {
   0% {
