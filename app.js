@@ -1592,7 +1592,7 @@ function renderQuestion(index) {
         <div class="option-img">${opt.image}</div>
         <div class="option-label">${opt.meaning}</div>
       `;
-      btn.onclick = () => selectOption(opt);
+      btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
     });
     
@@ -1610,7 +1610,7 @@ function renderQuestion(index) {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.innerHTML = `<div class="option-word-only">${opt.word}</div>`;
-      btn.onclick = () => selectOption(opt);
+      btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
     });
     
@@ -1764,7 +1764,7 @@ function renderQuestion(index) {
         <div class="option-img">${opt.image}</div>
         <div class="option-word-only" style="font-size: 1.2rem;">${opt.word}</div>
       `;
-      btn.onclick = () => selectOption(opt);
+      btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
     });
   } else if (q.type === 'sentence_qa') {
@@ -1837,7 +1837,7 @@ function renderQuestion(index) {
             <div class="chat-translation">${optThaiText}</div>
           `;
         }
-        selectOption(opt);
+        selectOption(opt, btn);
       };
       
       nodes.optionsGrid.appendChild(btn);
@@ -1873,7 +1873,7 @@ function renderQuestion(index) {
         <span class="option-word-only" style="font-size: 1.15rem; font-weight: 700;">${opt.text}</span>
       `;
       
-      btn.onclick = () => selectOption(opt);
+      btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
     });
   } else if (q.type === 'phonics_midterm') {
@@ -1909,7 +1909,7 @@ function renderQuestion(index) {
         <div class="option-word-only" style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">${opt.word}</div>
         <div class="option-label" style="font-size: 0.8rem; color: var(--text-muted);">${opt.meaning}</div>
       `;
-      btn.onclick = () => selectOption(opt);
+      btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
     });
   } else if (q.type === 'grammar_midterm') {
@@ -1969,7 +1969,7 @@ function renderQuestion(index) {
           studentBubble.style.cssText = 'background: var(--primary-light); border: 1.5px solid var(--primary); padding: 10px 14px; border-radius: 18px 18px 4px 18px; font-size: 1.05rem; font-weight: 700; color: var(--primary-hover);';
           studentBubble.innerHTML = opt.text;
         }
-        selectOption(opt);
+        selectOption(opt, btn);
       };
       
       nodes.optionsGrid.appendChild(btn);
@@ -1995,7 +1995,7 @@ function playFeedbackSounds(utterances) {
 }
 
 // SELECT ANSWER OPTION
-function selectOption(selectedOpt) {
+function selectOption(selectedOpt, clickedBtn) {
   // Disable options grid to prevent double-clicks
   const optionBtns = nodes.optionsGrid.querySelectorAll('.option-btn');
   optionBtns.forEach(btn => btn.disabled = true);
@@ -2017,7 +2017,14 @@ function selectOption(selectedOpt) {
   
   // Record choice
   userAnswers[currentQuestionIndex] = selectedOpt;
-  
+
+  // Highlight the option the child actually chose (green if right, red if wrong).
+  // This stays visible during feedback and resets by itself on the next question
+  // because renderQuestion rebuilds the options grid — no sticky :hover involved.
+  if (clickedBtn) {
+    clickedBtn.classList.add('selected', isCorrect ? 'is-correct' : 'is-wrong');
+  }
+
   // Reset classes
   nodes.gameBox.className = 'game-box';
   void nodes.gameBox.offsetWidth; // reflow

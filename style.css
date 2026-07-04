@@ -3060,3 +3060,24 @@ body {
     min-width: 0;
   }
 }
+
+/* ============================================================
+   Selected answer feedback — explicit classes added by selectOption().
+   Shows which option the child chose during feedback (green=right, red=wrong).
+   Resets automatically each question (renderQuestion rebuilds the grid) — this
+   is the controlled replacement for the old sticky :hover that bled across
+   questions on touch devices.
+   ============================================================ */
+.option-btn.selected {
+  transform: translateY(-4px);
+}
+.option-btn.is-correct {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 10px 24px var(--primary-glow);
+}
+.option-btn.is-wrong {
+  border-color: var(--danger);
+  background: var(--danger-light);
+  box-shadow: 0 10px 24px var(--danger-glow);
+}
