@@ -3081,3 +3081,13 @@ body {
   background: var(--danger-light);
   box-shadow: 0 10px 24px var(--danger-glow);
 }
+
+/* Correct answer revealed on a wrong pick — a gentle pulse to draw the eye */
+@keyframes reveal-correct-pulse {
+  0%   { box-shadow: 0 10px 24px var(--primary-glow); }
+  50%  { box-shadow: 0 0 0 4px var(--primary-border), 0 10px 24px var(--primary-glow); }
+  100% { box-shadow: 0 10px 24px var(--primary-glow); }
+}
+.option-btn.reveal-correct {
+  animation: reveal-correct-pulse 0.9s ease-in-out 1;
+}

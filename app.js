@@ -2031,6 +2031,22 @@ function selectOption(selectedOpt, clickedBtn) {
   
   const q = challengeQuestions[currentQuestionIndex];
 
+  // On a wrong answer, also reveal the CORRECT option in green so the child sees
+  // the right choice. Option buttons are appended in the same order as q.options.
+  if (!isCorrect && Array.isArray(q.options)) {
+    const optBtns = nodes.optionsGrid.querySelectorAll('.option-btn');
+    if (optBtns.length) {
+      let correctIdx = q.options.findIndex(o => o && o.isCorrect);
+      if (correctIdx < 0 && q.targetWord && q.targetWord.word) {
+        const target = q.targetWord.word.toLowerCase();
+        correctIdx = q.options.findIndex(o => o && o.word && o.word.toLowerCase() === target);
+      }
+      if (correctIdx >= 0 && optBtns[correctIdx]) {
+        optBtns[correctIdx].classList.add('is-correct', 'reveal-correct');
+      }
+    }
+  }
+
   if (isCorrect) {
     nodes.gameBox.classList.add('success-bounce');
     nodes.feedback.innerHTML = '<span class="correct">🎉 ถูกต้องแล้วจ้า เก่งที่สุดเลย!</span>';
