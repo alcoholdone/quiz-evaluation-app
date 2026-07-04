@@ -26,7 +26,8 @@ let dictationSelectedLetters = [];
 const DICTATION_ROUNDS = {
   r1: ['bag', 'board', 'book', 'chair', 'crayon'],
   r2: ['desk', 'eraser', 'globe', 'map', 'marker'],
-  r3: ['pen', 'pencil', 'poster', 'ruler', 'wastebasket']
+  r3: ['pen', 'pencil', 'poster', 'ruler', 'wastebasket'],
+  r4: ['yellow', 'purple', 'triangle', 'star', 'diamond'] // Unit 2: colors & shapes
 };
 let selectedDictationRound = 'r1';
 const DICTATION_STORAGE_KEY = 'aura_kids_dictation_history_v1';
@@ -306,7 +307,7 @@ function setupEventListeners() {
   // Dictation Round Selector Click Listeners
   const updateDictationRound = (roundKey) => {
     selectedDictationRound = roundKey;
-    ['r1', 'r2', 'r3'].forEach(r => {
+    ['r1', 'r2', 'r3', 'r4'].forEach(r => {
       const btn = document.getElementById(`btn-dictation-${r}`);
       if (btn) {
         if (r === roundKey) {
@@ -326,14 +327,14 @@ function setupEventListeners() {
     });
 
     // Update instruction texts dynamically
-    const roundNum = roundKey === 'r1' ? '1' : roundKey === 'r2' ? '2' : '3';
+    const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2' }[roundKey] || 'รอบที่ 1';
     const dictationDesc = document.querySelector('#dictation-start-screen p');
     if (dictationDesc) {
-      dictationDesc.textContent = `มารอบที่ ${roundNum} ฝึกเขียนตามคำบอก 5 คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ`;
+      dictationDesc.textContent = `มา${roundLabel} ฝึกเขียนตามคำบอก 5 คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ`;
     }
     const dictationGuideHeader = document.querySelector('.dictation-study-guide h3');
     if (dictationGuideHeader) {
-      dictationGuideHeader.textContent = `📖 คำศัพท์เตรียมท่องรอบที่ ${roundNum}`;
+      dictationGuideHeader.textContent = `📖 คำศัพท์เตรียมท่อง${roundLabel}`;
     }
 
     initDictationStudyMode();
@@ -342,9 +343,11 @@ function setupEventListeners() {
   const btnR1 = document.getElementById('btn-dictation-r1');
   const btnR2 = document.getElementById('btn-dictation-r2');
   const btnR3 = document.getElementById('btn-dictation-r3');
+  const btnR4 = document.getElementById('btn-dictation-r4');
   if (btnR1) btnR1.addEventListener('click', () => updateDictationRound('r1'));
   if (btnR2) btnR2.addEventListener('click', () => updateDictationRound('r2'));
   if (btnR3) btnR3.addEventListener('click', () => updateDictationRound('r3'));
+  if (btnR4) btnR4.addEventListener('click', () => updateDictationRound('r4'));
 }
 
 // MAIN TAB SWITCHING
@@ -3398,8 +3401,14 @@ function closeSpellingPractice() {
    ============================================================ */
 
 function initDictationStudyMode() {
-  // ดึงคำศัพท์ 5 คำแรกที่ผู้ใช้ระบุจาก VOCAB_LIST (หรือ fallback ไปยัง VOCAB_UNITS[0].words หาก VOCAB_LIST ว่างเปล่า)
-  const sourceList = (VOCAB_LIST && VOCAB_LIST.length > 0) ? VOCAB_LIST : (VOCAB_UNITS && VOCAB_UNITS[0] ? VOCAB_UNITS[0].words : []);
+  // ค้นคำจาก "ทุกยูนิต" รวมกัน เพื่อให้แต่ละรอบ (เช่นรอบ Unit 2) หาคำเจอ
+  // ไม่ว่าจะเลือกยูนิตไหนอยู่ในโหมดฝึก/เกม (dictation มีตัวเลือกรอบของตัวเอง)
+  const allUnitWords = (typeof VOCAB_UNITS !== 'undefined' && VOCAB_UNITS.length)
+    ? VOCAB_UNITS.flatMap(u => u.words || [])
+    : [];
+  const sourceList = allUnitWords.length > 0
+    ? allUnitWords
+    : ((VOCAB_LIST && VOCAB_LIST.length > 0) ? VOCAB_LIST : []);
   
   const roundWords = DICTATION_ROUNDS[selectedDictationRound] || DICTATION_ROUNDS.r1;
   dictationSessionList = sourceList.filter(item => 
