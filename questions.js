@@ -452,5 +452,25 @@ const VOCAB_UNITS = [
         phonicsLetter: 'G'
       }
     ]
+  },
+  {
+    id: 'unit_3',
+    title: 'Unit 3: Friends and play',
+    words: [
+      {
+        word: 'Friend',
+        meaning: 'เพื่อน',
+        image: '🧑‍🤝‍🧑',
+        explanation: '🧑‍🤝‍🧑 Friend สะกดว่า F - R - I - E - N - D แปลว่า เพื่อน ที่เราเล่นและเรียนด้วยกันจ้า',
+        label: 'n'
+      },
+      {
+        word: 'Play',
+        meaning: 'เล่น',
+        image: '🪀',
+        explanation: '🪀 Play สะกดว่า P - L - A - Y แปลว่า เล่น ของเล่นหรือกิจกรรมแสนสนุกจ้า',
+        label: 'v'
+      }
+    ]
   }
 ];

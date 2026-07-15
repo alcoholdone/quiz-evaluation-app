@@ -71,7 +71,7 @@ const SHAPE_COLOR_MAP = {
 // --- Word classification helpers (single source of truth) ---
 // Words that are NOT singular countable nouns: action verbs, adjectives,
 // greetings and colors. They must never get "a/an" or "Is this a ___?" framing.
-const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white'];
+const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white'];
 
 // "color" and "shape" ARE nouns, but they are abstract category headers whose
 // picture is a generic icon — so we never frame them as "Is this a ___?" /
@@ -937,6 +937,20 @@ function getSentenceQA(item) {
       answer: "This is my partner.",
       thaiQuestion: "นี่คือใคร?",
       thaiAnswer: "นี่คือคู่หูของฉัน"
+    };
+  } else if (wordLower === 'friend') {
+    return {
+      question: "Who’s this?",
+      answer: "This is my friend.",
+      thaiQuestion: "นี่คือใคร?",
+      thaiAnswer: "นี่คือเพื่อนของฉัน"
+    };
+  } else if (wordLower === 'play') {
+    return {
+      question: "What should we do now?",
+      answer: "Let’s play.",
+      thaiQuestion: "พวกเราควรทำอะไรตอนนี้?",
+      thaiAnswer: "ไปเล่นกันเถอะ"
     };
   } else if (['open', 'close'].includes(wordLower)) {
     return {
