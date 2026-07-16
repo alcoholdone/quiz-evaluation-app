@@ -898,7 +898,8 @@ function getSentenceQA(item) {
   // Nouns that take "a" (consonant sound)
   const nounsA = [
     'pen', 'pencil', 'bag', 'book', 'desk', 'chair', 'ruler', 'map', 'marker', 
-    'globe', 'table', 'board', 'wastebasket', 'poster', 'crayon', 'ball', 'bird', 'peach'
+    'globe', 'table', 'board', 'wastebasket', 'poster', 'crayon', 'ball', 'bird', 'peach',
+    'notebook', 'pencil case'
   ];
   
   if (item.type === 'command') {

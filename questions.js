@@ -470,6 +470,20 @@ const VOCAB_UNITS = [
         image: '🪀',
         explanation: '🪀 Play สะกดว่า P - L - A - Y แปลว่า เล่น ของเล่นหรือกิจกรรมแสนสนุกจ้า',
         label: 'v'
+      },
+      {
+        word: 'Notebook',
+        meaning: 'สมุดจด',
+        image: '📓',
+        explanation: '📓 Notebook สะกดว่า N - O - T - E - B - O - O - K แปลว่า สมุดจด เอาไว้จดบันทึกสิ่งต่างๆ จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Pencil case',
+        meaning: 'กล่องดินสอ',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="30" width="70" height="40" rx="8" fill="#ec4899" stroke="#db2777" stroke-width="3"/><rect x="15" y="38" width="70" height="6" fill="#f472b6"/><circle cx="50" cy="50" r="6" fill="#f59e0b"/><line x1="18" y1="42" x2="82" y2="42" stroke="#db2777" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M 25,30 Q 50,15 75,30" fill="none" stroke="#db2777" stroke-width="3" stroke-linecap="round"/></svg>`,
+        explanation: '✏️ Pencil case สะกดว่า P - E - N - C - I - L - C - A - S - E แปลว่า กล่องดินสอ เอาไว้เก็บอุปกรณ์เขียนหนังสือให้เรียบร้อยจ้า',
+        label: 'n'
       }
     ]
   }
