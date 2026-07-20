@@ -484,6 +484,76 @@ const VOCAB_UNITS = [
         image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="30" width="70" height="40" rx="8" fill="#ec4899" stroke="#db2777" stroke-width="3"/><rect x="15" y="38" width="70" height="6" fill="#f472b6"/><circle cx="50" cy="50" r="6" fill="#f59e0b"/><line x1="18" y1="42" x2="82" y2="42" stroke="#db2777" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M 25,30 Q 50,15 75,30" fill="none" stroke="#db2777" stroke-width="3" stroke-linecap="round"/></svg>`,
         explanation: '✏️ Pencil case สะกดว่า P - E - N - C - I - L - C - A - S - E แปลว่า กล่องดินสอ เอาไว้เก็บอุปกรณ์เขียนหนังสือให้เรียบร้อยจ้า',
         label: 'n'
+      },
+      {
+        word: 'One',
+        meaning: 'หนึ่ง',
+        image: '1️⃣',
+        explanation: '1️⃣ One สะกดว่า O - N - E แปลว่า หนึ่ง (จำนวน 1) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Two',
+        meaning: 'สอง',
+        image: '2️⃣',
+        explanation: '2️⃣ Two สะกดว่า T - W - O แปลว่า สอง (จำนวน 2) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Three',
+        meaning: 'สาม',
+        image: '3️⃣',
+        explanation: '3️⃣ Three สะกดว่า T - H - R - E - E แปลว่า สาม (จำนวน 3) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Four',
+        meaning: 'สี่',
+        image: '4️⃣',
+        explanation: '4️⃣ Four สะกดว่า F - O - U - R แปลว่า สี่ (จำนวน 4) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Five',
+        meaning: 'ห้า',
+        image: '5️⃣',
+        explanation: '5️⃣ Five สะกดว่า F - I - V - E แปลว่า ห้า (จำนวน 5) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Six',
+        meaning: 'หก',
+        image: '6️⃣',
+        explanation: '6️⃣ Six สะกดว่า S - I - X แปลว่า หก (จำนวน 6) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Seven',
+        meaning: 'เจ็ด',
+        image: '7️⃣',
+        explanation: '7️⃣ Seven สะกดว่า S - E - V - E - N แปลว่า เจ็ด (จำนวน 7) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Eight',
+        meaning: 'แปด',
+        image: '8️⃣',
+        explanation: '8️⃣ Eight สะกดว่า E - I - G - H - T แปลว่า แปด (จำนวน 8) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Nine',
+        meaning: 'เก้า',
+        image: '9️⃣',
+        explanation: '9️⃣ Nine สะกดว่า N - I - N - E แปลว่า เก้า (จำนวน 9) จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Ten',
+        meaning: 'สิบ',
+        image: '🔟',
+        explanation: '🔟 Ten สะกดว่า T - E - N แปลว่า สิบ (จำนวน 10) จ้า',
+        label: 'n'
       }
     ]
   }
