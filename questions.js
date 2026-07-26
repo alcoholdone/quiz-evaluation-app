@@ -554,6 +554,20 @@ const VOCAB_UNITS = [
         image: '🔟',
         explanation: '🔟 Ten สะกดว่า T - E - N แปลว่า สิบ (จำนวน 10) จ้า',
         label: 'n'
+      },
+      {
+        word: 'CD',
+        meaning: 'แผ่นซีดี',
+        image: '💿',
+        explanation: '💿 CD ย่อมาจาก Compact Disc แปลว่า แผ่นซีดี ใช้เก็บข้อมูล เพลง หรือวิดีโอจ้า',
+        label: 'n'
+      },
+      {
+        word: 'Video game',
+        meaning: 'วีดีโอเกม',
+        image: '🎮',
+        explanation: '🎮 Video game สะกดว่า V - I - D - E - O G - A - M - E แปลว่า วีดีโอเกม เกมที่เล่นบนหน้าจอสนุกมากๆ จ้า',
+        label: 'n'
       }
     ]
   }

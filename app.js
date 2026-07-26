@@ -953,6 +953,20 @@ function getSentenceQA(item) {
       thaiQuestion: "พวกเราควรทำอะไรตอนนี้?",
       thaiAnswer: "ไปเล่นกันเถอะ"
     };
+  } else if (wordLower === 'cd') {
+    return {
+      question: "What's this?",
+      answer: "It's a CD.",
+      thaiQuestion: "นี่คืออะไร?",
+      thaiAnswer: "มันคือแผ่นซีดี"
+    };
+  } else if (wordLower === 'video game') {
+    return {
+      question: "What's this?",
+      answer: "It's a video game.",
+      thaiQuestion: "นี่คืออะไร?",
+      thaiAnswer: "มันคือวีดีโอเกม"
+    };
   } else if (['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'].includes(wordLower)) {
     return {
       question: "How many?",
