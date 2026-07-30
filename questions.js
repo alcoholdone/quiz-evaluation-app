@@ -568,6 +568,20 @@ const VOCAB_UNITS = [
         image: '🎮',
         explanation: '🎮 Video game สะกดว่า V - I - D - E - O G - A - M - E แปลว่า วีดีโอเกม เกมที่เล่นบนหน้าจอสนุกมากๆ จ้า',
         label: 'n'
+      },
+      {
+        word: 'Cell phone',
+        meaning: 'โทรศัพท์เคลื่อนที่',
+        image: '📱',
+        explanation: '📱 Cell phone สะกดว่า C - E - L - L P - H - O - N - E แปลว่า โทรศัพท์เคลื่อนที่ ใช้โทรหาคนที่เรารักได้ทุกที่จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Computer',
+        meaning: 'คอมพิวเตอร์',
+        image: '💻',
+        explanation: '💻 Computer สะกดว่า C - O - M - P - U - T - E - R แปลว่า คอมพิวเตอร์ ใช้ทำงาน เรียนรู้ และเล่นเกมได้จ้า',
+        label: 'n'
       }
     ]
   }
