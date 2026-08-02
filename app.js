@@ -71,7 +71,7 @@ const SHAPE_COLOR_MAP = {
 // --- Word classification helpers (single source of truth) ---
 // Words that are NOT singular countable nouns: action verbs, adjectives,
 // greetings and colors. They must never get "a/an" or "Is this a ___?" framing.
-const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white'];
+const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count'];
 
 // "color" and "shape" ARE nouns, but they are abstract category headers whose
 // picture is a generic icon — so we never frame them as "Is this a ___?" /

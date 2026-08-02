@@ -582,6 +582,41 @@ const VOCAB_UNITS = [
         image: '💻',
         explanation: '💻 Computer สะกดว่า C - O - M - P - U - T - E - R แปลว่า คอมพิวเตอร์ ใช้ทำงาน เรียนรู้ และเล่นเกมได้จ้า',
         label: 'n'
+      },
+      {
+        word: 'Point',
+        meaning: 'ชี้',
+        image: '👆',
+        explanation: '👆 Point สะกดว่า P - O - I - N - T แปลว่า ชี้ เช่น She can point to the door. แปลว่า เธอสามารถชี้ไปที่ประตูได้จ้า',
+        label: 'v'
+      },
+      {
+        word: 'Find',
+        meaning: 'พบ, เจอ',
+        image: '🔍',
+        explanation: '🔍 Find สะกดว่า F - I - N - D แปลว่า พบ หรือ เจอ เช่น I can find my toys. แปลว่า ฉันสามารถหาของเล่นของฉันเจอจ้า',
+        label: 'v'
+      },
+      {
+        word: 'Count',
+        meaning: 'นับ',
+        image: '🔢',
+        explanation: '🔢 Count สะกดว่า C - O - U - N - T แปลว่า นับ เช่น Let\'s count together! แปลว่า มานับด้วยกันเลยจ้า',
+        label: 'v'
+      },
+      {
+        word: 'Door',
+        meaning: 'ประตู',
+        image: '🚪',
+        explanation: '🚪 Door สะกดว่า D - O - O - R แปลว่า ประตู เช่น Open the door, please. แปลว่า ช่วยเปิดประตูหน่อยนะจ้า',
+        label: 'n'
+      },
+      {
+        word: 'Toys',
+        meaning: 'ของเล่น',
+        image: '🧸',
+        explanation: '🧸 Toys สะกดว่า T - O - Y - S แปลว่า ของเล่น เช่น I have many toys. แปลว่า ฉันมีของเล่นเยอะมากจ้า',
+        label: 'n'
       }
     ]
   }
