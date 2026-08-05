@@ -617,6 +617,62 @@ const VOCAB_UNITS = [
         image: '🧸',
         explanation: '🧸 Toys สะกดว่า T - O - Y - S แปลว่า ของเล่น เช่น I have many toys. แปลว่า ฉันมีของเล่นเยอะมากจ้า',
         label: 'n'
+      },
+      {
+        word: 'Tiger',
+        meaning: 'เสือ',
+        image: '🐯',
+        explanation: '🐯 Tiger สะกดว่า T - I - G - E - R แปลว่า เสือ สัตว์ใหญ่ลายพาดกลอนที่แข็งแรงมากจ้า',
+        label: 'n'
+      },
+      {
+        word: 'Duck',
+        meaning: 'เป็ด',
+        image: '🦆',
+        explanation: '🦆 Duck สะกดว่า D - U - C - K แปลว่า เป็ด ชอบว่ายน้ำและร้อง ก๊าบๆ จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Store',
+        meaning: 'ร้านค้า',
+        image: '🏬',
+        explanation: '🏬 Store สะกดว่า S - T - O - R - E แปลว่า ร้านค้า เป็นที่ซื้อของต่างๆ จ้า',
+        label: 'n'
+      },
+      {
+        word: 'How many',
+        meaning: 'กี่ตัว / จำนวนเท่าไหร่',
+        image: '🔢',
+        explanation: '🔢 How many แปลว่า มีกี่ตัว หรือ จำนวนเท่าไหร่ ใช้ถามจำนวนสิ่งของจ้า',
+        label: 'phrase'
+      },
+      {
+        word: 'Look at the toys!',
+        meaning: 'มองดูของเล่นสิ!',
+        image: '👀',
+        explanation: '👀 Look at the toys! แปลว่า มองดูของเล่นสิ! ใช้ชวนเพื่อนๆ มาดูของเล่นด้วยกันจ้า',
+        type: 'command'
+      },
+      {
+        word: 'They are tigers.',
+        meaning: 'พวกมันคือเสือ',
+        image: '🐯',
+        explanation: '🐯 They are tigers. แปลว่า พวกมันคือเสือ ใช้บอกว่าสิ่งที่เห็นเป็นเสือหลายตัวจ้า',
+        type: 'command'
+      },
+      {
+        word: 'How many ducks?',
+        meaning: 'มีเป็ดกี่ตัว?',
+        image: '🦆',
+        explanation: '🦆 How many ducks? แปลว่า มีเป็ดกี่ตัว? ใช้ถามจำนวนเป็ดที่เราเห็นจ้า',
+        type: 'command'
+      },
+      {
+        word: 'Two ducks!',
+        meaning: 'เป็ดสองตัว!',
+        image: '🦆',
+        explanation: '🦆 Two ducks! แปลว่า เป็ดสองตัว! เป็นคำตอบที่บอกจำนวนเป็ดจ้า',
+        type: 'command'
       }
     ]
   }
