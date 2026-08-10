@@ -168,7 +168,12 @@ const nodes = {
   btnDictationResetLetters: document.getElementById('btn-dictation-reset-letters'),
   dictationFeedback: document.getElementById('dictation-feedback'),
   btnDictationRestart: document.getElementById('btn-dictation-restart'),
-  btnDictationBackHome: document.getElementById('btn-dictation-back-home')
+  btnDictationBackHome: document.getElementById('btn-dictation-back-home'),
+
+  // Special Practice Elements
+  tabSpecial: document.getElementById('tab-special'),
+  panelSpecial: document.getElementById('special-panel'),
+  specialPlayArea: document.getElementById('special-play-area')
 };
 
 // Setup Listeners
@@ -182,6 +187,8 @@ function setupEventListeners() {
   nodes.tabLearn.addEventListener('click', () => switchTab('learn'));
   nodes.tabGame.addEventListener('click', () => switchTab('game'));
   nodes.tabDashboard.addEventListener('click', () => switchTab('dashboard'));
+  if (nodes.tabSpecial) nodes.tabSpecial.addEventListener('click', () => switchTab('special'));
+  if (nodes.tabDictation) nodes.tabDictation.addEventListener('click', () => switchTab('dictation'));
   
   // Dashboard Subtabs
   nodes.subtabOverview.addEventListener('click', () => switchDashboardTab('overview'));
@@ -360,17 +367,20 @@ function switchTab(tabId) {
   nodes.tabLearn.classList.remove('active');
   nodes.tabGame.classList.remove('active');
   if (nodes.tabDictation) nodes.tabDictation.classList.remove('active');
+  if (nodes.tabSpecial) nodes.tabSpecial.classList.remove('active');
   nodes.tabDashboard.classList.remove('active');
   
   nodes.tabLearn.setAttribute('aria-selected', 'false');
   nodes.tabGame.setAttribute('aria-selected', 'false');
   if (nodes.tabDictation) nodes.tabDictation.setAttribute('aria-selected', 'false');
+  if (nodes.tabSpecial) nodes.tabSpecial.setAttribute('aria-selected', 'false');
   nodes.tabDashboard.setAttribute('aria-selected', 'false');
   
   // Update Panels
   nodes.panelLearn.classList.remove('active');
   nodes.panelGame.classList.remove('active');
   if (nodes.panelDictation) nodes.panelDictation.classList.remove('active');
+  if (nodes.panelSpecial) nodes.panelSpecial.classList.remove('active');
   nodes.panelDashboard.classList.remove('active');
   
   if (tabId === 'learn') {
@@ -400,6 +410,14 @@ function switchTab(tabId) {
     if (nodes.panelDictation) nodes.panelDictation.classList.add('active');
     pauseTimer();
     initDictationStudyMode();
+  } else if (tabId === 'special') {
+    if (nodes.tabSpecial) {
+      nodes.tabSpecial.classList.add('active');
+      nodes.tabSpecial.setAttribute('aria-selected', 'true');
+    }
+    if (nodes.panelSpecial) nodes.panelSpecial.classList.add('active');
+    pauseTimer();
+    initSpecialPanel();
   } else if (tabId === 'dashboard') {
     nodes.tabDashboard.classList.add('active');
     nodes.tabDashboard.setAttribute('aria-selected', 'true');
@@ -3064,6 +3082,16 @@ function loadUnitVocab(unitId) {
   refreshVocabList();
   renderCustomVocabTable();
   updateUnitSelectorUI();
+
+  // Show / hide the Special Practice tab (Unit 3 only)
+  const hasSpecial = unitId === 'unit_3';
+  if (nodes.tabSpecial) {
+    nodes.tabSpecial.style.display = hasSpecial ? '' : 'none';
+    // If current tab is special and we switch away, go back to learn
+    if (!hasSpecial && activeTab === 'special') {
+      switchTab('learn');
+    }
+  }
 }
 
 function renderUnitSelectors() {
@@ -4325,3 +4353,434 @@ window.toggleRedeemPaidStatus = function(idx) {
     }
   }
 };
+
+// ============================================================
+//  SPECIAL PRACTICE — Unit 3 (What's this? / Plural / How many / Fill in the blank)
+// ============================================================
+
+const SPECIAL_STORAGE_KEY = 'aura_kids_special_practice_v1';
+
+// --- State ---
+let spCurrentActivity = 1;  // 1–4
+let spCurrentIndex = 0;
+let spQuestions = [];
+let spScore = 0;
+let spTotal = 0;
+let spAnswered = false;
+let spCurrentChoices = [];   // choices for current question
+let spCurrentCorrect = '';   // correct answer string for current question
+let spAutoAdvanceTimer = null;  // timer reference for auto-advance
+
+// --- Helper: shuffle array ---
+function spShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// --- Save score to localStorage ---
+function saveSpecialScore(activity, score, total) {
+  const key = `${SPECIAL_STORAGE_KEY}_unit3`;
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { data = {}; }
+  const dateStr = new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+  data[`activity${activity}`] = { score, total, date: dateStr };
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+// --- Get stored scores ---
+function getSpecialScores() {
+  const key = `${SPECIAL_STORAGE_KEY}_unit3`;
+  try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { return {}; }
+}
+
+// --- Get special practice vocab ---
+function getSpVocab() {
+  const unit = VOCAB_UNITS.find(u => u.id === 'unit_3');
+  return (unit && unit.specialPractice) ? unit.specialPractice.vocabulary : [];
+}
+function getSpHowMany() {
+  const unit = VOCAB_UNITS.find(u => u.id === 'unit_3');
+  return (unit && unit.specialPractice) ? unit.specialPractice.howManyItems : [];
+}
+
+// --- Image helper: supports both emoji strings and inline SVG ---
+// Returns the full HTML to embed inside .sp-image-display
+function spImageHTML(image) {
+  if (typeof image === 'string' && image.trim().startsWith('<svg')) {
+    // SVG: wrap so CSS can target it cleanly
+    return `<span class="sp-svg-wrap">${image}</span>`;
+  }
+  // Plain emoji / text
+  return image;
+}
+
+// --- Init: called when tab is opened ---
+function initSpecialPanel() {
+  if (spCurrentActivity < 1 || spCurrentActivity > 4) spCurrentActivity = 1;
+  switchSpecialActivity(spCurrentActivity);
+}
+
+// --- Switch between activities ---
+window.switchSpecialActivity = function(num) {
+  spCurrentActivity = num;
+  // Update selector buttons
+  for (let i = 1; i <= 4; i++) {
+    const btn = document.getElementById(`sp-act-btn-${i}`);
+    if (btn) btn.classList.toggle('active', i === num);
+  }
+  spCurrentIndex = 0;
+  spScore = 0;
+  spAnswered = false;
+  buildSpQuestions(num);
+  renderSpQuestion();
+};
+
+// --- Build question list for each activity ---
+function buildSpQuestions(activity) {
+  const vocab = getSpVocab();
+  if (activity === 1) {
+    // What's this? — 7 questions, one per word
+    spQuestions = spShuffle(vocab).map(v => ({ type: 'singular', item: v }));
+    spTotal = spQuestions.length;
+  } else if (activity === 2) {
+    // What are these? — 7 questions
+    spQuestions = spShuffle(vocab).map(v => ({ type: 'plural', item: v }));
+    spTotal = spQuestions.length;
+  } else if (activity === 3) {
+    // How many — 8 questions
+    const items = getSpHowMany();
+    const questions = [];
+    const counts = [1,2,3,4,5];
+    for (let i = 0; i < 8; i++) {
+      const item = items[i % items.length];
+      const count = counts[Math.floor(Math.random() * counts.length)];
+      questions.push({ type: 'howmany', item, count });
+    }
+    spQuestions = spShuffle(questions);
+    spTotal = 8;
+  } else if (activity === 4) {
+    // Fill in the blank — 6 questions (mix of a/an + singular/plural)
+    const blanks = [];
+    const shuffled = spShuffle(vocab);
+    shuffled.slice(0, 3).forEach(v => {
+      blanks.push({ type: 'fillblank', subtype: 'article', item: v,
+        question: `Q: What's this?\nA: It's ___ ${v.word}.`,
+        answer: v.article,
+        choices: ['a', 'an', 'the', 'some'] });
+    });
+    shuffled.slice(3, 6).forEach(v => {
+      blanks.push({ type: 'fillblank', subtype: 'plural', item: v,
+        question: `Q: What are these?\nA: They're ___.`,
+        answer: v.plural,
+        choices: spShuffle([v.plural, v.word, vocab.find(x => x.word !== v.word)?.plural || 'notebooks', vocab.find(x => x.word !== v.word && x.plural !== (vocab.find(y => y.word !== v.word)?.plural))?.word || 'computers']) });
+    });
+    spQuestions = spShuffle(blanks);
+    spTotal = 6;
+  }
+}
+
+// --- Render current question ---
+function renderSpQuestion() {
+  const area = document.getElementById('special-play-area');
+  if (!area) return;
+
+  if (spCurrentIndex >= spTotal) {
+    renderSpResult();
+    return;
+  }
+
+  const q = spQuestions[spCurrentIndex];
+  if (!q) return;
+
+  spAnswered = false;
+
+  if (q.type === 'singular') renderSpSingular(area, q);
+  else if (q.type === 'plural') renderSpPlural(area, q);
+  else if (q.type === 'howmany') renderSpHowMany(area, q);
+  else if (q.type === 'fillblank') renderSpFillBlank(area, q);
+}
+
+// --- Activity 1: What's this? ---
+function renderSpSingular(area, q) {
+  const vocab = getSpVocab();
+  const correctText = `It's ${q.item.article} ${q.item.word}.`;
+  const distractors = spShuffle(vocab.filter(v => v.word !== q.item.word)).slice(0, 3)
+    .map(v => `It's ${v.article} ${v.word}.`);
+  const choices = spShuffle([correctText, ...distractors]);
+
+  area.innerHTML = `
+    <div class="sp-question-card">
+      <div class="sp-progress-bar"><div class="sp-progress-fill" style="width:${Math.round((spCurrentIndex/spTotal)*100)}%"></div></div>
+      <div class="sp-counter">${spCurrentIndex + 1} / ${spTotal}</div>
+      <div class="sp-question-label">❓ What's this?</div>
+      <div class="sp-image-display">${spImageHTML(q.item.image)}</div>
+      <div class="sp-options-grid" id="sp-opts-container">
+        ${choices.map((c, i) => `
+          <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
+            ${c}
+          </button>`).join('')}
+      </div>
+      <div class="sp-feedback" id="sp-feedback"></div>
+      <button class="sp-next-btn" id="sp-next-btn" style="display:none;">
+        ➡️ ข้อถัดไป
+      </button>
+    </div>`;
+
+  spCurrentChoices = choices;
+  spCurrentCorrect = correctText;
+  attachSpOptionListeners(1);
+  attachSpNextListener();
+  setTimeout(() => speakEN(`What's this?`, 0.85), 400);
+}
+
+// --- Activity 2: What are these? ---
+function renderSpPlural(area, q) {
+  const vocab = getSpVocab();
+  const correctText = `They're ${q.item.plural}.`;
+  const distractors = spShuffle(vocab.filter(v => v.word !== q.item.word)).slice(0, 3)
+    .map(v => `They're ${v.plural}.`);
+  const choices = spShuffle([correctText, ...distractors]);
+
+  area.innerHTML = `
+    <div class="sp-question-card">
+      <div class="sp-progress-bar"><div class="sp-progress-fill" style="width:${Math.round((spCurrentIndex/spTotal)*100)}%"></div></div>
+      <div class="sp-counter">${spCurrentIndex + 1} / ${spTotal}</div>
+      <div class="sp-question-label">❓ What are these?</div>
+      <div class="sp-image-display ${q.item.image.startsWith('<svg') ? 'sp-plural-display-svg' : 'sp-plural-display'}">
+        ${spImageHTML(q.item.image)}${spImageHTML(q.item.image)}${spImageHTML(q.item.image)}
+      </div>
+      <div class="sp-options-grid" id="sp-opts-container">
+        ${choices.map((c, i) => `
+          <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
+            ${c}
+          </button>`).join('')}
+      </div>
+      <div class="sp-feedback" id="sp-feedback"></div>
+      <button class="sp-next-btn" id="sp-next-btn" style="display:none;">
+        ➡️ ข้อถัดไป
+      </button>
+    </div>`;
+
+  spCurrentChoices = choices;
+  spCurrentCorrect = correctText;
+  attachSpOptionListeners(2);
+  attachSpNextListener();
+  setTimeout(() => speakEN(`What are these?`, 0.85), 400);
+}
+
+// --- Activity 3: How many? ---
+const SP_NUMBER_WORDS = ['one', 'two', 'three', 'four', 'five'];
+
+function renderSpHowMany(area, q) {
+  const count = q.count;  // 1-5
+  const numWord = SP_NUMBER_WORDS[count - 1];
+  // Correct answer: "Three CDs."
+  const label = count === 1 ? q.item.word : q.item.plural;
+  const correctText = `${numWord.charAt(0).toUpperCase() + numWord.slice(1)} ${label}.`;
+
+  // Distractors: same item, other counts
+  const otherCounts = [1,2,3,4,5].filter(n => n !== count);
+  const distractors = spShuffle(otherCounts).slice(0, 3).map(n => {
+    const nw = SP_NUMBER_WORDS[n - 1];
+    const lbl = n === 1 ? q.item.word : q.item.plural;
+    return `${nw.charAt(0).toUpperCase() + nw.slice(1)} ${lbl}.`;
+  });
+  const choices = spShuffle([correctText, ...distractors]);
+
+  // Build emoji display
+  let emojiRow = '';
+  for (let i = 0; i < count; i++) emojiRow += `<span class="sp-count-emoji">${q.item.image}</span>`;
+
+  area.innerHTML = `
+    <div class="sp-question-card">
+      <div class="sp-progress-bar"><div class="sp-progress-fill" style="width:${Math.round((spCurrentIndex/spTotal)*100)}%"></div></div>
+      <div class="sp-counter">${spCurrentIndex + 1} / ${spTotal}</div>
+      <div class="sp-question-label">🔢 How many ${q.item.plural}?</div>
+      <div class="sp-howmany-grid">${emojiRow}</div>
+      <div class="sp-qa-answer-prompt">A: ___</div>
+      <div class="sp-options-grid" id="sp-opts-container">
+        ${choices.map((c, i) => `
+          <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
+            ${c}
+          </button>`).join('')}
+      </div>
+      <div class="sp-feedback" id="sp-feedback"></div>
+      <button class="sp-next-btn" id="sp-next-btn" style="display:none;">
+        ➡️ ข้อถัดไป
+      </button>
+    </div>`;
+
+  spCurrentChoices = choices;
+  spCurrentCorrect = correctText;
+  attachSpOptionListeners(3);
+  attachSpNextListener();
+  setTimeout(() => speakEN(`How many ${q.item.plural}?`, 0.85), 400);
+}
+
+// --- Activity 4: Fill in the blank ---
+function renderSpFillBlank(area, q) {
+  const choices = q.choices;
+  const correctText = q.answer;
+
+  area.innerHTML = `
+    <div class="sp-question-card">
+      <div class="sp-progress-bar"><div class="sp-progress-fill" style="width:${Math.round((spCurrentIndex/spTotal)*100)}%"></div></div>
+      <div class="sp-counter">${spCurrentIndex + 1} / ${spTotal}</div>
+      <div class="sp-question-label">🔄 Fill in the blank</div>
+      <div class="sp-image-display">${spImageHTML(q.item.image)}</div>
+      <div class="sp-fillblank-sentence">${q.question.replace('___', '<span class="sp-blank">___</span>')}</div>
+      <div class="sp-options-grid" id="sp-opts-container">
+        ${choices.map((c, i) => `
+          <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
+            ${c}
+          </button>`).join('')}
+      </div>
+      <div class="sp-feedback" id="sp-feedback"></div>
+      <button class="sp-next-btn" id="sp-next-btn" style="display:none;">
+        ➡️ ข้อถัดไป
+      </button>
+    </div>`;
+
+  spCurrentChoices = choices;
+  spCurrentCorrect = correctText;
+  attachSpOptionListeners(4);
+  attachSpNextListener();
+  // No TTS for fill-in-the-blank — reading aloud the blank sounds odd
+}
+
+// --- Delegated event helpers ---
+function attachSpOptionListeners(activityNum) {
+  const container = document.getElementById('sp-opts-container');
+  if (!container) return;
+  container.addEventListener('click', (e) => {
+    const btn = e.target.closest('.sp-option-btn');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.choice, 10);
+    const selected = spCurrentChoices[idx];
+    checkSpAnswerInternal(btn, selected, spCurrentCorrect, activityNum);
+  });
+}
+
+function attachSpNextListener() {
+  const nextBtn = document.getElementById('sp-next-btn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (spAutoAdvanceTimer) clearTimeout(spAutoAdvanceTimer);
+      spCurrentIndex++;
+      spAnswered = false;
+      renderSpQuestion();
+    });
+  }
+}
+
+// --- Check answer (internal, called by delegation) ---
+function checkSpAnswerInternal(btn, selected, correct, activityNum) {
+  if (spAnswered) return;
+  spAnswered = true;
+
+  // Cancel previous auto-advance if any
+  if (spAutoAdvanceTimer) clearTimeout(spAutoAdvanceTimer);
+
+  const isCorrect = selected === correct;
+  if (isCorrect) spScore++;
+
+  // Disable all option buttons and highlight correct/wrong
+  document.querySelectorAll('.sp-option-btn').forEach(b => {
+    b.disabled = true;
+    const idx = parseInt(b.dataset.choice, 10);
+    const bText = spCurrentChoices[idx];
+    if (bText === correct) {
+      b.classList.add('sp-correct');
+    } else if (b === btn && !isCorrect) {
+      b.classList.add('sp-wrong');
+    }
+  });
+
+  const fb = document.getElementById('sp-feedback');
+  if (fb) {
+    if (isCorrect) {
+      fb.innerHTML = `<span class="sp-fb-correct">🌟 ถูกต้องมากเลย! <em>${correct}</em></span>`;
+      fb.classList.add('sp-fb-show');
+      stopAllSpeech();
+      setTimeout(() => speakEN(correct, 0.85), 300);
+    } else {
+      fb.innerHTML = `<span class="sp-fb-wrong">❌ คำตอบที่ถูกคือ: <em>${correct}</em></span>`;
+      fb.classList.add('sp-fb-show');
+      stopAllSpeech();
+      setTimeout(() => speakEN(correct, 0.75), 300);
+    }
+  }
+
+  // Show next button
+  const nextBtn = document.getElementById('sp-next-btn');
+  if (nextBtn) nextBtn.style.display = 'block';
+
+  // Auto-advance after 2.5s
+  spAutoAdvanceTimer = setTimeout(() => {
+    if (spAnswered) {
+      spCurrentIndex++;
+      spAnswered = false;
+      renderSpQuestion();
+    }
+  }, 2500);
+}
+
+// --- Next question (legacy, kept for compatibility) ---
+window.nextSpQuestion = function() {
+  if (spAutoAdvanceTimer) clearTimeout(spAutoAdvanceTimer);
+  spCurrentIndex++;
+  spAnswered = false;
+  renderSpQuestion();
+};
+
+// --- Show result screen ---
+function renderSpResult() {
+  const area = document.getElementById('special-play-area');
+  if (!area) return;
+
+  // Save to localStorage
+  saveSpecialScore(spCurrentActivity, spScore, spTotal);
+
+  const pct = Math.round((spScore / spTotal) * 100);
+  let emoji, msg;
+  if (pct === 100) { emoji = '🏆'; msg = 'เก่งมากเลย! ได้คะแนนเต็ม!'; }
+  else if (pct >= 70) { emoji = '🌟'; msg = 'ดีมาก! ทำได้ดีจ้า'; }
+  else if (pct >= 50) { emoji = '💪'; msg = 'พยายามอีกนิดนะ!'; }
+  else { emoji = '📚'; msg = 'ลองฝึกใหม่อีกครั้งจ้า!'; }
+
+  const activityNames = ['', "What's this?", "What are these?", "How many...?", "Fill in the blank"];
+  const stored = getSpecialScores();
+
+  area.innerHTML = `
+    <div class="sp-result-card">
+      <div class="sp-result-emoji">${emoji}</div>
+      <h3 class="sp-result-title">${activityNames[spCurrentActivity]}</h3>
+      <div class="sp-result-score">${spScore} / ${spTotal}</div>
+      <div class="sp-result-pct">${pct}%</div>
+      <p class="sp-result-msg">${msg}</p>
+
+      <div class="sp-history-grid">
+        ${Object.entries(stored).map(([key, val]) => `
+          <div class="sp-history-item">
+            <div class="sp-history-act">${['','🖼️','👥','🔢','🔄'][parseInt(key.replace('activity',''))]}</div>
+            <div class="sp-history-score">${val.score}/${val.total}</div>
+            <div class="sp-history-date">${val.date}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="sp-result-actions">
+        <button class="sp-retry-btn" onclick="switchSpecialActivity(${spCurrentActivity})">🔄 ลองใหม่อีกครั้ง</button>
+        <button class="sp-next-act-btn" onclick="switchSpecialActivity(${spCurrentActivity < 4 ? spCurrentActivity + 1 : 1})">
+          ${spCurrentActivity < 4 ? '➡️ กิจกรรมถัดไป' : '🏁 เริ่มใหม่ทั้งหมด'}
+        </button>
+      </div>
+    </div>`;
+
+  stopAllSpeech();
+  setTimeout(() => speakTH(msg), 500);
+}
+

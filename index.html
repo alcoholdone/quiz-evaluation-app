@@ -56,6 +56,7 @@
       <button id="tab-learn" class="tab-btn active" role="tab" aria-selected="true"><span class="t-ico">📖</span><span class="t-full">โหมดฝึกสะกดคำ</span><span class="t-short">ฝึกสะกด</span></button>
       <button id="tab-game" class="tab-btn" role="tab" aria-selected="false"><span class="t-ico">🎮</span><span class="t-full">โหมดเล่นเกมท้าทาย</span><span class="t-short">เล่นเกม</span></button>
       <button id="tab-dictation" class="tab-btn" role="tab" aria-selected="false"><span class="t-ico">📝</span><span class="t-full">เขียนตามคำบอก</span><span class="t-short">เขียน</span></button>
+      <button id="tab-special" class="tab-btn tab-btn-special" role="tab" aria-selected="false" style="display:none;"><span class="t-ico">⭐</span><span class="t-full">แบบฝึกพิเศษ</span><span class="t-short">พิเศษ</span></button>
       <button id="tab-dashboard" class="tab-btn" role="tab" aria-selected="false"><span class="t-ico">📊</span><span class="t-full">รายงานผลของผู้ปกครอง</span><span class="t-short">รายงาน</span></button>
     </nav>
 
@@ -288,6 +289,47 @@
             <button id="btn-dictation-restart" class="btn btn-primary">🔄 ฝึกเขียนใหม่อีกรอบ</button>
             <button id="btn-dictation-back-home" class="btn btn-secondary">🏠 กลับไปศึกษาคำศัพท์</button>
           </div>
+        </div>
+      </section>
+
+      <!-- PANEL 3.5: Special Practice (Unit 3 only) -->
+      <section id="special-panel" class="panel">
+        <!-- Header -->
+        <div class="special-header">
+          <div class="special-header-icon">⭐</div>
+          <div>
+            <h2 class="special-header-title">แบบฝึกทดสอบพิเศษ</h2>
+            <p class="special-header-sub">Unit 3: Friends and Play · คำศัพท์สิ่งของรอบตัว</p>
+          </div>
+        </div>
+
+        <!-- Activity Selector -->
+        <div class="special-activity-selector" id="special-activity-selector">
+          <button class="special-act-btn active" id="sp-act-btn-1" onclick="switchSpecialActivity(1)">
+            <span class="sp-act-ico">🖼️</span>
+            <span class="sp-act-label">What's this?</span>
+            <span class="sp-act-desc">Singular</span>
+          </button>
+          <button class="special-act-btn" id="sp-act-btn-2" onclick="switchSpecialActivity(2)">
+            <span class="sp-act-ico">👥</span>
+            <span class="sp-act-label">What are these?</span>
+            <span class="sp-act-desc">Plural</span>
+          </button>
+          <button class="special-act-btn" id="sp-act-btn-3" onclick="switchSpecialActivity(3)">
+            <span class="sp-act-ico">🔢</span>
+            <span class="sp-act-label">How many...?</span>
+            <span class="sp-act-desc">Counting</span>
+          </button>
+          <button class="special-act-btn" id="sp-act-btn-4" onclick="switchSpecialActivity(4)">
+            <span class="sp-act-ico">🔄</span>
+            <span class="sp-act-label">Fill in the blank</span>
+            <span class="sp-act-desc">a / an / plural</span>
+          </button>
+        </div>
+
+        <!-- Play Area (dynamically rendered by JS) -->
+        <div id="special-play-area">
+          <!-- JS will render content here -->
         </div>
       </section>
 

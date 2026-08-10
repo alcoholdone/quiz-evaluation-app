@@ -674,6 +674,27 @@ const VOCAB_UNITS = [
         explanation: '🦆 Two ducks! แปลว่า เป็ดสองตัว! เป็นคำตอบที่บอกจำนวนเป็ดจ้า',
         type: 'command'
       }
-    ]
+    ],
+    specialPractice: {
+      enabled: true,
+      vocabulary: [
+        { word: 'CD', plural: 'CDs', article: 'a', image: '💿', meaning: 'แผ่นซีดี' },
+        { word: 'cell phone', plural: 'cell phones', article: 'a', image: '📱', meaning: 'โทรศัพท์มือถือ' },
+        { word: 'computer', plural: 'computers', article: 'a', image: '💻', meaning: 'คอมพิวเตอร์' },
+        { word: 'marker', plural: 'markers', article: 'a', meaning: 'ปากกาเมจิก',
+          image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg"><rect x="38" y="6" width="24" height="20" rx="5" fill="#1d4ed8"/><rect x="38" y="24" width="24" height="52" rx="4" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/><path d="M38,76 L50,94 L62,76 Z" fill="#1e293b"/><rect x="38" y="54" width="24" height="5" fill="white" opacity="0.35"/><rect x="38" y="24" width="24" height="8" rx="0" fill="#2563eb"/></svg>` },
+        { word: 'notebook', plural: 'notebooks', article: 'a', image: '📓', meaning: 'สมุดจด' },
+        { word: 'pencil case', plural: 'pencil cases', article: 'a', meaning: 'กล่องดินสอ',
+          image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="30" width="70" height="40" rx="8" fill="#ec4899" stroke="#db2777" stroke-width="3"/><rect x="15" y="38" width="70" height="6" fill="#f472b6"/><circle cx="50" cy="50" r="6" fill="#f59e0b"/><line x1="18" y1="42" x2="82" y2="42" stroke="#db2777" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M 25,30 Q 50,15 75,30" fill="none" stroke="#db2777" stroke-width="3" stroke-linecap="round"/></svg>` },
+        { word: 'video game', plural: 'video games', article: 'a', image: '🎮', meaning: 'วีดีโอเกม' }
+      ],
+      howManyItems: [
+        { word: 'CD', plural: 'CDs', image: '💿' },
+        { word: 'cell phone', plural: 'cell phones', image: '📱' },
+        { word: 'computer', plural: 'computers', image: '💻' },
+        { word: 'notebook', plural: 'notebooks', image: '📓' },
+        { word: 'video game', plural: 'video games', image: '🎮' }
+      ]
+    }
   }
 ];
