@@ -27,7 +27,8 @@ const DICTATION_ROUNDS = {
   r1: ['bag', 'board', 'book', 'chair', 'crayon'],
   r2: ['desk', 'eraser', 'globe', 'map', 'marker'],
   r3: ['pen', 'pencil', 'poster', 'ruler', 'wastebasket'],
-  r4: ['yellow', 'purple', 'triangle', 'star', 'diamond'] // Unit 2: colors & shapes
+  r4: ['yellow', 'purple', 'triangle', 'star', 'diamond'], // Unit 2: colors & shapes
+  r5: ['notebook', 'pencil case', 'cell phone', 'computer', 'point'] // Unit 3: friends and play
 };
 let selectedDictationRound = 'r1';
 const DICTATION_STORAGE_KEY = 'aura_kids_dictation_history_v1';
@@ -314,7 +315,7 @@ function setupEventListeners() {
   // Dictation Round Selector Click Listeners
   const updateDictationRound = (roundKey) => {
     selectedDictationRound = roundKey;
-    ['r1', 'r2', 'r3', 'r4'].forEach(r => {
+    ['r1', 'r2', 'r3', 'r4', 'r5'].forEach(r => {
       const btn = document.getElementById(`btn-dictation-${r}`);
       if (btn) {
         if (r === roundKey) {
@@ -334,7 +335,7 @@ function setupEventListeners() {
     });
 
     // Update instruction texts dynamically
-    const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2' }[roundKey] || 'รอบที่ 1';
+    const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2', r5: 'ยูนิต 3' }[roundKey] || 'รอบที่ 1';
     const dictationDesc = document.querySelector('#dictation-start-screen p');
     if (dictationDesc) {
       dictationDesc.textContent = `มา${roundLabel} ฝึกเขียนตามคำบอก 5 คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ`;
@@ -351,10 +352,12 @@ function setupEventListeners() {
   const btnR2 = document.getElementById('btn-dictation-r2');
   const btnR3 = document.getElementById('btn-dictation-r3');
   const btnR4 = document.getElementById('btn-dictation-r4');
+  const btnR5 = document.getElementById('btn-dictation-r5');
   if (btnR1) btnR1.addEventListener('click', () => updateDictationRound('r1'));
   if (btnR2) btnR2.addEventListener('click', () => updateDictationRound('r2'));
   if (btnR3) btnR3.addEventListener('click', () => updateDictationRound('r3'));
   if (btnR4) btnR4.addEventListener('click', () => updateDictationRound('r4'));
+  if (btnR5) btnR5.addEventListener('click', () => updateDictationRound('r5'));
 }
 
 // MAIN TAB SWITCHING
