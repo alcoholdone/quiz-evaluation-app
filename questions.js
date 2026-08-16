@@ -696,5 +696,101 @@ const VOCAB_UNITS = [
         { word: 'video game', plural: 'video games', image: '🎮' }
       ]
     }
+  },
+  {
+    id: 'unit_4',
+    title: 'Unit 4: Family',
+    words: [
+      {
+        word: 'Grandmother',
+        meaning: 'คุณยาย / คุณย่า',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / dress -->
+  <ellipse cx="50" cy="78" rx="22" ry="16" fill="#c084fc"/>
+  <rect x="32" y="60" width="36" height="24" rx="10" fill="#c084fc"/>
+  <!-- Apron -->
+  <rect x="38" y="63" width="24" height="18" rx="6" fill="#f5d0fe" opacity="0.7"/>
+  <!-- Neck -->
+  <rect x="45" y="50" width="10" height="12" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="42" r="16" fill="#fcd9bd"/>
+  <!-- White hair bun on top -->
+  <ellipse cx="50" cy="27" rx="11" ry="8" fill="#e2e8f0"/>
+  <circle cx="43" cy="30" r="6" fill="#e2e8f0"/>
+  <circle cx="57" cy="30" r="6" fill="#e2e8f0"/>
+  <circle cx="50" cy="26" r="7" fill="#f1f5f9"/>
+  <!-- Glasses -->
+  <circle cx="44" cy="42" r="5" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="56" cy="42" r="5" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="49" y1="42" x2="51" y2="42" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="39" y1="42" x2="36" y2="41" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="61" y1="42" x2="64" y2="41" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- Eyes behind glasses -->
+  <circle cx="44" cy="42" r="2" fill="#374151"/>
+  <circle cx="56" cy="42" r="2" fill="#374151"/>
+  <!-- Smile wrinkles -->
+  <path d="M 44,49 Q 50,53 56,49" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <line x1="40" y1="46" x2="39" y2="48" stroke="#e8a87c" stroke-width="1" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="61" y2="48" stroke="#e8a87c" stroke-width="1" stroke-linecap="round"/>
+  <!-- Arms holding knitting -->
+  <line x1="32" y1="65" x2="22" y2="78" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="65" x2="78" y2="78" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Knitting needles -->
+  <line x1="18" y1="76" x2="30" y2="88" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+  <line x1="22" y1="76" x2="34" y2="88" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+  <!-- Yarn ball -->
+  <circle cx="24" cy="84" r="6" fill="#f472b6" opacity="0.8"/>
+  <path d="M20,80 Q24,84 28,88" stroke="#db2777" stroke-width="1" fill="none"/>
+  <path d="M18,84 Q24,82 30,84" stroke="#db2777" stroke-width="1" fill="none"/>
+</svg>`,
+        explanation: '👵 Grandmother สะกดว่า G - R - A - N - D - M - O - T - H - E - R แปลว่า คุณยาย หรือ คุณย่า คือแม่ของพ่อหรือแม่ของเราจ้า',
+        label: 'n'
+      },
+      {
+        word: 'Grandfather',
+        meaning: 'คุณตา / คุณปู่',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / shirt -->
+  <rect x="30" y="60" width="40" height="28" rx="10" fill="#60a5fa"/>
+  <!-- Suspenders -->
+  <line x1="42" y1="60" x2="38" y2="88" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+  <line x1="58" y1="60" x2="62" y2="88" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+  <!-- Neck -->
+  <rect x="45" y="50" width="10" height="12" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="42" r="16" fill="#fcd9bd"/>
+  <!-- White hair on sides -->
+  <ellipse cx="34" cy="38" rx="5" ry="8" fill="#e2e8f0"/>
+  <ellipse cx="66" cy="38" rx="5" ry="8" fill="#e2e8f0"/>
+  <!-- Bald top -->
+  <ellipse cx="50" cy="30" rx="12" ry="7" fill="#f5c5a3"/>
+  <!-- White eyebrows -->
+  <path d="M 40,36 Q 44,33 48,36" stroke="#e2e8f0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 52,36 Q 56,33 60,36" stroke="#e2e8f0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Glasses -->
+  <circle cx="44" cy="42" r="5" fill="none" stroke="#78716c" stroke-width="1.5"/>
+  <circle cx="56" cy="42" r="5" fill="none" stroke="#78716c" stroke-width="1.5"/>
+  <line x1="49" y1="42" x2="51" y2="42" stroke="#78716c" stroke-width="1.5"/>
+  <line x1="39" y1="42" x2="36" y2="41" stroke="#78716c" stroke-width="1.5"/>
+  <line x1="61" y1="42" x2="64" y2="41" stroke="#78716c" stroke-width="1.5"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="42" r="2" fill="#374151"/>
+  <circle cx="56" cy="42" r="2" fill="#374151"/>
+  <!-- White moustache -->
+  <path d="M 44,49 Q 47,52 50,49 Q 53,52 56,49" stroke="#e2e8f0" stroke-width="2.5" fill="#e2e8f0" stroke-linecap="round"/>
+  <!-- Smile wrinkles -->
+  <line x1="40" y1="46" x2="39" y2="48" stroke="#e8a87c" stroke-width="1" stroke-linecap="round"/>
+  <line x1="60" y1="46" x2="61" y2="48" stroke="#e8a87c" stroke-width="1" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="30" y1="65" x2="18" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="70" y1="65" x2="82" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Walking cane -->
+  <path d="M 80,76 Q 88,78 86,90" stroke="#a16207" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <line x1="86" y1="90" x2="86" y2="98" stroke="#a16207" stroke-width="3" stroke-linecap="round"/>
+</svg>`,
+        explanation: '👴 Grandfather สะกดว่า G - R - A - N - D - F - A - T - H - E - R แปลว่า คุณตา หรือ คุณปู่ คือพ่อของพ่อหรือแม่ของเราจ้า',
+        label: 'n'
+      }
+    ]
   }
 ];
