@@ -790,6 +790,77 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '👴 Grandfather สะกดว่า G - R - A - N - D - F - A - T - H - E - R แปลว่า คุณตา หรือ คุณปู่ คือพ่อของพ่อหรือแม่ของเราจ้า',
         label: 'n'
+      },
+      {
+        word: 'Mother',
+        meaning: 'แม่',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / dress -->
+  <ellipse cx="50" cy="78" rx="22" ry="16" fill="#f472b6"/>
+  <rect x="32" y="58" width="36" height="26" rx="10" fill="#f472b6"/>
+  <!-- Neck -->
+  <rect x="45" y="48" width="10" height="12" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="40" r="16" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="28" rx="14" ry="10" fill="#92400e"/>
+  <ellipse cx="36" cy="38" rx="5" ry="10" fill="#92400e"/>
+  <ellipse cx="64" cy="38" rx="5" ry="10" fill="#92400e"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="40" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="40" r="2.5" fill="#374151"/>
+  <!-- Eyelashes -->
+  <line x1="42" y1="36" x2="41" y2="34" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="44" y1="35.5" x2="44" y2="33.5" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="46" y1="36" x2="47" y2="34" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="54" y1="36" x2="53" y2="34" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="56" y1="35.5" x2="56" y2="33.5" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="58" y1="36" x2="59" y2="34" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Smile -->
+  <path d="M 44,47 Q 50,52 56,47" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="32" y1="63" x2="20" y2="75" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="63" x2="80" y2="75" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Heart detail -->
+  <path d="M46,68 Q50,64 54,68 Q58,72 50,78 Q42,72 46,68Z" fill="#fb7185" opacity="0.6"/>
+</svg>`,
+        explanation: '👩 Mother สะกดว่า M - O - T - H - E - R แปลว่า แม่ คือผู้หญิงที่ให้กำเนิดหรือเลี้ยงดูเราจ้า',
+        label: 'n'
+      },
+      {
+        word: 'Father',
+        meaning: 'พ่อ',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / shirt -->
+  <rect x="30" y="58" width="40" height="28" rx="10" fill="#3b82f6"/>
+  <!-- Tie -->
+  <polygon points="50,60 53,65 50,80 47,65" fill="#1d4ed8"/>
+  <!-- Collar -->
+  <polygon points="44,58 50,66 56,58" fill="white" opacity="0.8"/>
+  <!-- Neck -->
+  <rect x="45" y="48" width="10" height="12" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="40" r="16" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="26" rx="14" ry="8" fill="#1e293b"/>
+  <ellipse cx="36" cy="34" rx="4" ry="8" fill="#1e293b"/>
+  <ellipse cx="64" cy="34" rx="4" ry="8" fill="#1e293b"/>
+  <!-- Eyebrows -->
+  <path d="M 40,34 Q 44,31 48,34" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 52,34 Q 56,31 60,34" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="40" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="40" r="2.5" fill="#374151"/>
+  <!-- Nose -->
+  <path d="M 50,44 Q 48,48 50,49 Q 52,48 50,44" stroke="#e8a87c" stroke-width="1" fill="none"/>
+  <!-- Smile -->
+  <path d="M 44,48 Q 50,53 56,48" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="30" y1="63" x2="18" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="70" y1="63" x2="82" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+</svg>`,
+        explanation: '👨 Father สะกดว่า F - A - T - H - E - R แปลว่า พ่อ คือผู้ชายที่ให้กำเนิดหรือเลี้ยงดูเราจ้า',
+        label: 'n'
       }
     ]
   }
