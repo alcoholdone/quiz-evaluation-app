@@ -861,6 +861,56 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '👨 Father สะกดว่า F - A - T - H - E - R แปลว่า พ่อ คือผู้ชายที่ให้กำเนิดหรือเลี้ยงดูเราจ้า',
         label: 'n'
+      },
+      {
+        word: 'Sister',
+        meaning: 'พี่สาว / น้องสาว',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / dress -->
+  <ellipse cx="50" cy="80" rx="20" ry="14" fill="#fb7185"/>
+  <rect x="33" y="60" width="34" height="26" rx="10" fill="#fb7185"/>
+  <!-- Dress skirt flare -->
+  <ellipse cx="50" cy="84" rx="22" ry="10" fill="#fda4af"/>
+  <!-- Neck -->
+  <rect x="45" y="50" width="10" height="12" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="42" r="15" fill="#fcd9bd"/>
+  <!-- Hair top -->
+  <ellipse cx="50" cy="29" rx="13" ry="9" fill="#d97706"/>
+  <!-- Pigtail left -->
+  <ellipse cx="35" cy="38" rx="4" ry="9" fill="#d97706"/>
+  <!-- Pigtail right -->
+  <ellipse cx="65" cy="38" rx="4" ry="9" fill="#d97706"/>
+  <!-- Hair bow -->
+  <ellipse cx="44" cy="28" rx="5" ry="3" fill="#f43f5e" transform="rotate(-20 44 28)"/>
+  <ellipse cx="56" cy="28" rx="5" ry="3" fill="#f43f5e" transform="rotate(20 56 28)"/>
+  <circle cx="50" cy="27" r="3" fill="#f43f5e"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="42" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="42" r="2.5" fill="#374151"/>
+  <!-- Eye shine -->
+  <circle cx="45" cy="41" r="0.8" fill="#ffffff"/>
+  <circle cx="57" cy="41" r="0.8" fill="#ffffff"/>
+  <!-- Eyelashes -->
+  <line x1="42" y1="38" x2="41" y2="36" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="44" y1="37.5" x2="44" y2="35.5" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="46" y1="38" x2="47" y2="36" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="54" y1="38" x2="53" y2="36" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="56" y1="37.5" x2="56" y2="35.5" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="58" y1="38" x2="59" y2="36" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Rosy cheeks -->
+  <circle cx="39" cy="46" r="4" fill="#fca5a5" opacity="0.5"/>
+  <circle cx="61" cy="46" r="4" fill="#fca5a5" opacity="0.5"/>
+  <!-- Smile -->
+  <path d="M 44,48 Q 50,53 56,48" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="33" y1="65" x2="21" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="67" y1="65" x2="79" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Holding a star -->
+  <polygon points="79,68 81,74 87,74 82,78 84,84 79,80 74,84 76,78 71,74 77,74" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+</svg>`,
+        explanation: '👧 Sister สะกดว่า S - I - S - T - E - R แปลว่า พี่สาว หรือ น้องสาว คือสมาชิกในครอบครัวที่เป็นผู้หญิงจ้า',
+        label: 'n'
       }
     ]
   }
