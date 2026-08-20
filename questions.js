@@ -911,6 +911,47 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '👧 Sister สะกดว่า S - I - S - T - E - R แปลว่า พี่สาว หรือ น้องสาว คือสมาชิกในครอบครัวที่เป็นผู้หญิงจ้า',
         label: 'n'
+      },
+      {
+        word: 'Brother',
+        meaning: 'พี่ชาย / น้องชาย',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / shirt -->
+  <rect x="31" y="60" width="38" height="26" rx="10" fill="#34d399"/>
+  <!-- Collar -->
+  <polygon points="44,60 50,68 56,60" fill="white" opacity="0.8"/>
+  <!-- Neck -->
+  <rect x="45" y="49" width="10" height="13" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="41" r="16" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="27" rx="14" ry="9" fill="#1e293b"/>
+  <ellipse cx="36" cy="35" rx="4" ry="8" fill="#1e293b"/>
+  <ellipse cx="64" cy="35" rx="4" ry="8" fill="#1e293b"/>
+  <!-- Eyebrows -->
+  <path d="M 40,34 Q 44,31 48,34" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 52,34 Q 56,31 60,34" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="41" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="41" r="2.5" fill="#374151"/>
+  <!-- Eye shine -->
+  <circle cx="45" cy="40" r="0.8" fill="#ffffff"/>
+  <circle cx="57" cy="40" r="0.8" fill="#ffffff"/>
+  <!-- Rosy cheeks -->
+  <circle cx="39" cy="46" r="4" fill="#fca5a5" opacity="0.4"/>
+  <circle cx="61" cy="46" r="4" fill="#fca5a5" opacity="0.4"/>
+  <!-- Smile -->
+  <path d="M 44,48 Q 50,53 56,48" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="31" y1="65" x2="19" y2="77" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="69" y1="65" x2="81" y2="77" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Holding a football -->
+  <ellipse cx="84" cy="76" rx="7" ry="5" fill="#d97706" stroke="#92400e" stroke-width="1.5"/>
+  <line x1="77" y1="76" x2="91" y2="76" stroke="#92400e" stroke-width="1" stroke-linecap="round"/>
+  <line x1="84" y1="71" x2="84" y2="81" stroke="#92400e" stroke-width="1" stroke-linecap="round"/>
+</svg>`,
+        explanation: '👦 Brother สะกดว่า B - R - O - T - H - E - R แปลว่า พี่ชาย หรือ น้องชาย คือสมาชิกในครอบครัวที่เป็นผู้ชายจ้า',
+        label: 'n'
       }
     ]
   }
