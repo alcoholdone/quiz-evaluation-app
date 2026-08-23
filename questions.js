@@ -952,6 +952,100 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '👦 Brother สะกดว่า B - R - O - T - H - E - R แปลว่า พี่ชาย หรือ น้องชาย คือสมาชิกในครอบครัวที่เป็นผู้ชายจ้า',
         label: 'n'
+      },
+      {
+        word: 'Baby sister',
+        meaning: 'น้องสาวคนเล็ก',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Baby blanket / wrap -->
+  <ellipse cx="50" cy="78" rx="24" ry="16" fill="#fda4af"/>
+  <rect x="28" y="64" width="44" height="22" rx="14" fill="#fda4af"/>
+  <!-- Blanket fold -->
+  <path d="M28,72 Q50,66 72,72" stroke="#fb7185" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Tiny body peeking -->
+  <rect x="40" y="60" width="20" height="14" rx="8" fill="#fce7f3"/>
+  <!-- Neck -->
+  <rect x="45" y="50" width="10" height="12" rx="5" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="42" r="15" fill="#fcd9bd"/>
+  <!-- Baby hair (sparse) -->
+  <path d="M40,32 Q50,26 60,32" stroke="#d97706" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M44,28 Q50,24 56,28" stroke="#d97706" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Tiny bow -->
+  <ellipse cx="46" cy="28" rx="4" ry="2.5" fill="#f43f5e" transform="rotate(-15 46 28)"/>
+  <ellipse cx="54" cy="28" rx="4" ry="2.5" fill="#f43f5e" transform="rotate(15 54 28)"/>
+  <circle cx="50" cy="27" r="2.5" fill="#f43f5e"/>
+  <!-- Big eyes -->
+  <circle cx="44" cy="43" r="3" fill="#374151"/>
+  <circle cx="56" cy="43" r="3" fill="#374151"/>
+  <!-- Eye shine -->
+  <circle cx="45" cy="42" r="1" fill="#ffffff"/>
+  <circle cx="57" cy="42" r="1" fill="#ffffff"/>
+  <!-- Eyelashes -->
+  <line x1="42" y1="39" x2="41" y2="37" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="44" y1="38.5" x2="44" y2="36.5" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="54" y1="38.5" x2="54" y2="36.5" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="58" y1="39" x2="59" y2="37" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Rosy cheeks -->
+  <circle cx="38" cy="47" r="4.5" fill="#fca5a5" opacity="0.55"/>
+  <circle cx="62" cy="47" r="4.5" fill="#fca5a5" opacity="0.55"/>
+  <!-- Tiny smile -->
+  <path d="M 45,49 Q 50,53 55,49" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Tiny arms peeking -->
+  <line x1="28" y1="70" x2="18" y2="80" stroke="#fcd9bd" stroke-width="5" stroke-linecap="round"/>
+  <line x1="72" y1="70" x2="82" y2="80" stroke="#fcd9bd" stroke-width="5" stroke-linecap="round"/>
+  <!-- Tiny fist -->
+  <circle cx="17" cy="82" r="4" fill="#fcd9bd"/>
+  <circle cx="83" cy="82" r="4" fill="#fcd9bd"/>
+</svg>`,
+        explanation: '👶🎀 Baby sister สะกดว่า B - A - B - Y  S - I - S - T - E - R แปลว่า น้องสาวคนเล็ก คือน้องสาวที่ยังเป็นทารกหรือเด็กเล็กมากๆ จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Baby brother',
+        meaning: 'น้องชายคนเล็ก',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Baby blanket / wrap -->
+  <ellipse cx="50" cy="78" rx="24" ry="16" fill="#93c5fd"/>
+  <rect x="28" y="64" width="44" height="22" rx="14" fill="#93c5fd"/>
+  <!-- Blanket fold -->
+  <path d="M28,72 Q50,66 72,72" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Tiny body peeking -->
+  <rect x="40" y="60" width="20" height="14" rx="8" fill="#dbeafe"/>
+  <!-- Neck -->
+  <rect x="45" y="50" width="10" height="12" rx="5" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="42" r="15" fill="#fcd9bd"/>
+  <!-- Baby hair (sparse) -->
+  <path d="M40,32 Q50,26 60,32" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M44,28 Q50,24 56,28" stroke="#1e293b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Tiny cowlick -->
+  <path d="M50,26 Q53,22 51,27" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Big eyes -->
+  <circle cx="44" cy="43" r="3" fill="#374151"/>
+  <circle cx="56" cy="43" r="3" fill="#374151"/>
+  <!-- Eye shine -->
+  <circle cx="45" cy="42" r="1" fill="#ffffff"/>
+  <circle cx="57" cy="42" r="1" fill="#ffffff"/>
+  <!-- Eyebrows (boyish) -->
+  <path d="M 41,38 Q 44,36 47,38" stroke="#374151" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M 53,38 Q 56,36 59,38" stroke="#374151" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Rosy cheeks -->
+  <circle cx="38" cy="47" r="4.5" fill="#fca5a5" opacity="0.45"/>
+  <circle cx="62" cy="47" r="4.5" fill="#fca5a5" opacity="0.45"/>
+  <!-- Tiny smile -->
+  <path d="M 45,49 Q 50,53 55,49" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Tiny arms peeking -->
+  <line x1="28" y1="70" x2="18" y2="80" stroke="#fcd9bd" stroke-width="5" stroke-linecap="round"/>
+  <line x1="72" y1="70" x2="82" y2="80" stroke="#fcd9bd" stroke-width="5" stroke-linecap="round"/>
+  <!-- Tiny fist -->
+  <circle cx="17" cy="82" r="4" fill="#fcd9bd"/>
+  <circle cx="83" cy="82" r="4" fill="#fcd9bd"/>
+  <!-- Tiny star rattle -->
+  <polygon points="85,68 87,73 92,73 88,76 90,81 85,78 80,81 82,76 78,73 83,73" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.8"/>
+</svg>`,
+        explanation: '👶💙 Baby brother สะกดว่า B - A - B - Y  B - R - O - T - H - E - R แปลว่า น้องชายคนเล็ก คือน้องชายที่ยังเป็นทารกหรือเด็กเล็กมากๆ จ้า',
+        label: 'n'
       }
     ]
   }
