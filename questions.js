@@ -1046,6 +1046,49 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '👶💙 Baby brother สะกดว่า B - A - B - Y  B - R - O - T - H - E - R แปลว่า น้องชายคนเล็ก คือน้องชายที่ยังเป็นทารกหรือเด็กเล็กมากๆ จ้า',
         label: 'n'
+      },
+      {
+        word: 'Tall',
+        meaning: 'สูง',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground -->
+  <rect x="10" y="88" width="80" height="5" rx="2" fill="#a3e635" opacity="0.5"/>
+  <!-- Shadow -->
+  <ellipse cx="50" cy="90" rx="12" ry="3" fill="#374151" opacity="0.2"/>
+  <!-- Long legs -->
+  <rect x="40" y="68" width="9" height="22" rx="4" fill="#3b82f6"/>
+  <rect x="51" y="68" width="9" height="22" rx="4" fill="#3b82f6"/>
+  <!-- Shoes -->
+  <ellipse cx="44.5" cy="90" rx="7" ry="3.5" fill="#1e293b"/>
+  <ellipse cx="55.5" cy="90" rx="7" ry="3.5" fill="#1e293b"/>
+  <!-- Body / shirt -->
+  <rect x="33" y="44" width="34" height="26" rx="10" fill="#38bdf8"/>
+  <!-- Neck -->
+  <rect x="45" y="38" width="10" height="10" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="28" r="14" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="16" rx="12" ry="8" fill="#1e293b"/>
+  <ellipse cx="38" cy="24" rx="5" ry="7" fill="#1e293b"/>
+  <ellipse cx="62" cy="24" rx="5" ry="7" fill="#1e293b"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="28" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="28" r="2.5" fill="#374151"/>
+  <!-- Eye shine -->
+  <circle cx="45" cy="27" r="0.8" fill="#ffffff"/>
+  <circle cx="57" cy="27" r="0.8" fill="#ffffff"/>
+  <!-- Smile -->
+  <path d="M 44,33 Q 50,38 56,33" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="33" y1="52" x2="20" y2="62" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="67" y1="52" x2="80" y2="62" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Height arrow -->
+  <line x1="88" y1="15" x2="88" y2="90" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3,2"/>
+  <polygon points="88,10 85,18 91,18" fill="#f59e0b"/>
+  <polygon points="88,95 85,87 91,87" fill="#f59e0b"/>
+</svg>`,
+        explanation: '📏 Tall สะกดว่า T - A - L - L แปลว่า สูง ใช้บอกว่าใครหรืออะไรมีความสูงมากกว่าปกติจ้า',
+        label: 'adj'
       }
     ]
   }
