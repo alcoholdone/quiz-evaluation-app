@@ -1089,6 +1089,89 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '📏 Tall สะกดว่า T - A - L - L แปลว่า สูง ใช้บอกว่าใครหรืออะไรมีความสูงมากกว่าปกติจ้า',
         label: 'adj'
+      },
+      {
+        word: 'Short',
+        meaning: 'เตี้ย, สั้น',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / shirt -->
+  <rect x="35" y="60" width="30" height="24" rx="8" fill="#f97316"/>
+  <!-- Neck -->
+  <rect x="45" y="52" width="10" height="10" rx="4" fill="#fcd9bd"/>
+  <!-- Head (larger relative to body to show short stature) -->
+  <circle cx="50" cy="40" r="15" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="27" rx="13" ry="8" fill="#92400e"/>
+  <ellipse cx="37" cy="34" rx="5" ry="7" fill="#92400e"/>
+  <ellipse cx="63" cy="34" rx="5" ry="7" fill="#92400e"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="40" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="40" r="2.5" fill="#374151"/>
+  <!-- Eye shine -->
+  <circle cx="45" cy="39" r="0.8" fill="#ffffff"/>
+  <circle cx="57" cy="39" r="0.8" fill="#ffffff"/>
+  <!-- Smile -->
+  <path d="M 44,45 Q 50,50 56,45" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="35" y1="66" x2="22" y2="74" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="65" y1="66" x2="78" y2="74" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="38" y="84" width="9" height="12" rx="4" fill="#1d4ed8"/>
+  <rect x="53" y="84" width="9" height="12" rx="4" fill="#1d4ed8"/>
+  <!-- Shoes -->
+  <ellipse cx="42.5" cy="96" rx="7" ry="3.5" fill="#1e293b"/>
+  <ellipse cx="57.5" cy="96" rx="7" ry="3.5" fill="#1e293b"/>
+  <!-- Height arrow (short) -->
+  <line x1="88" y1="40" x2="88" y2="90" stroke="#ef4444" stroke-width="2" stroke-dasharray="3,2"/>
+  <polygon points="88,35 85,43 91,43" fill="#ef4444"/>
+  <polygon points="88,95 85,87 91,87" fill="#ef4444"/>
+</svg>`,
+        explanation: '📏 Short สะกดว่า S - H - O - R - T แปลว่า เตี้ย หรือ สั้น ใช้บอกว่าใครหรืออะไรมีความสูงน้อยกว่าปกติ หรือมีความยาวน้อยจ้า',
+        label: 'adj'
+      },
+      {
+        word: 'Young',
+        meaning: 'อายุน้อย',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / shirt -->
+  <rect x="32" y="55" width="36" height="28" rx="10" fill="#34d399"/>
+  <!-- Neck -->
+  <rect x="45" y="46" width="10" height="11" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="34" r="15" fill="#fcd9bd"/>
+  <!-- Youthful hair -->
+  <ellipse cx="50" cy="20" rx="14" ry="9" fill="#f59e0b"/>
+  <ellipse cx="36" cy="28" rx="5" ry="8" fill="#f59e0b"/>
+  <ellipse cx="64" cy="28" rx="5" ry="8" fill="#f59e0b"/>
+  <!-- Big bright eyes (youthful) -->
+  <circle cx="43" cy="34" r="4" fill="#ffffff"/>
+  <circle cx="57" cy="34" r="4" fill="#ffffff"/>
+  <circle cx="43" cy="34" r="2.5" fill="#3b82f6"/>
+  <circle cx="57" cy="34" r="2.5" fill="#3b82f6"/>
+  <!-- Eye shine -->
+  <circle cx="44.2" cy="32.8" r="1" fill="#ffffff"/>
+  <circle cx="58.2" cy="32.8" r="1" fill="#ffffff"/>
+  <!-- Big smile (happy young face) -->
+  <path d="M 42,40 Q 50,47 58,40" stroke="#e8a87c" stroke-width="2" fill="#fde68a" stroke-linecap="round"/>
+  <!-- Rosy cheeks -->
+  <circle cx="38" cy="38" r="4" fill="#fca5a5" opacity="0.6"/>
+  <circle cx="62" cy="38" r="4" fill="#fca5a5" opacity="0.6"/>
+  <!-- Arms -->
+  <line x1="32" y1="62" x2="18" y2="72" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="62" x2="82" y2="72" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="37" y="83" width="10" height="14" rx="4" fill="#3b82f6"/>
+  <rect x="53" y="83" width="10" height="14" rx="4" fill="#3b82f6"/>
+  <!-- Shoes -->
+  <ellipse cx="42" cy="97" rx="7.5" ry="3" fill="#1e293b"/>
+  <ellipse cx="58" cy="97" rx="7.5" ry="3" fill="#1e293b"/>
+  <!-- Star sparkles (youthful energy) -->
+  <text x="8" y="30" font-size="10" fill="#f59e0b">✦</text>
+  <text x="80" y="25" font-size="8" fill="#34d399">✦</text>
+  <text x="14" y="55" font-size="6" fill="#f472b6">✦</text>
+</svg>`,
+        explanation: '🌟 Young สะกดว่า Y - O - U - N - G แปลว่า อายุน้อย ใช้บอกว่าใครหรืออะไรยังมีอายุน้อย หรือยังเยาว์วัยจ้า',
+        label: 'adj'
       }
     ]
   }
