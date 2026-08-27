@@ -1172,6 +1172,116 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '🌟 Young สะกดว่า Y - O - U - N - G แปลว่า อายุน้อย ใช้บอกว่าใครหรืออะไรยังมีอายุน้อย หรือยังเยาว์วัยจ้า',
         label: 'adj'
+      },
+      {
+        word: 'Old',
+        meaning: 'อายุมาก, แก่',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / cardigan -->
+  <rect x="32" y="56" width="36" height="28" rx="10" fill="#43938F"/>
+  <!-- Cardigan buttons -->
+  <circle cx="50" cy="62" r="1.5" fill="#F6C24A"/>
+  <circle cx="50" cy="69" r="1.5" fill="#F6C24A"/>
+  <circle cx="50" cy="76" r="1.5" fill="#F6C24A"/>
+  <!-- Neck -->
+  <rect x="45" y="47" width="10" height="11" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="35" r="15" fill="#fcd9bd"/>
+  <!-- White hair on sides -->
+  <ellipse cx="36" cy="31" rx="5" ry="8" fill="#e2e8f0"/>
+  <ellipse cx="64" cy="31" rx="5" ry="8" fill="#e2e8f0"/>
+  <!-- Bald / grey top -->
+  <ellipse cx="50" cy="23" rx="12" ry="7" fill="#f5c5a3"/>
+  <path d="M 38,23 Q 50,17 62,23" stroke="#e2e8f0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- White eyebrows -->
+  <path d="M 41,29 Q 44,26 47,29" stroke="#e2e8f0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 53,29 Q 56,26 59,29" stroke="#e2e8f0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Glasses -->
+  <circle cx="44" cy="35" r="5" fill="none" stroke="#306FC7" stroke-width="1.5"/>
+  <circle cx="56" cy="35" r="5" fill="none" stroke="#306FC7" stroke-width="1.5"/>
+  <line x1="49" y1="35" x2="51" y2="35" stroke="#306FC7" stroke-width="1.5"/>
+  <line x1="39" y1="35" x2="36" y2="34" stroke="#306FC7" stroke-width="1.5"/>
+  <line x1="61" y1="35" x2="64" y2="34" stroke="#306FC7" stroke-width="1.5"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="35" r="2" fill="#374151"/>
+  <circle cx="56" cy="35" r="2" fill="#374151"/>
+  <!-- Smile + wrinkles -->
+  <path d="M 44,42 Q 50,46 56,42" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <line x1="39" y1="39" x2="37" y2="41" stroke="#e8a87c" stroke-width="1" stroke-linecap="round"/>
+  <line x1="61" y1="39" x2="63" y2="41" stroke="#e8a87c" stroke-width="1" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="32" y1="63" x2="20" y2="73" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="63" x2="80" y2="73" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="37" y="84" width="10" height="13" rx="4" fill="#306FC7"/>
+  <rect x="53" y="84" width="10" height="13" rx="4" fill="#306FC7"/>
+  <!-- Shoes -->
+  <ellipse cx="42" cy="97" rx="7.5" ry="3" fill="#1e293b"/>
+  <ellipse cx="58" cy="97" rx="7.5" ry="3" fill="#1e293b"/>
+  <!-- Walking cane -->
+  <path d="M 80,72 Q 88,74 86,86" stroke="#DA3832" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <line x1="86" y1="86" x2="86" y2="96" stroke="#DA3832" stroke-width="3" stroke-linecap="round"/>
+  <!-- Birthday candles hint (many years) -->
+  <text x="8" y="30" font-size="9" fill="#F6C24A">✦</text>
+  <text x="12" y="52" font-size="6" fill="#43938F">✦</text>
+</svg>`,
+        explanation: '👴 Old สะกดว่า O - L - D แปลว่า อายุมาก หรือ แก่ ใช้บอกว่าใครหรืออะไรมีอายุมาก เป็นคำตรงข้ามกับ Young จ้า',
+        label: 'adj'
+      },
+      {
+        word: 'Pretty',
+        meaning: 'สวย, น่ารัก',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dress -->
+  <ellipse cx="50" cy="80" rx="21" ry="14" fill="#DA3832"/>
+  <rect x="34" y="58" width="32" height="26" rx="10" fill="#DA3832"/>
+  <ellipse cx="50" cy="84" rx="23" ry="10" fill="#DA3832" opacity="0.6"/>
+  <!-- Neck -->
+  <rect x="45" y="48" width="10" height="12" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="39" r="15" fill="#fcd9bd"/>
+  <!-- Long hair -->
+  <ellipse cx="50" cy="26" rx="14" ry="9" fill="#F6C24A"/>
+  <ellipse cx="35" cy="40" rx="5" ry="13" fill="#F6C24A"/>
+  <ellipse cx="65" cy="40" rx="5" ry="13" fill="#F6C24A"/>
+  <!-- Flower in hair -->
+  <circle cx="64" cy="27" r="2.5" fill="#DA3832"/>
+  <circle cx="68" cy="25" r="2.5" fill="#DA3832"/>
+  <circle cx="68" cy="30" r="2.5" fill="#DA3832"/>
+  <circle cx="72" cy="27" r="2.5" fill="#DA3832"/>
+  <circle cx="68" cy="27.5" r="2" fill="#F6C24A"/>
+  <!-- Big eyes -->
+  <circle cx="44" cy="39" r="4" fill="#ffffff"/>
+  <circle cx="56" cy="39" r="4" fill="#ffffff"/>
+  <circle cx="44" cy="39" r="2.5" fill="#306FC7"/>
+  <circle cx="56" cy="39" r="2.5" fill="#306FC7"/>
+  <circle cx="45.2" cy="37.8" r="1" fill="#ffffff"/>
+  <circle cx="57.2" cy="37.8" r="1" fill="#ffffff"/>
+  <!-- Eyelashes -->
+  <line x1="41" y1="35" x2="39.5" y2="33" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="44" y1="34" x2="44" y2="32" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="47" y1="35" x2="48.5" y2="33" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="53" y1="35" x2="51.5" y2="33" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="56" y1="34" x2="56" y2="32" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="59" y1="35" x2="60.5" y2="33" stroke="#374151" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Rosy cheeks -->
+  <circle cx="38" cy="44" r="4" fill="#DA3832" opacity="0.35"/>
+  <circle cx="62" cy="44" r="4" fill="#DA3832" opacity="0.35"/>
+  <!-- Smile -->
+  <path d="M 44,46 Q 50,51 56,46" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="34" y1="63" x2="21" y2="73" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="66" y1="63" x2="79" y2="73" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Holding a mirror -->
+  <circle cx="82" cy="72" r="7" fill="#306FC7" opacity="0.3" stroke="#306FC7" stroke-width="1.5"/>
+  <line x1="82" y1="79" x2="82" y2="88" stroke="#F6C24A" stroke-width="3" stroke-linecap="round"/>
+  <!-- Sparkles -->
+  <text x="8" y="28" font-size="10" fill="#F6C24A">✦</text>
+  <text x="16" y="52" font-size="6" fill="#43938F">✦</text>
+  <text x="26" y="20" font-size="7" fill="#DA3832">✦</text>
+</svg>`,
+        explanation: '🌸 Pretty สะกดว่า P - R - E - T - T - Y แปลว่า สวย หรือ น่ารัก ใช้ชมคนหรือสิ่งของที่ดูสวยงามน่ามองจ้า',
+        label: 'adj'
       }
     ]
   }
