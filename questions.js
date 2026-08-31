@@ -1282,6 +1282,188 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '🌸 Pretty สะกดว่า P - R - E - T - T - Y แปลว่า สวย หรือ น่ารัก ใช้ชมคนหรือสิ่งของที่ดูสวยงามน่ามองจ้า',
         label: 'adj'
+      },
+      {
+        word: 'Handsome',
+        meaning: 'หล่อ, รูปหล่อ',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Suit jacket -->
+  <rect x="31" y="57" width="38" height="28" rx="10" fill="#306FC7"/>
+  <!-- Shirt front -->
+  <polygon points="42,57 50,70 58,57" fill="#ffffff"/>
+  <!-- Bow tie -->
+  <polygon points="50,60 44,57 44,63" fill="#DA3832"/>
+  <polygon points="50,60 56,57 56,63" fill="#DA3832"/>
+  <circle cx="50" cy="60" r="1.5" fill="#F6C24A"/>
+  <!-- Pocket square -->
+  <polygon points="36,66 41,66 38.5,62" fill="#F6C24A"/>
+  <!-- Neck -->
+  <rect x="45" y="48" width="10" height="11" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="38" r="15" fill="#fcd9bd"/>
+  <!-- Neat hair with side part -->
+  <ellipse cx="50" cy="25" rx="14" ry="9" fill="#1e293b"/>
+  <path d="M 38,23 Q 46,18 56,22" stroke="#334155" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="36" cy="32" rx="4" ry="7" fill="#1e293b"/>
+  <ellipse cx="64" cy="32" rx="4" ry="7" fill="#1e293b"/>
+  <!-- Eyebrows -->
+  <path d="M 41,32 Q 44,29 47,32" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 53,32 Q 56,29 59,32" stroke="#1e293b" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="44" cy="38" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="38" r="2.5" fill="#374151"/>
+  <circle cx="45" cy="37" r="0.8" fill="#ffffff"/>
+  <circle cx="57" cy="37" r="0.8" fill="#ffffff"/>
+  <!-- Nose -->
+  <path d="M 50,41 Q 48,45 50,46 Q 52,45 50,41" stroke="#e8a87c" stroke-width="1" fill="none"/>
+  <!-- Confident smile -->
+  <path d="M 44,47 Q 50,52 56,47" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Arms -->
+  <line x1="31" y1="64" x2="19" y2="74" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="69" y1="64" x2="81" y2="74" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="37" y="85" width="10" height="12" rx="4" fill="#1e293b"/>
+  <rect x="53" y="85" width="10" height="12" rx="4" fill="#1e293b"/>
+  <!-- Shoes -->
+  <ellipse cx="42" cy="97" rx="7.5" ry="3" fill="#43938F"/>
+  <ellipse cx="58" cy="97" rx="7.5" ry="3" fill="#43938F"/>
+  <!-- Sparkles -->
+  <text x="8" y="30" font-size="10" fill="#F6C24A">✦</text>
+  <text x="80" y="24" font-size="8" fill="#43938F">✦</text>
+  <text x="16" y="54" font-size="6" fill="#DA3832">✦</text>
+</svg>`,
+        explanation: '🤵 Handsome สะกดว่า H - A - N - D - S - O - M - E แปลว่า หล่อ หรือ รูปหล่อ ใช้ชมผู้ชายที่ดูดีน่ามอง คล้ายกับคำว่า Pretty ที่ใช้ชมผู้หญิงจ้า',
+        label: 'adj'
+      },
+      {
+        word: 'Say',
+        meaning: 'พูด, กล่าว',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <rect x="30" y="60" width="34" height="26" rx="10" fill="#43938F"/>
+  <!-- Neck -->
+  <rect x="42" y="51" width="10" height="11" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="47" cy="41" r="15" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="47" cy="28" rx="14" ry="9" fill="#1e293b"/>
+  <ellipse cx="34" cy="36" rx="4" ry="7" fill="#1e293b"/>
+  <!-- Eyebrows -->
+  <path d="M 39,35 Q 42,32 45,35" stroke="#1e293b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M 50,35 Q 53,32 56,35" stroke="#1e293b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="42" cy="41" r="2.5" fill="#374151"/>
+  <circle cx="53" cy="41" r="2.5" fill="#374151"/>
+  <circle cx="43" cy="40" r="0.8" fill="#ffffff"/>
+  <circle cx="54" cy="40" r="0.8" fill="#ffffff"/>
+  <!-- Open mouth (talking) -->
+  <ellipse cx="47" cy="49" rx="5" ry="4" fill="#DA3832"/>
+  <ellipse cx="47" cy="50.5" rx="3" ry="2" fill="#fca5a5"/>
+  <!-- Speech bubble -->
+  <path d="M 66,20 h26 a5,5 0 0 1 5,5 v16 a5,5 0 0 1 -5,5 h-18 l-8,7 v-7 a5,5 0 0 1 -5,-5 v-16 a5,5 0 0 1 5,-5 z" fill="#306FC7"/>
+  <circle cx="72" cy="33" r="2.2" fill="#ffffff"/>
+  <circle cx="79" cy="33" r="2.2" fill="#ffffff"/>
+  <circle cx="86" cy="33" r="2.2" fill="#ffffff"/>
+  <!-- Sound waves from mouth -->
+  <path d="M 55,46 Q 60,49 55,52" stroke="#F6C24A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 60,43 Q 67,49 60,55" stroke="#F6C24A" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <!-- Arms -->
+  <line x1="30" y1="66" x2="18" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="64" y1="66" x2="74" y2="72" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="35" y="86" width="10" height="11" rx="4" fill="#306FC7"/>
+  <rect x="49" y="86" width="10" height="11" rx="4" fill="#306FC7"/>
+  <ellipse cx="40" cy="97" rx="7" ry="3" fill="#1e293b"/>
+  <ellipse cx="54" cy="97" rx="7" ry="3" fill="#1e293b"/>
+</svg>`,
+        explanation: '🗣️ Say สะกดว่า S - A - Y แปลว่า พูด หรือ กล่าว ใช้ตอนที่เราเอ่ยคำพูดออกมา เช่น Say hello! คือ พูดว่าสวัสดีจ้า',
+        label: 'v.t'
+      },
+      {
+        word: 'Read',
+        meaning: 'อ่าน',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <rect x="32" y="52" width="36" height="26" rx="10" fill="#F6C24A"/>
+  <!-- Neck -->
+  <rect x="45" y="43" width="10" height="11" rx="4" fill="#fcd9bd"/>
+  <!-- Head (tilted down to read) -->
+  <circle cx="50" cy="33" r="15" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="20" rx="14" ry="9" fill="#92400e"/>
+  <ellipse cx="36" cy="28" rx="4" ry="7" fill="#92400e"/>
+  <ellipse cx="64" cy="28" rx="4" ry="7" fill="#92400e"/>
+  <!-- Eyes looking down -->
+  <path d="M 41,34 Q 44,38 47,34" stroke="#374151" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 53,34 Q 56,38 59,34" stroke="#374151" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Smile -->
+  <path d="M 45,41 Q 50,45 55,41" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Rosy cheeks -->
+  <circle cx="38" cy="38" r="3.5" fill="#DA3832" opacity="0.3"/>
+  <circle cx="62" cy="38" r="3.5" fill="#DA3832" opacity="0.3"/>
+  <!-- Arms holding book -->
+  <line x1="32" y1="60" x2="24" y2="74" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <line x1="68" y1="60" x2="76" y2="74" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Open book -->
+  <path d="M 20,74 Q 50,66 80,74 L 80,92 Q 50,84 20,92 Z" fill="#ffffff" stroke="#306FC7" stroke-width="2"/>
+  <line x1="50" y1="70" x2="50" y2="88" stroke="#306FC7" stroke-width="2"/>
+  <!-- Text lines on pages -->
+  <line x1="27" y1="78" x2="44" y2="76" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="27" y1="83" x2="44" y2="81" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="56" y1="76" x2="73" y2="78" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="56" y1="81" x2="73" y2="83" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Sparkle of ideas -->
+  <text x="8" y="24" font-size="10" fill="#43938F">✦</text>
+  <text x="82" y="20" font-size="8" fill="#F6C24A">✦</text>
+</svg>`,
+        explanation: '📖 Read สะกดว่า R - E - A - D แปลว่า อ่าน ใช้ตอนที่เรามองตัวหนังสือแล้วเข้าใจความหมาย เช่น Read a book คือ อ่านหนังสือจ้า',
+        label: 'v.t'
+      },
+      {
+        word: 'Write',
+        meaning: 'เขียน',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Desk top -->
+  <rect x="8" y="76" width="84" height="6" rx="3" fill="#43938F"/>
+  <rect x="14" y="82" width="6" height="14" rx="2" fill="#43938F" opacity="0.7"/>
+  <rect x="80" y="82" width="6" height="14" rx="2" fill="#43938F" opacity="0.7"/>
+  <!-- Paper on desk -->
+  <rect x="30" y="64" width="40" height="14" rx="2" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="35" y1="69" x2="62" y2="69" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="35" y1="73" x2="56" y2="73" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Body -->
+  <rect x="32" y="46" width="36" height="22" rx="9" fill="#306FC7"/>
+  <!-- Neck -->
+  <rect x="45" y="38" width="10" height="10" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="28" r="14" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="17" rx="13" ry="8" fill="#1e293b"/>
+  <ellipse cx="37" cy="24" rx="4" ry="6" fill="#1e293b"/>
+  <ellipse cx="63" cy="24" rx="4" ry="6" fill="#1e293b"/>
+  <!-- Eyes looking down at paper -->
+  <path d="M 42,29 Q 45,33 48,29" stroke="#374151" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 52,29 Q 55,33 58,29" stroke="#374151" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Smile -->
+  <path d="M 45,35 Q 50,39 55,35" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Left arm resting -->
+  <line x1="32" y1="54" x2="24" y2="66" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Right arm holding pencil -->
+  <line x1="68" y1="54" x2="62" y2="66" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Pencil -->
+  <g transform="rotate(35 62 66)">
+    <rect x="59" y="44" width="6" height="22" rx="1" fill="#F6C24A"/>
+    <rect x="59" y="38" width="6" height="6" rx="1" fill="#DA3832"/>
+    <polygon points="59,66 65,66 62,73" fill="#fcd9bd"/>
+    <polygon points="60.8,70 63.2,70 62,73" fill="#1e293b"/>
+  </g>
+  <!-- Letters being written -->
+  <text x="10" y="60" font-size="12" fill="#306FC7" font-weight="bold">A</text>
+  <text x="82" y="36" font-size="10" fill="#DA3832" font-weight="bold">B</text>
+  <text x="86" y="58" font-size="8" fill="#43938F" font-weight="bold">C</text>
+</svg>`,
+        explanation: '✏️ Write สะกดว่า W - R - I - T - E แปลว่า เขียน ใช้ตอนที่เราใช้ดินสอหรือปากกาเขียนตัวหนังสือลงบนกระดาษจ้า',
+        label: 'v.t'
       }
     ]
   }
