@@ -1464,6 +1464,61 @@ const VOCAB_UNITS = [
 </svg>`,
         explanation: '✏️ Write สะกดว่า W - R - I - T - E แปลว่า เขียน ใช้ตอนที่เราใช้ดินสอหรือปากกาเขียนตัวหนังสือลงบนกระดาษจ้า',
         label: 'v.t'
+      },
+      {
+        word: 'Apple',
+        meaning: 'แอปเปิ้ล',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shadow -->
+  <ellipse cx="50" cy="92" rx="24" ry="4" fill="#374151" opacity="0.15"/>
+  <!-- Apple body -->
+  <path d="M 50,28 C 34,24 20,36 20,55 C 20,76 36,92 50,92 C 64,92 80,76 80,55 C 80,36 66,24 50,28 Z" fill="#DA3832"/>
+  <!-- Left/right lobe crease -->
+  <path d="M 50,30 C 44,44 44,74 50,90" stroke="#b02b26" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <!-- Shine highlight -->
+  <ellipse cx="37" cy="47" rx="8" ry="12" fill="#ffffff" opacity="0.35" transform="rotate(-20 37 47)"/>
+  <!-- Dimple at top -->
+  <path d="M 42,30 Q 50,26 58,30" stroke="#b02b26" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Stem -->
+  <path d="M 50,28 Q 52,16 58,12" stroke="#8a5a2b" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Leaf -->
+  <path d="M 52,20 Q 68,8 76,20 Q 64,30 52,20 Z" fill="#43938F"/>
+  <path d="M 55,21 Q 66,17 74,20" stroke="#2f6b68" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- Sparkles -->
+  <text x="8" y="34" font-size="10" fill="#F6C24A">✦</text>
+  <text x="84" y="52" font-size="7" fill="#306FC7">✦</text>
+</svg>`,
+        explanation: '🍎 Apple สะกดว่า A - P - P - L - E แปลว่า แอปเปิ้ล เป็นผลไม้ลูกกลมสีแดงหรือสีเขียว กินแล้วกรอบหวานและมีประโยชน์จ้า',
+        label: 'n'
+      },
+      {
+        word: 'Cap',
+        meaning: 'หมวกแก๊ป',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shadow -->
+  <ellipse cx="50" cy="80" rx="30" ry="5" fill="#374151" opacity="0.15"/>
+  <!-- Brim / visor -->
+  <path d="M 24,66 Q 12,66 10,60 Q 30,52 50,52 L 50,66 Z" fill="#1e5aa8"/>
+  <!-- Crown -->
+  <path d="M 22,66 Q 22,32 50,32 Q 78,32 78,66 Z" fill="#306FC7"/>
+  <!-- Panel seams -->
+  <path d="M 50,32 L 50,66" stroke="#1e5aa8" stroke-width="1.5"/>
+  <path d="M 34,35 Q 32,52 33,66" stroke="#1e5aa8" stroke-width="1.5" fill="none"/>
+  <path d="M 66,35 Q 68,52 67,66" stroke="#1e5aa8" stroke-width="1.5" fill="none"/>
+  <!-- Front star badge -->
+  <polygon points="50,40 52.4,46.6 59.4,46.6 53.7,50.8 55.9,57.4 50,53.3 44.1,57.4 46.3,50.8 40.6,46.6 47.6,46.6" fill="#F6C24A" stroke="#d9a730" stroke-width="0.8"/>
+  <!-- Button on top -->
+  <circle cx="50" cy="31" r="4" fill="#DA3832"/>
+  <!-- Sweatband -->
+  <rect x="22" y="63" width="56" height="5" rx="2" fill="#43938F"/>
+  <!-- Brim front edge highlight -->
+  <path d="M 12,60 Q 30,53 50,53" stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.4"/>
+  <!-- Sparkles -->
+  <text x="82" y="34" font-size="9" fill="#F6C24A">✦</text>
+  <text x="10" y="86" font-size="6" fill="#43938F">✦</text>
+</svg>`,
+        explanation: '🧢 Cap สะกดว่า C - A - P แปลว่า หมวกแก๊ป เป็นหมวกที่มีปีกยื่นออกมาด้านหน้า ใส่กันแดดตอนออกไปเล่นข้างนอกจ้า',
+        label: 'n'
       }
     ]
   }
