@@ -1466,6 +1466,112 @@ const VOCAB_UNITS = [
         label: 'v.t'
       },
       {
+        word: 'Ask',
+        meaning: 'ถาม',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / shirt -->
+  <rect x="32" y="58" width="36" height="26" rx="10" fill="#43938F"/>
+  <!-- Neck -->
+  <rect x="45" y="49" width="10" height="11" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="39" r="15" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="26" rx="14" ry="9" fill="#1e293b"/>
+  <ellipse cx="36" cy="34" rx="4" ry="7" fill="#1e293b"/>
+  <ellipse cx="64" cy="34" rx="4" ry="7" fill="#1e293b"/>
+  <!-- Eyebrows (curious / inquisitive) -->
+  <path d="M 40,31 Q 44,27 48,32" stroke="#1e293b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M 52,32 Q 56,27 60,31" stroke="#1e293b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- Eyes looking up / curious -->
+  <circle cx="44" cy="38" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="38" r="2.5" fill="#374151"/>
+  <circle cx="45" cy="37" r="0.8" fill="#ffffff"/>
+  <circle cx="57" cy="37" r="0.8" fill="#ffffff"/>
+  <!-- Rosy cheeks -->
+  <circle cx="38" cy="44" r="3.5" fill="#DA3832" opacity="0.3"/>
+  <circle cx="62" cy="44" r="3.5" fill="#DA3832" opacity="0.3"/>
+  <!-- Open inquiring smile -->
+  <path d="M 45,46 Q 50,50 55,46" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Left arm down -->
+  <line x1="32" y1="64" x2="22" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Right arm raised up asking question -->
+  <line x1="68" y1="64" x2="78" y2="44" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Raised hand palm/fingers -->
+  <circle cx="79" cy="41" r="4.5" fill="#fcd9bd"/>
+  <line x1="77" y1="41" x2="77" y2="34" stroke="#fcd9bd" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="80" y1="41" x2="81" y2="33" stroke="#fcd9bd" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="36" y="84" width="10" height="12" rx="4" fill="#306FC7"/>
+  <rect x="54" y="84" width="10" height="12" rx="4" fill="#306FC7"/>
+  <ellipse cx="41" cy="97" rx="7" ry="3" fill="#1e293b"/>
+  <ellipse cx="59" cy="97" rx="7" ry="3" fill="#1e293b"/>
+  <!-- Question mark speech bubble -->
+  <path d="M 12,14 h24 a5,5 0 0 1 5,5 v16 a5,5 0 0 1 -5,5 h-12 l-6,6 v-6 a5,5 0 0 1 -6,-5 v-16 a5,5 0 0 1 5,-5 z" fill="#DA3832"/>
+  <text x="24" y="32" font-size="18" fill="#ffffff" font-weight="bold" text-anchor="middle" font-family="sans-serif">?</text>
+  <!-- Sparkles -->
+  <text x="86" y="24" font-size="9" fill="#F6C24A">✦</text>
+  <text x="6" y="60" font-size="7" fill="#43938F">✦</text>
+</svg>`,
+        explanation: '🙋 Ask สะกดว่า A - S - K แปลว่า ถาม เช่น ถามคำถามคุณครูหรือเพื่อนๆ จ้า',
+        label: 'v.t'
+      },
+      {
+        word: 'Answer',
+        meaning: 'ตอบ',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body / shirt -->
+  <rect x="32" y="58" width="36" height="26" rx="10" fill="#306FC7"/>
+  <!-- Neck -->
+  <rect x="45" y="49" width="10" height="11" rx="4" fill="#fcd9bd"/>
+  <!-- Head -->
+  <circle cx="50" cy="39" r="15" fill="#fcd9bd"/>
+  <!-- Hair -->
+  <ellipse cx="50" cy="26" rx="14" ry="9" fill="#92400e"/>
+  <ellipse cx="36" cy="34" rx="4" ry="7" fill="#92400e"/>
+  <ellipse cx="64" cy="34" rx="4" ry="7" fill="#92400e"/>
+  <!-- Eyebrows (confident / happy) -->
+  <path d="M 40,32 Q 44,29 48,32" stroke="#92400e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M 52,32 Q 56,29 60,32" stroke="#92400e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- Bright happy eyes -->
+  <circle cx="44" cy="38" r="2.5" fill="#374151"/>
+  <circle cx="56" cy="38" r="2.5" fill="#374151"/>
+  <circle cx="45" cy="37" r="0.8" fill="#ffffff"/>
+  <circle cx="57" cy="37" r="0.8" fill="#ffffff"/>
+  <!-- Rosy cheeks -->
+  <circle cx="38" cy="44" r="3.5" fill="#DA3832" opacity="0.3"/>
+  <circle cx="62" cy="44" r="3.5" fill="#DA3832" opacity="0.3"/>
+  <!-- Confident talking smile -->
+  <path d="M 44,46 Q 50,52 56,46" stroke="#e8a87c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Left arm pointing / gesture -->
+  <line x1="32" y1="64" x2="20" y2="52" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Pointing index finger -->
+  <circle cx="19" cy="49" r="3.5" fill="#fcd9bd"/>
+  <line x1="19" y1="49" x2="19" y2="42" stroke="#fcd9bd" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Right arm resting -->
+  <line x1="68" y1="64" x2="78" y2="76" stroke="#fcd9bd" stroke-width="6" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="36" y="84" width="10" height="12" rx="4" fill="#43938F"/>
+  <rect x="54" y="84" width="10" height="12" rx="4" fill="#43938F"/>
+  <ellipse cx="41" cy="97" rx="7" ry="3" fill="#1e293b"/>
+  <ellipse cx="59" cy="97" rx="7" ry="3" fill="#1e293b"/>
+  <!-- Speech / Idea bubble with lightbulb -->
+  <path d="M 64,12 h24 a5,5 0 0 1 5,5 v18 a5,5 0 0 1 -5,5 h-14 l-6,6 v-6 a5,5 0 0 1 -4,-5 v-18 a5,5 0 0 1 5,-5 z" fill="#F6C24A"/>
+  <!-- Lightbulb inside bubble -->
+  <circle cx="76" cy="23" r="5.5" fill="#ffffff"/>
+  <path d="M 73.5,26.5 L 78.5,26.5 L 77.5,30 L 74.5,30 Z" fill="#DA3832"/>
+  <line x1="75" y1="31" x2="77" y2="31" stroke="#374151" stroke-width="1" stroke-linecap="round"/>
+  <!-- Idea glow rays -->
+  <line x1="76" y1="15" x2="76" y2="13" stroke="#DA3832" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="83" y1="18" x2="85" y2="16" stroke="#DA3832" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="69" y1="18" x2="67" y2="16" stroke="#DA3832" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Sparkles -->
+  <text x="8" y="30" font-size="10" fill="#DA3832">✦</text>
+  <text x="88" y="56" font-size="7" fill="#43938F">✦</text>
+</svg>`,
+        explanation: '💡 Answer สะกดว่า A - N - S - W - E - R แปลว่า ตอบ เช่น ตอบคำถามที่คุณครูถามจ้า',
+        label: 'v.t'
+      },
+      {
         word: 'Apple',
         meaning: 'แอปเปิ้ล',
         image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
