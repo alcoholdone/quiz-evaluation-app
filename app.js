@@ -1600,13 +1600,16 @@ function generateFinalExamQuestions() {
 }
 
 // GENERATE CHALLENGE QUESTIONS DYNAMICALLY
-function generateChallengeQuestions() {
+function generateQuestions() {
   if (currentUnitId === 'midterm_prep') {
     return generateMidtermQuestions();
   }
   if (currentUnitId === 'final_exam_prep') {
     return generateFinalExamQuestions();
   }
+
+
+
   
   const targets = selectTargetWords();
   const list = [];
