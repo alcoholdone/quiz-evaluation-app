@@ -1449,35 +1449,53 @@ function generateFinalExamQuestions() {
     });
   });
 
-  // ── 5. "HOW MANY?" (3 questions) ─────────────────────────────────────────
+  // ── 5. "HOW MANY?" (3 questions: แสดงรูปภาพจริงซ้ำตามจำนวน) ─────────────
   const howManyPool = [
     { sg: 'crayon',   pl: 'crayons',  meaning: 'สีเทียน',    img: '🖍️' },
     { sg: 'marker',   pl: 'markers',  meaning: 'ปากกาเมจิก', img: '🖊️' },
     { sg: 'notebook', pl: 'notebooks',meaning: 'สมุด',         img: '📓' },
     { sg: 'CD',       pl: 'CDs',      meaning: 'แผ่นซีดี',   img: '💿' },
+    { sg: 'pencil case', pl: 'pencil cases', meaning: 'กล่องดินสอ', img: pencilCaseImg }
   ];
-  const numWords  = ['One','Two','Three','Four'];
-  const numEmojis = ['1️⃣','2️⃣','3️⃣','4️⃣'];
-  const countVals = shuffle([1, 2, 3]);
+  const numWords = ['One','Two','Three','Four'];
+  const countVals = shuffle([1, 2, 3, 4]);
   shuffle(howManyPool).slice(0, 3).forEach((item, i) => {
     const count = countVals[i];
     const correct = count === 1 ? `One ${item.sg}.` : `${numWords[count - 1]} ${item.pl}.`;
     const w1 = count === 1 ? `One ${item.pl}.` : `One ${item.sg}.`;
-    const w2 = `${numWords[count % 3 + 1]} ${item.pl}.`;
-    const w3 = count === 1 ? `Two ${item.pl}.` : `It's ${/^[aeiou]/i.test(item.sg) ? 'an' : 'a'} ${item.sg}.`;
+    const w2 = `${numWords[(count % 4) + 1] || 'Two'} ${item.pl}.`;
+    const w3 = count === 1 ? `Two ${item.pl}.` : `It's a ${item.sg}.`;
     const opts = shuffle([
-      { text: correct, isCorrect: true,  word: item.sg, meaning: item.meaning, image: numEmojis[count - 1] },
+      { text: correct, isCorrect: true,  word: item.sg, meaning: item.meaning },
       { text: w1,      isCorrect: false, word: item.sg, meaning: item.meaning },
       { text: w2,      isCorrect: false, word: item.sg, meaning: item.meaning },
       { text: w3,      isCorrect: false, word: item.sg, meaning: item.meaning }
     ]);
+
+    // สร้างกล่องภาพที่แสดงรูปภาพซ้ำตามจำนวนจริง เช่น สีเทียน 3 แท่ง, แผ่นซีดี 2 แผ่น
+    let itemsHtml = '';
+    const isSvg = item.img.startsWith('<svg');
+    for (let c = 0; c < count; c++) {
+      if (isSvg) {
+        itemsHtml += `<span style="display:inline-flex; align-items:center; justify-content:center; width:72px; height:72px; margin: 4px;">${item.img}</span>`;
+      } else {
+        itemsHtml += `<span style="display:inline-block; font-size: 60px; margin: 4px 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));">${item.img}</span>`;
+      }
+    }
+    const repeatedVisual = `<div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:8px; padding: 10px 18px; background: #f8fafc; border-radius: 18px; border: 2px dashed #cbd5e1; margin: 8px 0; min-height: 85px;">${itemsHtml}</div>`;
+
     list.push({
       id: qId++, type: 'grammar_midterm',
-      targetWord: { word: item.pl, meaning: item.meaning, image: numEmojis[count - 1],
-        explanation: `🔢 ${numEmojis[count - 1]} ${item.meaning} → ตอบว่า "${correct}" จ้า` },
+      targetWord: {
+        word: item.pl,
+        meaning: item.meaning,
+        image: repeatedVisual,
+        explanation: `🔢 นับรูปภาพ ${item.meaning} ได้ทั้งหมด ${count} อัน → ตอบว่า "${correct}" จ้า`
+      },
       questionText: `How many ${item.pl}?`,
-      thaiQuestionText: `มีกี่${item.meaning}จ๊ะ? (ดูตัวเลขในภาพ)`,
-      options: opts, skill: 'Grammar: How many'
+      thaiQuestionText: `มีกี่${item.meaning}จ๊ะ? (นับรูปภาพในกรอบแล้วตอบ)`,
+      options: opts,
+      skill: 'Grammar: How many'
     });
   });
 
@@ -2243,7 +2261,12 @@ function renderQuestion(index) {
   } else if (q.type === 'grammar_midterm') {
     nodes.gameModeTitle.innerHTML = '💬 ภารกิจ: เติมบทสนทนาและตอบคำถามไวยากรณ์ให้ถูกต้อง!';
     
-    const imgHtml = q.targetWord.image.startsWith('<svg') ? q.targetWord.image : `<div class="question-visual" style="height:100px; font-size:75px; margin: 5px 0;">${q.targetWord.image}</div>`;
+    let imgHtml = '';
+    if (q.targetWord.image.startsWith('<div')) {
+      imgHtml = q.targetWord.image;
+    } else {
+      imgHtml = `<div class="question-visual" style="min-height: 125px; margin: 8px 0;">${q.targetWord.image}</div>`;
+    }
     
     nodes.questionArea.innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
