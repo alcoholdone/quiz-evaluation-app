@@ -55,6 +55,8 @@ let VOCAB_LIST = [];
 
 // Total questions in the midterm simulation (10 vocab + 4 phonics + 7 grammar).
 const MIDTERM_QUESTION_COUNT = 21;
+// Total questions in the final exam simulation (Unit 3 + Unit 4 — Let's Go 3).
+const FINAL_EXAM_QUESTION_COUNT = 29;
 
 // Each shape's drawn SVG fill is a fixed color, so the "This is a ___. It's ___"
 // answer must match the picture the child actually sees.
@@ -1337,10 +1339,273 @@ function generateMidtermQuestions() {
   return list;
 }
 
+// ============================================================
+// GENERATE FINAL EXAM QUESTIONS (Unit 3 + Unit 4 — Let's Go 3)
+// 29 questions: 8 Vocab · 3 Singular/Plural · 2 What's this ·
+//               2 What are these · 3 How many · 3 Who's she/he ·
+//               3 Is he/she · 2 Conversation · 3 Phonics
+// ============================================================
+function generateFinalExamQuestions() {
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+  const list = [];
+  let qId = 1;
+
+  const unit3 = VOCAB_UNITS.find(u => u.id === 'unit_3');
+  const unit4 = VOCAB_UNITS.find(u => u.id === 'unit_4');
+  const allWords = [...(unit3 ? unit3.words : []), ...(unit4 ? unit4.words : [])];
+  const vocabPool = allWords.filter(w => w.type !== 'command');
+
+  // ── 1. VOCABULARY (8 questions: audio×3, visual_word×3, thai_image×2) ─────
+  const vocabTargets = shuffle(vocabPool).slice(0, 8);
+  const vocabTypePool = shuffle(['audio','audio','audio','visual_word','visual_word','visual_word','thai_image','thai_image']);
+  for (let i = 0; i < 8; i++) {
+    const tw = vocabTargets[i] || vocabPool[0];
+    const type = vocabTypePool[i];
+    let opts = [tw, ...shuffle(allWords.filter(w => w.word !== tw.word && w.type !== 'command')).slice(0, 3)];
+    opts = shuffle(opts);
+    list.push({
+      id: qId++, type, targetWord: tw, options: opts,
+      skill: type === 'audio' ? 'Listening' : type === 'visual_word' ? 'Word Recognition' : 'Visual Matching'
+    });
+  }
+
+  // ── 2. SINGULAR → PLURAL (3 questions) ───────────────────────────────────
+  const singPluralData = [
+    { sg: 'a crayon',      pl: 'crayons',      img: '🖍️', meaning: 'สีเทียน' },
+    { sg: 'a marker',      pl: 'markers',      img: '🖊️', meaning: 'ปากกาเมจิก' },
+    { sg: 'a notebook',    pl: 'notebooks',    img: '📓', meaning: 'สมุด' },
+    { sg: 'a pencil case', pl: 'pencil cases', img: '🎒', meaning: 'กล่องดินสอ' },
+    { sg: 'a CD',          pl: 'CDs',          img: '💿', meaning: 'แผ่นซีดี' },
+    { sg: 'a video game',  pl: 'video games',  img: '🎮', meaning: 'วีดีโอเกม' },
+    { sg: 'a cell phone',  pl: 'cell phones',  img: '📱', meaning: 'โทรศัพท์' },
+  ];
+  shuffle(singPluralData).slice(0, 3).forEach(pair => {
+    const wrongs = shuffle(singPluralData.filter(p => p.pl !== pair.pl)).slice(0, 3);
+    const opts = shuffle([
+      { text: pair.pl, isCorrect: true,  word: pair.pl, meaning: pair.meaning },
+      ...wrongs.map(w => ({ text: w.pl, isCorrect: false, word: w.pl, meaning: w.meaning }))
+    ]);
+    list.push({
+      id: qId++, type: 'grammar_midterm',
+      targetWord: { word: pair.sg, meaning: pair.meaning, image: pair.img,
+        explanation: `🔢 "${pair.sg}" = 1 อัน → หลายอัน = "${pair.pl}" จ้า` },
+      questionText: `"${pair.sg}" → หลายอัน = ?`,
+      thaiQuestionText: `เมื่อมีหลายอัน "${pair.meaning}" เราพูดว่าอะไร?`,
+      options: opts, skill: 'Grammar: Singular/Plural'
+    });
+  });
+
+  // ── 3. "WHAT'S THIS?" (2 questions) ──────────────────────────────────────
+  const whatsThisPool = [
+    { word: 'cell phone', meaning: 'โทรศัพท์',    img: '📱' },
+    { word: 'computer',   meaning: 'คอมพิวเตอร์', img: '💻' },
+    { word: 'CD',         meaning: 'แผ่นซีดี',    img: '💿' },
+    { word: 'crayon',     meaning: 'สีเทียน',      img: '🖍️' },
+    { word: 'notebook',   meaning: 'สมุด',          img: '📓' },
+  ];
+  shuffle(whatsThisPool).slice(0, 2).forEach(item => {
+    const an = /^[aeiou]/i.test(item.word) ? 'an' : 'a';
+    const corr = `It's ${an} ${item.word.toLowerCase()}.`;
+    const others = shuffle(whatsThisPool.filter(t => t.word !== item.word));
+    const an2 = /^[aeiou]/i.test(others[0].word) ? 'an' : 'a';
+    const opts = shuffle([
+      { text: corr, isCorrect: true, word: item.word, meaning: item.meaning, image: item.img },
+      { text: `They're ${item.word.toLowerCase()}s.`, isCorrect: false, word: item.word, meaning: item.meaning },
+      { text: `It's ${an === 'a' ? 'an' : 'a'} ${item.word.toLowerCase()}.`, isCorrect: false, word: item.word, meaning: item.meaning },
+      { text: `It's ${an2} ${others[0].word.toLowerCase()}.`, isCorrect: false, word: others[0].word, meaning: others[0].meaning }
+    ]);
+    list.push({
+      id: qId++, type: 'grammar_midterm',
+      targetWord: { word: item.word, meaning: item.meaning, image: item.img },
+      questionText: "What's this?", thaiQuestionText: "นี่คืออะไรจ๊ะ?",
+      options: opts, skill: "Sentence Q&A: What's this?"
+    });
+  });
+
+  // ── 4. "WHAT ARE THESE?" (2 questions) ───────────────────────────────────
+  const whatAreThesePool = [
+    { pl: 'CDs',          sg: 'CD',          meaning: 'แผ่นซีดี',    img: '💿' },
+    { pl: 'video games',  sg: 'video game',  meaning: 'วีดีโอเกม',   img: '🎮' },
+    { pl: 'notebooks',    sg: 'notebook',    meaning: 'สมุด',          img: '📓' },
+    { pl: 'pencil cases', sg: 'pencil case', meaning: 'กล่องดินสอ',  img: '🎒' },
+    { pl: 'cell phones',  sg: 'cell phone',  meaning: 'โทรศัพท์',    img: '📱' },
+  ];
+  shuffle(whatAreThesePool).slice(0, 2).forEach(item => {
+    const others = shuffle(whatAreThesePool.filter(t => t.pl !== item.pl));
+    const opts = shuffle([
+      { text: `They're ${item.pl.toLowerCase()}.`,     isCorrect: true,  word: item.pl,       meaning: item.meaning, image: item.img },
+      { text: `It's a ${item.sg.toLowerCase()}.`,      isCorrect: false, word: item.sg,       meaning: item.meaning },
+      { text: `They're ${item.sg.toLowerCase()}.`,     isCorrect: false, word: item.sg,       meaning: item.meaning },
+      { text: `They're ${others[0].pl.toLowerCase()}.`,isCorrect: false, word: others[0].pl, meaning: others[0].meaning }
+    ]);
+    list.push({
+      id: qId++, type: 'grammar_midterm',
+      targetWord: { word: item.pl, meaning: item.meaning, image: item.img },
+      questionText: "What are these?", thaiQuestionText: "พวกนี้คืออะไรจ๊ะ?",
+      options: opts, skill: "Sentence Q&A: What are these?"
+    });
+  });
+
+  // ── 5. "HOW MANY?" (3 questions) ─────────────────────────────────────────
+  const howManyPool = [
+    { sg: 'crayon',   pl: 'crayons',  meaning: 'สีเทียน',    img: '🖍️' },
+    { sg: 'marker',   pl: 'markers',  meaning: 'ปากกาเมจิก', img: '🖊️' },
+    { sg: 'notebook', pl: 'notebooks',meaning: 'สมุด',         img: '📓' },
+    { sg: 'CD',       pl: 'CDs',      meaning: 'แผ่นซีดี',   img: '💿' },
+  ];
+  const numWords  = ['One','Two','Three','Four'];
+  const numEmojis = ['1️⃣','2️⃣','3️⃣','4️⃣'];
+  const countVals = shuffle([1, 2, 3]);
+  shuffle(howManyPool).slice(0, 3).forEach((item, i) => {
+    const count = countVals[i];
+    const correct = count === 1 ? `One ${item.sg}.` : `${numWords[count - 1]} ${item.pl}.`;
+    const w1 = count === 1 ? `One ${item.pl}.` : `One ${item.sg}.`;
+    const w2 = `${numWords[count % 3 + 1]} ${item.pl}.`;
+    const w3 = count === 1 ? `Two ${item.pl}.` : `It's ${/^[aeiou]/i.test(item.sg) ? 'an' : 'a'} ${item.sg}.`;
+    const opts = shuffle([
+      { text: correct, isCorrect: true,  word: item.sg, meaning: item.meaning, image: numEmojis[count - 1] },
+      { text: w1,      isCorrect: false, word: item.sg, meaning: item.meaning },
+      { text: w2,      isCorrect: false, word: item.sg, meaning: item.meaning },
+      { text: w3,      isCorrect: false, word: item.sg, meaning: item.meaning }
+    ]);
+    list.push({
+      id: qId++, type: 'grammar_midterm',
+      targetWord: { word: item.pl, meaning: item.meaning, image: numEmojis[count - 1],
+        explanation: `🔢 ${numEmojis[count - 1]} ${item.meaning} → ตอบว่า "${correct}" จ้า` },
+      questionText: `How many ${item.pl}?`,
+      thaiQuestionText: `มีกี่${item.meaning}จ๊ะ? (ดูตัวเลขในภาพ)`,
+      options: opts, skill: 'Grammar: How many'
+    });
+  });
+
+  // ── 6. "WHO'S SHE/HE?" (3 questions) ─────────────────────────────────────
+  const familyPool = [
+    { word: 'grandmother', meaning: 'คุณยาย/คุณย่า',  gender: 'she', img: '👵' },
+    { word: 'grandfather', meaning: 'คุณตา/คุณปู่',   gender: 'he',  img: '👴' },
+    { word: 'mother',      meaning: 'แม่',              gender: 'she', img: '👩' },
+    { word: 'father',      meaning: 'พ่อ',              gender: 'he',  img: '👨' },
+    { word: 'sister',      meaning: 'พี่สาว/น้องสาว', gender: 'she', img: '👧' },
+    { word: 'brother',     meaning: 'พี่ชาย/น้องชาย', gender: 'he',  img: '👦' },
+    { word: 'baby sister', meaning: 'น้องสาวคนเล็ก',  gender: 'she', img: '👶' },
+    { word: 'baby brother',meaning: 'น้องชายคนเล็ก',  gender: 'he',  img: '👶' },
+  ];
+  shuffle(familyPool).slice(0, 3).forEach(member => {
+    const pron = member.gender === 'she' ? "She's" : "He's";
+    const wrongs = shuffle(familyPool.filter(m => m.word !== member.word)).slice(0, 3);
+    const opts = shuffle([
+      { text: `${pron} my ${member.word}.`, isCorrect: true, word: member.word, meaning: member.meaning, image: member.img },
+      ...wrongs.map(w => {
+        const wp = w.gender === 'she' ? "She's" : "He's";
+        return { text: `${wp} my ${w.word}.`, isCorrect: false, word: w.word, meaning: w.meaning };
+      })
+    ]);
+    list.push({
+      id: qId++, type: 'grammar_midterm',
+      targetWord: { word: member.word, meaning: member.meaning, image: member.img },
+      questionText: `Who's ${member.gender === 'she' ? 'she' : 'he'}?`,
+      thaiQuestionText: `${member.gender === 'she' ? 'เธอ' : 'เขา'}คือใครจ๊ะ? (${member.meaning})`,
+      options: opts, skill: "Sentence Q&A: Who's she/he?"
+    });
+  });
+
+  // ── 7. "IS HE/SHE ___?" YES/NO (3 questions) ─────────────────────────────
+  const descPool = unit4
+    ? unit4.words.filter(w => ['Tall','Short','Young','Old','Pretty','Handsome'].includes(w.word))
+    : [];
+  const yesNoScenarios = [
+    { imgKey: 'Tall',     q: 'tall',     person: 'he',  isYes: true,  thaiQ: 'สูง' },
+    { imgKey: 'Short',    q: 'short',    person: 'she', isYes: true,  thaiQ: 'เตี้ย' },
+    { imgKey: 'Young',    q: 'old',      person: 'he',  isYes: false, thaiQ: 'อายุมาก' },
+    { imgKey: 'Old',      q: 'young',    person: 'she', isYes: false, thaiQ: 'อายุน้อย' },
+    { imgKey: 'Pretty',   q: 'pretty',   person: 'she', isYes: true,  thaiQ: 'สวย' },
+    { imgKey: 'Handsome', q: 'handsome', person: 'he',  isYes: true,  thaiQ: 'หล่อ' },
+  ];
+  shuffle(yesNoScenarios).slice(0, 3).forEach(s => {
+    const imgWord = descPool.find(w => w.word === s.imgKey)
+      || { word: s.imgKey, meaning: s.thaiQ, image: '👤' };
+    const p = s.person;
+    const opts = shuffle([
+      { text: `Yes, ${p} is.`,   isCorrect: s.isYes,  word: 'yes',   meaning: 'ใช่',    image: '✅' },
+      { text: `No, ${p} isn't.`, isCorrect: !s.isYes, word: 'no',    meaning: 'ไม่ใช่', image: '❌' },
+      { text: `Yes, I am.`,       isCorrect: false,    word: 'wrong', meaning: 'ผิด' },
+      { text: `No, I'm not.`,     isCorrect: false,    word: 'wrong', meaning: 'ผิด' }
+    ]);
+    list.push({
+      id: qId++, type: 'grammar_midterm',
+      targetWord: {
+        word: imgWord.word, meaning: imgWord.meaning, image: imgWord.image,
+        explanation: `${s.isYes ? '✅' : '❌'} Is ${p} ${s.q}? ${s.isYes ? `Yes, ${p} is.` : `No, ${p} isn't.`} ดูรูปแล้วตอบให้ถูกจ้า`
+      },
+      questionText: `Is ${p} ${s.q}?`,
+      thaiQuestionText: `${p === 'he' ? 'เขา' : 'เธอ'}${s.thaiQ}ไหมจ๊ะ? (ดูรูปแล้วเลือก)`,
+      options: opts, skill: 'Yes/No Question'
+    });
+  });
+
+  // ── 8. CONVERSATION (2 questions: Unit3 + Unit4) ──────────────────────────
+  [
+    {
+      targetWord: { word: 'friend', meaning: 'เพื่อน', image: '🧑‍🤝‍🧑' },
+      questionText: 'Hi, Mom! This is my friend, Sarah.',
+      thaiQuestionText: 'สวัสดีแม่! นี่คือเพื่อนของผม ชื่อ Sarah',
+      options: shuffle([
+        { text: "It's nice to meet you, Sarah.", isCorrect: true,  word: 'meet',   meaning: 'ยินดีที่ได้รู้จัก' },
+        { text: "How many crayons?",             isCorrect: false, word: 'how',    meaning: 'กี่อัน' },
+        { text: "They're CDs.",                  isCorrect: false, word: 'CDs',    meaning: 'แผ่นซีดี' },
+        { text: "Yes, he is.",                   isCorrect: false, word: 'yes',    meaning: 'ใช่' }
+      ])
+    },
+    {
+      targetWord: { word: 'meet', meaning: 'ยินดีที่ได้รู้จัก', image: '🤝' },
+      questionText: "It's nice to meet you, Scott.",
+      thaiQuestionText: 'ยินดีที่ได้รู้จักคุณ Scott จ้า',
+      options: shuffle([
+        { text: "It's nice to meet you, too.", isCorrect: true,  word: 'too',    meaning: 'เช่นกัน' },
+        { text: "What's this?",               isCorrect: false, word: 'what',   meaning: 'อะไร' },
+        { text: "She's my sister.",           isCorrect: false, word: 'sister', meaning: 'น้องสาว' },
+        { text: "One crayon.",                isCorrect: false, word: 'one',    meaning: 'หนึ่ง' }
+      ])
+    }
+  ].forEach(cq => {
+    list.push({ id: qId++, type: 'grammar_midterm', ...cq, skill: 'Conversation' });
+  });
+
+  // ── 9. PHONICS: Dd, Tt, Aa (3 questions) ─────────────────────────────────
+  [
+    {
+      phonicsLetter: 'D',
+      targets:     [{ word: 'Desk', meaning: 'โต๊ะเรียน', image: '🏫' }, { word: 'Duck', meaning: 'เป็ด', image: '🦆' }, { word: 'Door', meaning: 'ประตู', image: '🚪' }],
+      distractors: [{ word: 'Tiger', meaning: 'เสือ', image: '🐯' }, { word: 'Apple', meaning: 'แอปเปิ้ล', image: '🍎' }, { word: 'Cat', meaning: 'แมว', image: '🐱' }]
+    },
+    {
+      phonicsLetter: 'T',
+      targets:     [{ word: 'Tiger', meaning: 'เสือ', image: '🐯' }, { word: 'Two', meaning: 'สอง', image: '2️⃣' }, { word: 'Toys', meaning: 'ของเล่น', image: '🧸' }],
+      distractors: [{ word: 'Duck', meaning: 'เป็ด', image: '🦆' }, { word: 'Apple', meaning: 'แอปเปิ้ล', image: '🍎' }, { word: 'Bag', meaning: 'กระเป๋า', image: '🎒' }]
+    },
+    {
+      phonicsLetter: 'A',
+      targets:     [{ word: 'Apple', meaning: 'แอปเปิ้ล', image: '🍎' }],
+      distractors: [{ word: 'Tiger', meaning: 'เสือ', image: '🐯' }, { word: 'Duck', meaning: 'เป็ด', image: '🦆' }, { word: 'Door', meaning: 'ประตู', image: '🚪' }]
+    }
+  ].forEach(set => {
+    const target = shuffle([...set.targets])[0];
+    const opts = shuffle([
+      { ...target, isCorrect: true },
+      ...shuffle([...set.distractors]).slice(0, 3).map(d => ({ ...d, isCorrect: false }))
+    ]);
+    list.push({ id: qId++, type: 'phonics_midterm', phonicsLetter: set.phonicsLetter, targetWord: target, options: opts, skill: 'Phonics' });
+  });
+
+  return list;
+}
+
 // GENERATE CHALLENGE QUESTIONS DYNAMICALLY
-function generateQuestions() {
+function generateChallengeQuestions() {
   if (currentUnitId === 'midterm_prep') {
     return generateMidtermQuestions();
+  }
+  if (currentUnitId === 'final_exam_prep') {
+    return generateFinalExamQuestions();
   }
   
   const targets = selectTargetWords();
@@ -2277,6 +2542,8 @@ function submitAssessment() {
   let finalStarsEarned = starsEarned;
   if (currentUnitId === 'midterm_prep') {
     finalStarsEarned += 20; // โบนัสเพิ่ม 20 ดาวพิเศษสำหรับการจำลองสอบกลางภาค ป.1!
+  } else if (currentUnitId === 'final_exam_prep') {
+    finalStarsEarned += 25; // โบนัสเพิ่ม 25 ดาวพิเศษสำหรับการจำลองสอบปลายภาค ป.1!
   }
   addStars(finalStarsEarned);
   
@@ -2837,7 +3104,7 @@ function renderDetailedReview() {
     } else if (q.type === 'phonics_midterm') {
       qText = `คำถามโฟนิกส์ (Phonics): คำศัพท์ใดที่ขึ้นต้นด้วยเสียงตัวอักษร "${q.phonicsLetter.toUpperCase()}" จ๊ะ?`;
     } else if (q.type === 'grammar_midterm') {
-      qText = `คำถามไวยากรณ์กลางภาค (Grammar): เติมบทสนทนาและตอบคำถามไวยากรณ์ "${q.questionText}" ให้ถูกต้องตามหลักภาษา`;
+      qText = `คำถามไวยากรณ์ (Grammar): เติมบทสนทนาและตอบคำถามไวยากรณ์ "${q.questionText}" ให้ถูกต้องตามหลักภาษา`;
     } else {
       qText = `คำถามจับคู่: คำศัพท์ภาษาไทยคำว่า "${q.targetWord.meaning}" ตรงกับรูปและคำอังกฤษข้อใด?`;
     }
@@ -3074,6 +3341,13 @@ function loadUnitVocab(unitId) {
     if (subtitle) {
       subtitle.textContent = `🎓 โหมดเตรียมสอบกลางภาค ป.1 (Let's Go 1 Unit 1-2)`;
     }
+  } else if (unitId === 'final_exam_prep') {
+    const unit3 = VOCAB_UNITS.find(u => u.id === 'unit_3');
+    const unit4 = VOCAB_UNITS.find(u => u.id === 'unit_4');
+    ORIGINAL_VOCAB_LIST = [...(unit3 ? unit3.words : []), ...(unit4 ? unit4.words : [])];
+    if (subtitle) {
+      subtitle.textContent = `📝 โหมดเตรียมสอบปลายภาค ป.1 (Let's Go 3 Unit 3-4)`;
+    }
   } else {
     const unit = VOCAB_UNITS.find(u => u.id === unitId) || VOCAB_UNITS[0];
     ORIGINAL_VOCAB_LIST = [...unit.words];
@@ -3135,25 +3409,54 @@ function renderUnitSelectors() {
   btnLearnMidterm.type = 'button';
   btnLearnMidterm.className = `btn-unit-select ${currentUnitId === 'midterm_prep' ? 'active' : ''}`;
   btnLearnMidterm.textContent = '🎓 เตรียมสอบกลางภาค';
-  btnLearnMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true);
+  btnLearnMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false);
   btnLearnMidterm.addEventListener('click', () => {
     loadUnitVocab('midterm_prep');
   });
   learnSelector.appendChild(btnLearnMidterm);
+
+  // Add Final Exam Prep Button to Learn Mode
+  const btnLearnFinal = document.createElement('button');
+  btnLearnFinal.type = 'button';
+  btnLearnFinal.className = `btn-unit-select ${currentUnitId === 'final_exam_prep' ? 'active' : ''}`;
+  btnLearnFinal.textContent = '🌟 เตรียมสอบปลายภาค';
+  btnLearnFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true);
+  btnLearnFinal.addEventListener('click', () => {
+    loadUnitVocab('final_exam_prep');
+  });
+  learnSelector.appendChild(btnLearnFinal);
 
   // Add Midterm Prep Button to Game Mode
   const btnGameMidterm = document.createElement('button');
   btnGameMidterm.type = 'button';
   btnGameMidterm.className = `btn-unit-select ${currentUnitId === 'midterm_prep' ? 'active' : ''}`;
   btnGameMidterm.textContent = '🎓 เตรียมสอบกลางภาค';
-  btnGameMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true);
+  btnGameMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false);
   btnGameMidterm.addEventListener('click', () => {
     loadUnitVocab('midterm_prep');
   });
   gameSelector.appendChild(btnGameMidterm);
+
+  // Add Final Exam Prep Button to Game Mode
+  const btnGameFinal = document.createElement('button');
+  btnGameFinal.type = 'button';
+  btnGameFinal.className = `btn-unit-select ${currentUnitId === 'final_exam_prep' ? 'active' : ''}`;
+  btnGameFinal.textContent = '🌟 เตรียมสอบปลายภาค';
+  btnGameFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true);
+  btnGameFinal.addEventListener('click', () => {
+    loadUnitVocab('final_exam_prep');
+  });
+  gameSelector.appendChild(btnGameFinal);
 }
 
-function getUnitBtnStyle(isActive, isMidterm = false) {
+function getUnitBtnStyle(isActive, isMidterm = false, isFinal = false) {
+  if (isFinal) {
+    if (isActive) {
+      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #a855f7; background: linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%); color: #581c87; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.35); animation: pulse-gold 2s infinite;';
+    } else {
+      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #e9d5ff; background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); color: #7e22ce; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(168, 85, 247, 0.1);';
+    }
+  }
   if (isMidterm) {
     if (isActive) {
       return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #eab308; background: linear-gradient(135deg, #fef08a 0%, #facc15 100%); color: #78350f; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.35); animation: pulse-gold 2s infinite;';
@@ -3176,11 +3479,11 @@ function updateUnitSelectorUI() {
     const isActive = unit.id === currentUnitId;
     if (learnBtns[idx]) {
       learnBtns[idx].className = `btn-unit-select ${isActive ? 'active' : ''}`;
-      learnBtns[idx].style.cssText = getUnitBtnStyle(isActive, false);
+      learnBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false);
     }
     if (gameBtns[idx]) {
       gameBtns[idx].className = `btn-unit-select ${isActive ? 'active' : ''}`;
-      gameBtns[idx].style.cssText = getUnitBtnStyle(isActive, false);
+      gameBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false);
     }
   });
 
@@ -3188,11 +3491,22 @@ function updateUnitSelectorUI() {
   const isMidtermActive = currentUnitId === 'midterm_prep';
   if (learnBtns[midtermIdx]) {
     learnBtns[midtermIdx].className = `btn-unit-select ${isMidtermActive ? 'active' : ''}`;
-    learnBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true);
+    learnBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false);
   }
   if (gameBtns[midtermIdx]) {
     gameBtns[midtermIdx].className = `btn-unit-select ${isMidtermActive ? 'active' : ''}`;
-    gameBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true);
+    gameBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false);
+  }
+
+  const finalIdx = VOCAB_UNITS.length + 1;
+  const isFinalActive = currentUnitId === 'final_exam_prep';
+  if (learnBtns[finalIdx]) {
+    learnBtns[finalIdx].className = `btn-unit-select ${isFinalActive ? 'active' : ''}`;
+    learnBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true);
+  }
+  if (gameBtns[finalIdx]) {
+    gameBtns[finalIdx].className = `btn-unit-select ${isFinalActive ? 'active' : ''}`;
+    gameBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true);
   }
 }
 
@@ -3327,6 +3641,16 @@ function updateGameStartMeta() {
     }
     if (startTitle) startTitle.textContent = '🏆 ภารกิจจำลองสอบกลางภาค ป.1 (Let\'s Go 1)';
     if (startDesc) startDesc.textContent = `น้องๆ จะได้ทำข้อสอบ ${MIDTERM_QUESTION_COUNT} ข้อ รวมคำศัพท์ ไวยากรณ์ (Grammar) และฝึกโฟนิกส์ (Phonics Bb, Pp, Cc, Gg) ของบทเรียน Unit 1-2 เพื่อสะสมดาวทองเป็นกรณีพิเศษ!`;
+  } else if (currentUnitId === 'final_exam_prep') {
+    quizQuestionCount = FINAL_EXAM_QUESTION_COUNT;
+    if (gameModeSetup) gameModeSetup.style.display = 'none';
+    if (quizLengthSetup) quizLengthSetup.style.display = 'none';
+    if (startMetaInfo) {
+      startMetaInfo.innerHTML = `🌟 แบบทดสอบปลายภาค ป.1 มีทั้งหมด <span style="color:#7e22ce; font-weight:800;">${FINAL_EXAM_QUESTION_COUNT} ข้อ</span> ครบทุกแนวข้อสอบ Unit 3-4 จ้า`;
+      startMetaInfo.style.cssText = 'background: #faf5ff; border: 1.5px solid #e9d5ff; padding: 10px 16px; border-radius: 12px; display: inline-block; font-size: 0.95rem; font-weight: 600; color: #7e22ce; margin-bottom: 24px; animation: pulse-gold 2s infinite;';
+    }
+    if (startTitle) startTitle.textContent = '🌟 ภารกิจจำลองสอบปลายภาค ป.1 (Let\'s Go 1)';
+    if (startDesc) startDesc.textContent = `น้องๆ จะได้ทำข้อสอบ ${FINAL_EXAM_QUESTION_COUNT} ข้อ รวมคำศัพท์ สิ่งของในห้องเรียน/คนในครอบครัว, ไวยากรณ์ Singular/Plural, ประโยคถาม-ตอบ, บทสนทนา และฝึกโฟนิกส์ (Phonics Dd, Tt, Aa) ของบทเรียน Unit 3-4 เพื่อรับโบนัสดาวทองคำพิเศษ 25 ดวง!`;
   } else {
     if (gameModeSetup) gameModeSetup.style.display = 'block';
     if (quizLengthSetup) quizLengthSetup.style.display = 'block';
@@ -4048,6 +4372,21 @@ function celebrateQuizResult(correctCount, starsEarned) {
     playFeedbackSounds([
       makeUtterance('เย้! สอบจำลองกลางภาคสำเร็จแล้วค่ะ', 'th-TH', 1),
       makeUtterance(`น้องตอบถูก ${correctCount} จาก ${challengeQuestions.length} ข้อ และได้รับโบนัสดาวทองคำพิเศษ 20 ดวงสำหรับความพยายามสะสมไปเลยจ้า!`, 'th-TH', 1)
+    ]);
+    return;
+  }
+  
+  if (currentUnitId === 'final_exam_prep') {
+    // Grand celebration for final exam prep completion!
+    spawnStarConfetti(x - 120, y, 30);
+    spawnStarConfetti(x + 120, y, 30);
+    setTimeout(() => spawnStarConfetti(x, y - 60, 40), 250);
+    setTimeout(() => spawnStarConfetti(x, y, 25), 500);
+    
+    stopAllSpeech();
+    playFeedbackSounds([
+      makeUtterance('เย้! สอบจำลองปลายภาคสำเร็จแล้วค่ะ', 'th-TH', 1),
+      makeUtterance(`น้องตอบถูก ${correctCount} จาก ${challengeQuestions.length} ข้อ และได้รับโบนัสดาวทองคำพิเศษ 25 ดวงยอดเยี่ยมที่สุดเลยจ้า!`, 'th-TH', 1)
     ]);
     return;
   }
