@@ -1355,6 +1355,9 @@ function generateFinalExamQuestions() {
   const allWords = [...(unit3 ? unit3.words : []), ...(unit4 ? unit4.words : [])];
   const vocabPool = allWords.filter(w => w.type !== 'command');
 
+  const pCaseWord = unit3?.words.find(w => w.word.toLowerCase() === 'pencil case');
+  const pencilCaseImg = pCaseWord ? pCaseWord.image : `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="30" width="70" height="40" rx="8" fill="#ec4899" stroke="#db2777" stroke-width="3"/><rect x="15" y="38" width="70" height="6" fill="#f472b6"/><circle cx="50" cy="50" r="6" fill="#f59e0b"/><line x1="18" y1="42" x2="82" y2="42" stroke="#db2777" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M 25,30 Q 50,15 75,30" fill="none" stroke="#db2777" stroke-width="3" stroke-linecap="round"/></svg>`;
+
   // ── 1. VOCABULARY (8 questions: audio×3, visual_word×3, thai_image×2) ─────
   const vocabTargets = shuffle(vocabPool).slice(0, 8);
   const vocabTypePool = shuffle(['audio','audio','audio','visual_word','visual_word','visual_word','thai_image','thai_image']);
@@ -1374,7 +1377,7 @@ function generateFinalExamQuestions() {
     { sg: 'a crayon',      pl: 'crayons',      img: '🖍️', meaning: 'สีเทียน' },
     { sg: 'a marker',      pl: 'markers',      img: '🖊️', meaning: 'ปากกาเมจิก' },
     { sg: 'a notebook',    pl: 'notebooks',    img: '📓', meaning: 'สมุด' },
-    { sg: 'a pencil case', pl: 'pencil cases', img: '🎒', meaning: 'กล่องดินสอ' },
+    { sg: 'a pencil case', pl: 'pencil cases', img: pencilCaseImg, meaning: 'กล่องดินสอ' },
     { sg: 'a CD',          pl: 'CDs',          img: '💿', meaning: 'แผ่นซีดี' },
     { sg: 'a video game',  pl: 'video games',  img: '🎮', meaning: 'วีดีโอเกม' },
     { sg: 'a cell phone',  pl: 'cell phones',  img: '📱', meaning: 'โทรศัพท์' },
@@ -1427,7 +1430,7 @@ function generateFinalExamQuestions() {
     { pl: 'CDs',          sg: 'CD',          meaning: 'แผ่นซีดี',    img: '💿' },
     { pl: 'video games',  sg: 'video game',  meaning: 'วีดีโอเกม',   img: '🎮' },
     { pl: 'notebooks',    sg: 'notebook',    meaning: 'สมุด',          img: '📓' },
-    { pl: 'pencil cases', sg: 'pencil case', meaning: 'กล่องดินสอ',  img: '🎒' },
+    { pl: 'pencil cases', sg: 'pencil case', meaning: 'กล่องดินสอ',  img: pencilCaseImg },
     { pl: 'cell phones',  sg: 'cell phone',  meaning: 'โทรศัพท์',    img: '📱' },
   ];
   shuffle(whatAreThesePool).slice(0, 2).forEach(item => {
