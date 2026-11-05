@@ -74,16 +74,17 @@ const SHAPE_COLOR_MAP = {
 // --- Word classification helpers (single source of truth) ---
 // Words that are NOT singular countable nouns: action verbs, adjectives,
 // greetings and colors. They must never get "a/an" or "Is this a ___?" framing.
-const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many'];
+const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many', 'tall', 'short', 'young', 'old', 'pretty', 'handsome', 'say', 'read', 'write', 'ask', 'answer', 'big', 'little', 'new', 'long'];
 
 // "color" and "shape" ARE nouns, but they are abstract category headers whose
 // picture is a generic icon — so we never frame them as "Is this a ___?" /
 // "It's a ___" or use them as a picture quiz target.
-const CATEGORY_NOUNS = ['color', 'shape'];
+const CATEGORY_NOUNS = ['color', 'shape', 'birthday', 'year'];
 
 // True for any noun (used to decide part-of-speech style behavior).
 function isNounWord(item) {
   if (!item || item.type === 'command') return false;
+  if (item.label && item.label !== 'n') return false;
   return !NON_NOUN_WORDS.includes(item.word.trim().toLowerCase());
 }
 
