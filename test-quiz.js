@@ -12,7 +12,10 @@ try {
 
 // 2. Mock Browser Environment สำหรับทดสอบ Logic In-Memory
 const questionsCode = fs.readFileSync('./questions.js', 'utf8').replace('const VOCAB_UNITS =', 'global.VOCAB_UNITS =');
-const appCode = fs.readFileSync('./app.js', 'utf8').replace('let challengeQuestions =', 'global.challengeQuestions =');
+const appCode = fs.readFileSync('./app.js', 'utf8')
+  .replace('let challengeQuestions =', 'global.challengeQuestions =')
+  .replace('let dictationSessionList =', 'global.dictationSessionList =')
+  .replace('let selectedDictationRound =', 'global.selectedDictationRound =');
 
 global.SpeechSynthesisUtterance = function(text) {
   this.text = text;
@@ -93,6 +96,22 @@ testUnits.forEach(u => {
     allPassed = false;
   }
 });
+
+// 4. ทดสอบโหมดเขียนตามคำบอก (Dictation) โดยเฉพาะรอบที่ 6 (Unit 5: 8 คำ)
+console.log('\n📝 กำลังทดสอบโหมดเขียนตามคำบอก (Dictation)...');
+try {
+  selectedDictationRound = 'r6';
+  initDictationStudyMode();
+  if (dictationSessionList.length !== 8) {
+    console.error(`❌ Dictation Unit 5 (r6): ได้ ${dictationSessionList.length} คำ (คาดหวัง 8 คำ)`);
+    allPassed = false;
+  } else {
+    console.log(`✅ Dictation Unit 5 (r6) โหลดคำศัพท์ครบ 8 คำ: ${dictationSessionList.map(w => w.word).join(', ')}`);
+  }
+} catch (err) {
+  console.error('❌ Dictation Unit 5 พบ Error:', err.message);
+  allPassed = false;
+}
 
 if (allPassed) {
   console.log('\n🎉 ทุกโหมดผ่านการทดสอบ 100% พร้อมใช้งานบนเบราว์เซอร์ครับ!');

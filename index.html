@@ -210,6 +210,9 @@
             <button type="button" class="btn-toggle-option" id="btn-dictation-r5" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
               ยูนิต 3 (5 คำ)
             </button>
+            <button type="button" class="btn-toggle-option" id="btn-dictation-r6" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
+              ยูนิต 5 (8 คำ)
+            </button>
           </div>
 
           <!-- 5 Words Study Guide -->
@@ -229,7 +232,7 @@
         <div id="dictation-play-area" style="display: none;">
           <div class="game-meta-bar">
             <div class="game-tracker" style="font-weight: 700; color: var(--dark-3);">
-              เขียนคำศัพท์ข้อที่ <span id="current-dictation-num" class="text-highlight" style="color: var(--primary-hover); font-weight: 800;">1</span> จาก 5 ข้อ
+              เขียนคำศัพท์ข้อที่ <span id="current-dictation-num" class="text-highlight" style="color: var(--primary-hover); font-weight: 800;">1</span> จาก <span id="total-dictation-num">5</span> ข้อ
             </div>
             <div class="game-timer" style="background: var(--primary-light); border-color: var(--primary-border); color: var(--primary-dark);">⭐ คะแนน: <span id="dictation-current-score" style="font-weight: 800;">0</span></div>
           </div>
@@ -283,7 +286,7 @@
           <div style="max-width: 320px; margin: 0 auto 30px; background: var(--primary-light); border: 2px solid var(--primary-border); padding: 20px; border-radius: 20px;">
             <div style="font-size: 0.95rem; color: var(--primary-dark); font-weight: 700;">คะแนนที่ได้</div>
             <div style="font-family: var(--font-display); font-size: clamp(2.2rem, 9vw, 3.5rem); font-weight: 700; color: var(--primary-hover); margin: 10px 0;">
-              <span id="dictation-result-score">0</span> / 5
+              <span id="dictation-result-score">0</span> / <span id="dictation-result-total">5</span>
             </div>
             <div style="font-size: 0.85rem; color: var(--text-muted);" id="dictation-result-message">ดีมากจ้า พยายามต่อไปนะ!</div>
           </div>

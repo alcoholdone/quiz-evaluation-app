@@ -28,7 +28,8 @@ const DICTATION_ROUNDS = {
   r2: ['desk', 'eraser', 'globe', 'map', 'marker'],
   r3: ['pen', 'pencil', 'poster', 'ruler', 'wastebasket'],
   r4: ['yellow', 'purple', 'triangle', 'star', 'diamond'], // Unit 2: colors & shapes
-  r5: ['notebook', 'pencil case', 'cell phone', 'computer', 'point'] // Unit 3: friends and play
+  r5: ['notebook', 'pencil case', 'cell phone', 'computer', 'point'], // Unit 3: friends and play
+  r6: ['baseball', 'kite', 'bicycle', 'jump rope', 'puzzle', 'little', 'long', 'square'] // Unit 5: 8 words
 };
 let selectedDictationRound = 'r1';
 const DICTATION_STORAGE_KEY = 'aura_kids_dictation_history_v1';
@@ -74,7 +75,7 @@ const SHAPE_COLOR_MAP = {
 // --- Word classification helpers (single source of truth) ---
 // Words that are NOT singular countable nouns: action verbs, adjectives,
 // greetings and colors. They must never get "a/an" or "Is this a ___?" framing.
-const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many', 'tall', 'short', 'young', 'old', 'pretty', 'handsome', 'say', 'read', 'write', 'ask', 'answer', 'big', 'little', 'new', 'long'];
+const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many', 'tall', 'short', 'young', 'old', 'pretty', 'handsome', 'say', 'read', 'write', 'ask', 'answer', 'big', 'little', 'new', 'long', 'round', 'square', 'ride', 'throw', 'catch'];
 
 // "color" and "shape" ARE nouns, but they are abstract category headers whose
 // picture is a generic icon — so we never frame them as "Is this a ___?" /
@@ -318,7 +319,7 @@ function setupEventListeners() {
   // Dictation Round Selector Click Listeners
   const updateDictationRound = (roundKey) => {
     selectedDictationRound = roundKey;
-    ['r1', 'r2', 'r3', 'r4', 'r5'].forEach(r => {
+    ['r1', 'r2', 'r3', 'r4', 'r5', 'r6'].forEach(r => {
       const btn = document.getElementById(`btn-dictation-${r}`);
       if (btn) {
         if (r === roundKey) {
@@ -338,14 +339,15 @@ function setupEventListeners() {
     });
 
     // Update instruction texts dynamically
-    const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2', r5: 'ยูนิต 3' }[roundKey] || 'รอบที่ 1';
+    const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2', r5: 'ยูนิต 3', r6: 'ยูนิต 5' }[roundKey] || 'รอบที่ 1';
+    const roundWordCount = (DICTATION_ROUNDS[roundKey] || []).length || 5;
     const dictationDesc = document.querySelector('#dictation-start-screen p');
     if (dictationDesc) {
-      dictationDesc.textContent = `มา${roundLabel} ฝึกเขียนตามคำบอก 5 คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ`;
+      dictationDesc.textContent = `มา${roundLabel} ฝึกเขียนตามคำบอก ${roundWordCount} คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ`;
     }
     const dictationGuideHeader = document.querySelector('.dictation-study-guide h3');
     if (dictationGuideHeader) {
-      dictationGuideHeader.textContent = `📖 คำศัพท์เตรียมท่อง${roundLabel}`;
+      dictationGuideHeader.textContent = `📖 คำศัพท์เตรียมท่อง${roundLabel} (${roundWordCount} คำ)`;
     }
 
     initDictationStudyMode();
@@ -356,11 +358,13 @@ function setupEventListeners() {
   const btnR3 = document.getElementById('btn-dictation-r3');
   const btnR4 = document.getElementById('btn-dictation-r4');
   const btnR5 = document.getElementById('btn-dictation-r5');
+  const btnR6 = document.getElementById('btn-dictation-r6');
   if (btnR1) btnR1.addEventListener('click', () => updateDictationRound('r1'));
   if (btnR2) btnR2.addEventListener('click', () => updateDictationRound('r2'));
   if (btnR3) btnR3.addEventListener('click', () => updateDictationRound('r3'));
   if (btnR4) btnR4.addEventListener('click', () => updateDictationRound('r4'));
   if (btnR5) btnR5.addEventListener('click', () => updateDictationRound('r5'));
+  if (btnR6) btnR6.addEventListener('click', () => updateDictationRound('r6'));
 }
 
 // MAIN TAB SWITCHING
@@ -3855,9 +3859,24 @@ function initDictationStudyMode() {
     : ((VOCAB_LIST && VOCAB_LIST.length > 0) ? VOCAB_LIST : []);
   
   const roundWords = DICTATION_ROUNDS[selectedDictationRound] || DICTATION_ROUNDS.r1;
-  dictationSessionList = sourceList.filter(item => 
-    roundWords.includes(item.word.trim().toLowerCase())
-  );
+  const unitMap = { r1: 'unit_1', r2: 'unit_1', r3: 'unit_1', r4: 'unit_2', r5: 'unit_3', r6: 'unit_5' };
+  const targetUnitId = unitMap[selectedDictationRound];
+  const targetUnit = (typeof VOCAB_UNITS !== 'undefined') ? VOCAB_UNITS.find(u => u.id === targetUnitId) : null;
+  const primaryList = (targetUnit && targetUnit.words) ? targetUnit.words : [];
+
+  dictationSessionList = [];
+  const seen = new Set();
+  roundWords.forEach(w => {
+    const wLower = w.trim().toLowerCase();
+    let item = primaryList.find(x => x.word.trim().toLowerCase() === wLower);
+    if (!item) {
+      item = sourceList.find(x => x.word.trim().toLowerCase() === wLower && !seen.has(x.word.toLowerCase()));
+    }
+    if (item && !seen.has(item.word.toLowerCase())) {
+      seen.add(item.word.toLowerCase());
+      dictationSessionList.push(item);
+    }
+  });
 
   // Fallback เพิ่มเติมหากไม่พบคำใดๆ เลย ป้องกันระบบขัดข้อง
   if (dictationSessionList.length === 0) {
@@ -3920,14 +3939,17 @@ function renderDictationQuestion() {
   stopAllSpeech();
 
   // อัปเดตข้อมูล UI ข้อปัจจุบัน
+  const totalQuestions = dictationSessionList.length || 5;
   const currentNumNode = document.getElementById('current-dictation-num');
+  const totalNumNode = document.getElementById('total-dictation-num');
   const currentScoreNode = document.getElementById('dictation-current-score');
   const progressBarNode = document.getElementById('dictation-progress-bar');
 
   if (currentNumNode) currentNumNode.textContent = currentDictationIndex + 1;
+  if (totalNumNode) totalNumNode.textContent = totalQuestions;
   if (currentScoreNode) currentScoreNode.textContent = dictationScore;
 
-  const progressPct = (currentDictationIndex / 5) * 100;
+  const progressPct = (currentDictationIndex / totalQuestions) * 100;
   if (progressBarNode) progressBarNode.style.width = `${progressPct}%`;
 
   // แสดงคำแปลไทยเพื่อบอกคำใบ้
@@ -4086,14 +4108,15 @@ function checkDictationSpelling(item) {
   }
 
   // อัปเดต Progress Bar สำหรับข้อปัจจุบัน
+  const totalQuestions = dictationSessionList.length || 5;
   const progressBarNode = document.getElementById('dictation-progress-bar');
-  const progressPct = ((currentDictationIndex + 1) / 5) * 100;
+  const progressPct = ((currentDictationIndex + 1) / totalQuestions) * 100;
   if (progressBarNode) progressBarNode.style.width = `${progressPct}%`;
 
   // หน่วงเวลา 4.2 วินาที ก่อนขยับข้อถัดไป เพื่อให้เด็กสังเกตคำสะกดเฉลยและฟังเสียงสะกดจนเสร็จสิ้น
   setTimeout(() => {
     currentDictationIndex++;
-    if (currentDictationIndex < 5) {
+    if (currentDictationIndex < totalQuestions) {
       renderDictationQuestion();
     } else {
       showDictationResults();
@@ -4125,14 +4148,23 @@ function showDictationResults() {
   if (nodes.dictationPlayArea) nodes.dictationPlayArea.style.display = 'none';
   if (nodes.dictationResultScreen) nodes.dictationResultScreen.style.display = 'block';
 
+  const totalQuestions = dictationSessionList.length || 5;
   const resultScoreNode = document.getElementById('dictation-result-score');
+  const resultTotalNode = document.getElementById('dictation-result-total');
   if (resultScoreNode) resultScoreNode.textContent = dictationScore;
+  if (resultTotalNode) resultTotalNode.textContent = totalQuestions;
+
+  const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2', r5: 'ยูนิต 3', r6: 'ยูนิต 5' }[selectedDictationRound] || 'รอบที่ 1';
+  const resultDescNode = document.getElementById('dictation-result-desc');
+  if (resultDescNode) {
+    resultDescNode.textContent = `น้องทำแบบทดสอบเขียนตามคำบอก ${roundLabel} สำเร็จแล้ว`;
+  }
 
   let msg = '';
-  if (dictationScore === 5) {
+  if (dictationScore === totalQuestions) {
     msg = 'ยอดเยี่ยมที่สุดเลยจ้า! สะกดเขียนคำถูกต้องครบถ้วนทุกข้อเลย 🏆🌟';
     speakTH('ยอดเยี่ยมที่สุดเลยจ้า สะกดเขียนคำถูกต้องครบถ้วนทุกข้อเลย');
-  } else if (dictationScore >= 3) {
+  } else if (dictationScore >= Math.ceil(totalQuestions * 0.6)) {
     msg = 'ดีมากเลยจ้า! น้องตอบถูกส่วนใหญ่ ฝึกฝนอีกนิดจะเก่งมากยิ่งขึ้นนะจ๊ะ 👍';
     speakTH('ดีมากเลยจ้า น้องตอบถูกส่วนใหญ่ ฝึกฝนอีกนิดจะเก่งมากยิ่งขึ้นนะจ๊ะ');
   } else {
@@ -4161,6 +4193,7 @@ function saveDictationHistory(score) {
   const history = getDictationHistory();
   const attempt = {
     score: score,
+    total: dictationSessionList.length || 5,
     date: new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
     timestamp: Date.now(),
     round: selectedDictationRound
@@ -4204,12 +4237,20 @@ function renderDictationHistoryInDashboard() {
     item.style.alignItems = 'center';
     item.style.margin = '0';
 
+    const totalQ = attempt.total || (attempt.round === 'r6' ? 8 : 5);
     let stars = '';
-    for (let s = 0; s < 5; s++) {
+    for (let s = 0; s < totalQ; s++) {
       stars += s < attempt.score ? '⭐' : '☆';
     }
 
-    const roundName = attempt.round === 'r2' ? 'รอบที่ 2' : attempt.round === 'r3' ? 'รอบที่ 3' : 'รอบที่ 1';
+    const roundName = {
+      r1: 'รอบที่ 1',
+      r2: 'รอบที่ 2',
+      r3: 'รอบที่ 3',
+      r4: 'ยูนิต 2',
+      r5: 'ยูนิต 3',
+      r6: 'ยูนิต 5'
+    }[attempt.round] || 'รอบที่ 1';
 
     item.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
@@ -4218,7 +4259,7 @@ function renderDictationHistoryInDashboard() {
       </div>
       <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
         <span style="color: var(--accent-dark); font-weight: 700; font-size: 1.1rem; letter-spacing: 2px;">${stars}</span>
-        <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-hover);">${attempt.score} / 5 คะแนน</span>
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-hover);">${attempt.score} / ${totalQ} คะแนน</span>
       </div>
     `;
     listNode.appendChild(item);

@@ -2191,6 +2191,299 @@ const VOCAB_UNITS = [
   <rect x="30" y="74" width="58" height="4" rx="2" fill="#cbd5e1" opacity="0.4"/>
 </svg>`,
         explanation: '✏️ Short สะกดว่า S - H - O - R - T แปลว่า สั้น สิ่งของที่มีความยาวน้อย เป็นคำตรงข้ามกับ Long จ้า'
+      },
+      {
+        word: 'Round',
+        meaning: 'กลม',
+        syllable: 'round',
+        label: 'adj',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Soft ground shadow -->
+  <ellipse cx="50" cy="85" rx="30" ry="6" fill="#374151" opacity="0.15"/>
+  <!-- Perfect Round Circle with vibrant gradient / shine -->
+  <circle cx="50" cy="48" r="34" fill="#f59e0b"/>
+  <circle cx="50" cy="48" r="30" fill="#fbbf24"/>
+  <!-- Highlight crescent -->
+  <path d="M 28,32 A 28 28 0 0 1 72 32 A 32 32 0 0 0 28 32 Z" fill="#ffffff" opacity="0.5"/>
+  <!-- Concentric round rings -->
+  <circle cx="50" cy="48" r="20" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 3"/>
+  <!-- Center circle -->
+  <circle cx="50" cy="48" r="8" fill="#d97706"/>
+  <!-- "ROUND" badge -->
+  <rect x="25" y="42" width="50" height="13" rx="4" fill="#1e293b"/>
+  <text x="50" y="52" font-size="8.5" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">ROUND</text>
+  <!-- Sparkles -->
+  <text x="12" y="24" font-size="10" fill="#fbbf24">✦</text>
+  <text x="82" y="32" font-size="8" fill="#f59e0b">✦</text>
+</svg>`,
+        explanation: '🟡 Round สะกดว่า R - O - U - N - D แปลว่า กลม มีรูปร่างกลมเหมือนลูกบอลหรือวงกลมจ้า'
+      },
+      {
+        word: 'Square',
+        meaning: 'สี่เหลี่ยมจัตุรัส',
+        syllable: 'square',
+        label: 'adj',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground shadow -->
+  <ellipse cx="50" cy="86" rx="32" ry="5" fill="#374151" opacity="0.15"/>
+  <!-- Square body with 4 equal sides -->
+  <rect x="22" y="20" width="56" height="56" rx="6" fill="#2563eb" stroke="#1d4ed8" stroke-width="2"/>
+  <!-- Inner square outline -->
+  <rect x="28" y="26" width="44" height="44" rx="4" fill="#3b82f6"/>
+  <!-- Right-angle indicators on corners -->
+  <path d="M 32,38 L 38,38 L 38,32" fill="none" stroke="#ffffff" stroke-width="1.8"/>
+  <path d="M 68,38 L 62,38 L 62,32" fill="none" stroke="#ffffff" stroke-width="1.8"/>
+  <path d="M 32,58 L 38,58 L 38,64" fill="none" stroke="#ffffff" stroke-width="1.8"/>
+  <path d="M 68,58 L 62,58 L 62,64" fill="none" stroke="#ffffff" stroke-width="1.8"/>
+  <!-- "SQUARE" label in center -->
+  <rect x="27" y="43" width="46" height="12" rx="3" fill="#1e293b"/>
+  <text x="50" y="52" font-size="7.5" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">SQUARE</text>
+  <!-- Equal tick marks on 4 sides -->
+  <line x1="50" y1="17" x2="50" y2="23" stroke="#fbbf24" stroke-width="2"/>
+  <line x1="50" y1="73" x2="50" y2="79" stroke="#fbbf24" stroke-width="2"/>
+  <line x1="19" y1="48" x2="25" y2="48" stroke="#fbbf24" stroke-width="2"/>
+  <line x1="75" y1="48" x2="81" y2="48" stroke="#fbbf24" stroke-width="2"/>
+  <!-- Sparkles -->
+  <text x="82" y="24" font-size="9" fill="#fbbf24">✦</text>
+</svg>`,
+        explanation: '🟦 Square สะกดว่า S - Q - U - A - R - E แปลว่า สี่เหลี่ยมจัตุรัส มีด้านเท่ากัน 4 ด้านและมุมฉากจ้า'
+      },
+      {
+        word: 'Ride',
+        meaning: 'ขี่',
+        syllable: 'ride',
+        label: 'v',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground -->
+  <line x1="8" y1="88" x2="92" y2="88" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <!-- Bicycle Wheels -->
+  <circle cx="26" cy="74" r="14" fill="none" stroke="#334155" stroke-width="3"/>
+  <circle cx="74" cy="74" r="14" fill="none" stroke="#334155" stroke-width="3"/>
+  <circle cx="26" cy="74" r="2.5" fill="#64748b"/>
+  <circle cx="74" cy="74" r="2.5" fill="#64748b"/>
+  <!-- Bicycle Frame -->
+  <line x1="26" y1="74" x2="44" y2="74" stroke="#0284c7" stroke-width="2.5"/>
+  <line x1="26" y1="74" x2="38" y2="56" stroke="#0284c7" stroke-width="2.5"/>
+  <line x1="44" y1="74" x2="38" y2="52" stroke="#0284c7" stroke-width="2.5"/>
+  <line x1="44" y1="74" x2="64" y2="56" stroke="#0284c7" stroke-width="2.5"/>
+  <line x1="38" y1="56" x2="64" y2="56" stroke="#0284c7" stroke-width="2.5"/>
+  <line x1="74" y1="74" x2="64" y2="50" stroke="#0284c7" stroke-width="2.5"/>
+  <!-- Handlebars -->
+  <path d="M 60,50 L 68,48" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Kid Rider -->
+  <line x1="40" y1="46" x2="48" y2="60" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+  <line x1="48" y1="60" x2="44" y2="72" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="40" y1="46" x2="52" y2="34" stroke="#ef4444" stroke-width="7" stroke-linecap="round"/>
+  <line x1="50" y1="36" x2="64" y2="48" stroke="#fcd9bd" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Head & Helmet -->
+  <circle cx="56" cy="24" r="7" fill="#fcd9bd"/>
+  <path d="M 48,22 Q 56,12 64,22 Z" fill="#fbbf24"/>
+  <circle cx="64" cy="22" r="2" fill="#d97706"/>
+  <!-- Motion breeze lines -->
+  <line x1="12" y1="36" x2="24" y2="36" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="8" y1="42" x2="20" y2="42" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/>
+</svg>`,
+        explanation: '🚴 Ride สะกดว่า R - I - D - E แปลว่า ขี่ เช่น Ride a bicycle ขี่จักรยาน หรือขี่ม้าจ้า'
+      },
+      {
+        word: 'Jump',
+        meaning: 'กระโดด',
+        syllable: 'jump',
+        label: 'v',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground and shadow far below showing height -->
+  <line x1="14" y1="92" x2="86" y2="92" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <ellipse cx="50" cy="92" rx="14" ry="3" fill="#374151" opacity="0.2"/>
+  <!-- Upward motion swooshes from ground -->
+  <path d="M 42,90 Q 42,76 38,68" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 50,90 L 50,68" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 58,90 Q 58,76 62,68" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+  <polygon points="50,60 45,67 55,67" fill="#ef4444"/>
+  <!-- Kid jumping in mid-air -->
+  <line x1="44" y1="52" x2="34" y2="62" stroke="#1d4ed8" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="34" y1="62" x2="38" y2="70" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+  <line x1="56" y1="52" x2="66" y2="62" stroke="#1d4ed8" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="66" y1="62" x2="62" y2="70" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+  <rect x="42" y="34" width="16" height="20" rx="6" fill="#10b981"/>
+  <!-- Arms raised high -->
+  <line x1="43" y1="38" x2="28" y2="22" stroke="#fcd9bd" stroke-width="4" stroke-linecap="round"/>
+  <line x1="57" y1="38" x2="72" y2="22" stroke="#fcd9bd" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="50" cy="22" r="10" fill="#fcd9bd"/>
+  <ellipse cx="50" cy="14" rx="10" ry="6" fill="#92400e"/>
+  <path d="M 46,24 Q 50,28 54,24" stroke="#b91c1c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <circle cx="47" cy="20" r="1.5" fill="#1e293b"/>
+  <circle cx="53" cy="20" r="1.5" fill="#1e293b"/>
+  <!-- Star sparkles -->
+  <text x="14" y="20" font-size="10" fill="#fbbf24">✦</text>
+  <text x="78" y="20" font-size="10" fill="#fbbf24">✦</text>
+</svg>`,
+        explanation: '🦘 Jump สะกดว่า J - U - M - P แปลว่า กระโดด เช่น Jump high กระโดดขึ้นสูงๆ จ้า'
+      },
+      {
+        word: 'Throw',
+        meaning: 'ขว้าง, ปา',
+        syllable: 'throw',
+        label: 'v',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground -->
+  <line x1="10" y1="90" x2="90" y2="90" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+  <!-- Character throwing ball -->
+  <line x1="36" y1="64" x2="22" y2="88" stroke="#1e293b" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="36" y1="64" x2="48" y2="88" stroke="#1e293b" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="36" y1="64" x2="40" y2="42" stroke="#f97316" stroke-width="9" stroke-linecap="round"/>
+  <line x1="40" y1="46" x2="56" y2="52" stroke="#fcd9bd" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="38" y1="42" x2="52" y2="28" stroke="#fcd9bd" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="42" cy="28" r="9" fill="#fcd9bd"/>
+  <ellipse cx="40" cy="21" rx="8" ry="5" fill="#1e293b"/>
+  <!-- Flying Baseball -->
+  <circle cx="78" cy="34" r="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 74,28 Q 78,34 74,40" stroke="#ef4444" stroke-width="1.2" fill="none"/>
+  <path d="M 82,28 Q 78,34 82,40" stroke="#ef4444" stroke-width="1.2" fill="none"/>
+  <!-- Motion streaks -->
+  <path d="M 54,30 Q 64,32 70,34" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2"/>
+  <line x1="56" y1="36" x2="68" y2="38" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>`,
+        explanation: '⚾ Throw สะกดว่า T - H - R - O - W แปลว่า ขว้าง หรือ ปา เช่น Throw a ball ขว้างลูกบอลจ้า'
+      },
+      {
+        word: 'Catch',
+        meaning: 'จับ, คว้า',
+        syllable: 'catch',
+        label: 'v',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground shadow -->
+  <ellipse cx="50" cy="88" rx="26" ry="4" fill="#374151" opacity="0.15"/>
+  <!-- Large Baseball Mitt / Catching Glove -->
+  <path d="M 32,74 C 20,68 18,48 24,36 C 28,26 40,24 46,30 C 50,22 62,22 66,30 C 72,26 82,30 80,44 C 84,52 82,68 70,76 Z" fill="#b45309" stroke="#78350f" stroke-width="2.5"/>
+  <!-- Glove Webbing -->
+  <path d="M 36,36 L 54,34 M 38,44 L 56,42 M 42,32 L 44,48 M 50,32 L 52,48" stroke="#78350f" stroke-width="2"/>
+  <ellipse cx="54" cy="54" rx="16" ry="14" fill="#92400e"/>
+  <!-- Caught Baseball right in the mitt! -->
+  <circle cx="54" cy="52" r="13" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 47,44 Q 52,52 47,60" stroke="#ef4444" stroke-width="1.5" fill="none"/>
+  <path d="M 61,44 Q 56,52 61,60" stroke="#ef4444" stroke-width="1.5" fill="none"/>
+  <!-- Impact / Catch sparkles -->
+  <polygon points="54,26 56,31 61,31 57,34 59,39 54,36 49,39 51,34 47,31 52,31" fill="#fbbf24"/>
+  <text x="76" y="24" font-size="10" fill="#f59e0b">✦</text>
+  <text x="14" y="32" font-size="9" fill="#fbbf24">✦</text>
+</svg>`,
+        explanation: '🧤 Catch สะกดว่า C - A - T - C - H แปลว่า จับ หรือ คว้า เช่น Catch a ball จับลูกบอลด้วยถุงมือจ้า'
+      },
+      {
+        word: 'Egg',
+        meaning: 'ไข่',
+        syllable: 'egg',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground shadow -->
+  <ellipse cx="50" cy="86" rx="28" ry="6" fill="#374151" opacity="0.15"/>
+  <!-- Egg Body -->
+  <path d="M 50,16 C 30,16 22,46 22,64 C 22,80 34,86 50,86 C 66,86 78,80 78,64 C 78,46 70,16 50,16 Z" fill="#ffedd5" stroke="#fed7aa" stroke-width="2"/>
+  <path d="M 28,64 C 28,78 38,84 50,84 C 64,84 74,78 74,64 C 74,74 62,82 50,82 C 36,82 28,74 28,64 Z" fill="#fdba74" opacity="0.3"/>
+  <!-- Highlights -->
+  <ellipse cx="40" cy="38" rx="8" ry="16" fill="#ffffff" opacity="0.6" transform="rotate(-20 40 38)"/>
+  <ellipse cx="42" cy="34" rx="4" ry="8" fill="#ffffff" opacity="0.8" transform="rotate(-20 42 34)"/>
+  <!-- Sparkles -->
+  <text x="14" y="30" font-size="10" fill="#fbbf24">✦</text>
+  <text x="80" y="42" font-size="9" fill="#f59e0b">✦</text>
+</svg>`,
+        explanation: '🥚 Egg สะกดว่า E - G - G แปลว่า ไข่ อาหารแสนอร่อยและมีประโยชน์จ้า'
+      },
+      {
+        word: 'Bed',
+        meaning: 'เตียง',
+        syllable: 'bed',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Floor shadow -->
+  <ellipse cx="50" cy="88" rx="42" ry="5" fill="#374151" opacity="0.15"/>
+  <!-- Headboard -->
+  <rect x="14" y="34" width="10" height="48" rx="3" fill="#b45309"/>
+  <rect x="12" y="30" width="14" height="6" rx="2" fill="#d97706"/>
+  <!-- Footboard -->
+  <rect x="80" y="52" width="8" height="30" rx="3" fill="#b45309"/>
+  <rect x="78" y="48" width="12" height="6" rx="2" fill="#d97706"/>
+  <!-- Bed Frame & Legs -->
+  <rect x="22" y="66" width="60" height="12" rx="2" fill="#d97706"/>
+  <rect x="18" y="78" width="6" height="10" rx="1" fill="#78350f"/>
+  <rect x="80" y="78" width="6" height="10" rx="1" fill="#78350f"/>
+  <!-- Mattress & Pillow -->
+  <rect x="20" y="56" width="62" height="12" rx="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="24" y="46" width="18" height="12" rx="4" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5"/>
+  <!-- Blanket (Cyan) -->
+  <path d="M 38,54 L 80,54 L 80,68 L 38,68 Z" fill="#06b6d4"/>
+  <path d="M 34,54 Q 38,48 42,54" stroke="#0891b2" stroke-width="3" fill="#a5f3fc"/>
+  <line x1="52" y1="54" x2="52" y2="68" stroke="#0891b2" stroke-width="2"/>
+  <line x1="66" y1="54" x2="66" y2="68" stroke="#0891b2" stroke-width="2"/>
+  <!-- Sleep hints -->
+  <text x="74" y="28" font-size="10" font-weight="900" fill="#3b82f6" font-family="sans-serif">Z</text>
+  <text x="82" y="20" font-size="8" font-weight="900" fill="#60a5fa" font-family="sans-serif">z</text>
+</svg>`,
+        explanation: '🛏️ Bed สะกดว่า B - E - D แปลว่า เตียง ที่นอนนุ่มๆ สำหรับนอนหลับพักผ่อนจ้า'
+      },
+      {
+        word: 'Pet',
+        meaning: 'สัตว์เลี้ยง',
+        syllable: 'pet',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground shadow -->
+  <ellipse cx="50" cy="86" rx="28" ry="5" fill="#374151" opacity="0.15"/>
+  <!-- Dog Body & Paws -->
+  <ellipse cx="50" cy="66" rx="20" ry="18" fill="#d97706"/>
+  <ellipse cx="50" cy="68" rx="11" ry="12" fill="#fef3c7"/>
+  <ellipse cx="40" cy="84" rx="6" ry="4" fill="#b45309"/>
+  <ellipse cx="60" cy="84" rx="6" ry="4" fill="#b45309"/>
+  <!-- Tail -->
+  <path d="M 68,64 Q 82,58 78,48" fill="none" stroke="#d97706" stroke-width="6" stroke-linecap="round"/>
+  <!-- Collar -->
+  <rect x="36" y="50" width="28" height="5" rx="2" fill="#ef4444"/>
+  <circle cx="50" cy="56" r="3.5" fill="#fbbf24"/>
+  <!-- Head & Ears -->
+  <circle cx="50" cy="38" r="16" fill="#d97706"/>
+  <ellipse cx="33" cy="38" rx="6" ry="13" fill="#b45309" transform="rotate(15 33 38)"/>
+  <ellipse cx="67" cy="38" rx="6" ry="13" fill="#b45309" transform="rotate(-15 67 38)"/>
+  <!-- Face -->
+  <ellipse cx="50" cy="44" rx="8" ry="6" fill="#fef3c7"/>
+  <ellipse cx="50" cy="41" rx="4" ry="2.5" fill="#1e293b"/>
+  <circle cx="43" cy="34" r="2.5" fill="#1e293b"/>
+  <circle cx="57" cy="34" r="2.5" fill="#1e293b"/>
+  <circle cx="44" cy="33" r="0.8" fill="#ffffff"/>
+  <circle cx="58" cy="33" r="0.8" fill="#ffffff"/>
+  <path d="M 47,46 Q 50,49 53,46" stroke="#1e293b" stroke-width="1.5" fill="none"/>
+  <ellipse cx="50" cy="48" rx="2.5" ry="3" fill="#f472b6"/>
+  <!-- Love Heart -->
+  <path d="M 50,16 Q 47,12 43,14 Q 39,17 43,21 L 50,26 L 57,21 Q 61,17 57,14 Q 53,12 50,16 Z" fill="#ef4444"/>
+</svg>`,
+        explanation: '🐶 Pet สะกดว่า P - E - T แปลว่า สัตว์เลี้ยง เช่น สุนัขหรือแมวแสนน่ารักที่เราเลี้ยงไว้จ้า'
+      },
+      {
+        word: 'Peg',
+        meaning: 'หมุด',
+        syllable: 'peg',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clothesline -->
+  <line x1="8" y1="52" x2="92" y2="52" stroke="#64748b" stroke-width="3" stroke-linecap="round"/>
+  <!-- Ground shadow -->
+  <ellipse cx="50" cy="88" rx="20" ry="4" fill="#374151" opacity="0.15"/>
+  <!-- Wooden Clothes Peg -->
+  <path d="M 42,16 L 46,44 L 41,78 L 47,78 L 48,46 L 45,16 Z" fill="#d97706"/>
+  <path d="M 58,16 L 54,44 L 59,78 L 53,78 L 52,46 L 55,16 Z" fill="#b45309"/>
+  <rect x="42" y="14" width="6" height="12" rx="2" fill="#f59e0b"/>
+  <rect x="52" y="14" width="6" height="12" rx="2" fill="#d97706"/>
+  <!-- Metal spring -->
+  <circle cx="50" cy="45" r="7" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+  <circle cx="50" cy="45" r="3" fill="#f8fafc"/>
+  <line x1="43" y1="45" x2="40" y2="34" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
+  <line x1="57" y1="45" x2="60" y2="34" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
+  <!-- Clamped paper/cloth -->
+  <path d="M 45,52 L 45,72 L 55,72 L 55,52 Z" fill="#38bdf8" opacity="0.6"/>
+  <!-- Sparkles -->
+  <text x="16" y="28" font-size="10" fill="#fbbf24">✦</text>
+  <text x="76" y="36" font-size="9" fill="#f59e0b">✦</text>
+</svg>`,
+        explanation: '📌 Peg สะกดว่า P - E - G แปลว่า หมุด หรือ ที่หนีบผ้า เอาไว้กลัดหรือยึดติดสิ่งของจ้า'
       }
     ]
   }
