@@ -15,7 +15,9 @@ const questionsCode = fs.readFileSync('./questions.js', 'utf8').replace('const V
 const appCode = fs.readFileSync('./app.js', 'utf8')
   .replace('let challengeQuestions =', 'global.challengeQuestions =')
   .replace('let dictationSessionList =', 'global.dictationSessionList =')
-  .replace('let selectedDictationRound =', 'global.selectedDictationRound =');
+  .replace('let selectedDictationRound =', 'global.selectedDictationRound =')
+  .replace('let currentTerm =', 'global.currentTerm =')
+  .replace('let currentUnitId =', 'global.currentUnitId =');
 
 global.SpeechSynthesisUtterance = function(text) {
   this.text = text;
@@ -60,6 +62,34 @@ global.localStorage = { getItem: () => null, setItem: () => {} };
 eval(questionsCode);
 eval(appCode);
 
+let allPassed = true;
+
+// 2.5 ทดสอบค่าเริ่มต้น (เทอม 2 -> Unit 5, Dictation r6)
+console.log('📅 กำลังทดสอบระบบแยกเทอม (Term 1 / Term 2)...');
+if (currentTerm !== 2 || currentUnitId !== 'unit_5' || selectedDictationRound !== 'r6') {
+  console.error(`❌ ค่าเริ่มต้นไม่ถูกต้อง: term=${currentTerm}, unit=${currentUnitId}, dictation=${selectedDictationRound}`);
+  allPassed = false;
+} else {
+  console.log('✅ ค่าเริ่มต้นถูกต้อง: เทอม 2 (Unit 5 + Dictation ยูนิต 5)');
+}
+
+// ทดสอบสลับเป็นเทอม 1 และสลับกลับเทอม 2
+setCurrentTerm(1);
+if (currentTerm !== 1 || currentUnitId !== 'unit_1' || selectedDictationRound !== 'r1') {
+  console.error(`❌ สลับเป็นเทอม 1 ไม่ถูกต้อง: term=${currentTerm}, unit=${currentUnitId}, dictation=${selectedDictationRound}`);
+  allPassed = false;
+} else {
+  console.log('✅ สลับเป็นเทอม 1 ผ่านฉลุย! (unit_1 + dictation r1)');
+}
+
+setCurrentTerm(2);
+if (currentTerm !== 2 || currentUnitId !== 'unit_5' || selectedDictationRound !== 'r6') {
+  console.error(`❌ สลับกลับเทอม 2 ไม่ถูกต้อง: term=${currentTerm}, unit=${currentUnitId}, dictation=${selectedDictationRound}`);
+  allPassed = false;
+} else {
+  console.log('✅ สลับกลับเทอม 2 ผ่านฉลุย! (unit_5 + dictation r6)\n');
+}
+
 // 3. ทดสอบการสร้างข้อสอบและ Render ในแต่ละโหมด
 console.log('🎮 กำลังทดสอบฟังก์ชันสร้างข้อสอบและการทำงานของแต่ละโหมด...');
 const testUnits = [
@@ -72,8 +102,6 @@ const testUnits = [
   { id: 'final_exam_prep', expected: 29, name: '🌟 เตรียมสอบปลายภาค (Let\'s Go 3 Unit 3-4)' },
   { id: 'unit5_exam', expected: 20, name: '🎯 สอบท้ายบท Unit 5 (Birthday and Toys)' }
 ];
-
-let allPassed = true;
 
 testUnits.forEach(u => {
   try {

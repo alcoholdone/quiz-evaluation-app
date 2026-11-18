@@ -66,15 +66,20 @@
       <!-- PANEL 1: Learn Mode -->
       <section id="learn-panel" class="panel active">
         <!-- Unit Selector for Learn Mode -->
-        <div class="unit-selector-card card" style="margin-bottom: 20px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.5rem;">📚</span>
-            <div>
-              <h3 style="font-family: var(--font-display); font-size: 1.1rem; color: var(--dark-2); margin: 0;">เลือกบทเรียน (Select Unit)</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">เลือกบทเรียนเพื่อเรียนรู้คำศัพท์จ้า</p>
+        <div class="unit-selector-card card" style="margin-bottom: 20px; padding: 15px 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 1.5rem;">📚</span>
+              <div>
+                <h3 style="font-family: var(--font-display); font-size: 1.1rem; color: var(--dark-2); margin: 0;">เลือกเทอมและบทเรียน (Select Term & Unit)</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">สลับดูบทเรียนเทอม 1 หรือเทอม 2 ได้เลยจ้า</p>
+              </div>
+            </div>
+            <div id="learn-term-selector" class="term-selector-group" style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <!-- Dynamically populated term buttons from JS -->
             </div>
           </div>
-          <div class="unit-buttons-group" id="learn-unit-selector" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div class="unit-buttons-group" id="learn-unit-selector" style="display: flex; gap: 10px; flex-wrap: wrap; border-top: 1.5px dashed #e2e8f0; padding-top: 12px;">
             <!-- Dynamically populated unit buttons from JS -->
           </div>
         </div>
@@ -159,7 +164,10 @@
           <!-- Unit Selector & Test Format for Game Mode -->
           <div class="quiz-setup-box" style="max-width: 460px; margin: 0 auto 24px; text-align: left; background: #f8fafc; padding: 18px; border-radius: 18px; border: 1.5px solid #e2e8f0; display: flex; flex-direction: column; gap: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
             <div>
-              <label style="font-weight: 700; color: var(--dark-2); font-size: 0.95rem; display: block; margin-bottom: 10px;">📖 เลือกบทเรียนที่ต้องการท้าทาย:</label>
+              <label style="font-weight: 700; color: var(--dark-2); font-size: 0.95rem; display: block; margin-bottom: 10px;">📖 เลือกเทอมและบทเรียนที่ต้องการท้าทาย:</label>
+              <div id="game-term-selector" class="term-selector-group" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                <!-- Dynamically populated term buttons from JS -->
+              </div>
               <div id="game-unit-selector" style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <!-- Dynamically populated unit buttons from JS -->
               </div>
@@ -247,34 +255,39 @@
           <div class="empty-icon" style="font-size: clamp(2.5rem, 10vw, 4rem); margin-bottom: 15px;">📝</div>
           <h2 style="font-family: var(--font-display); font-size: var(--fs-lg); color: var(--dark-2); margin-bottom: 10px;">ฝึกเขียนตามคำบอก (Dictation)</h2>
           <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 20px; line-height: 1.6;">
-            มารอบที่ 1 ฝึกเขียนตามคำบอก 5 คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ
+            มายูนิต 5 ฝึกเขียนตามคำบอก 8 คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ
           </p>
+
+          <!-- Term Selector for Dictation Mode -->
+          <div id="dictation-term-selector" class="term-selector-group" style="margin-bottom: 14px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <!-- Dynamically populated term buttons from JS -->
+          </div>
 
           <!-- Round Selector for Dictation Mode -->
           <div class="dictation-round-selector" style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-            <button type="button" class="btn-toggle-option active" id="btn-dictation-r1" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary-hover); cursor: pointer; transition: all 0.2s;">
+            <button type="button" class="btn-toggle-option" id="btn-dictation-r1" data-term="1" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
               รอบที่ 1 (5 คำ)
             </button>
-            <button type="button" class="btn-toggle-option" id="btn-dictation-r2" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
+            <button type="button" class="btn-toggle-option" id="btn-dictation-r2" data-term="1" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
               รอบที่ 2 (5 คำ)
             </button>
-            <button type="button" class="btn-toggle-option" id="btn-dictation-r3" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
+            <button type="button" class="btn-toggle-option" id="btn-dictation-r3" data-term="1" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
               รอบที่ 3 (5 คำ)
             </button>
-            <button type="button" class="btn-toggle-option" id="btn-dictation-r4" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
+            <button type="button" class="btn-toggle-option" id="btn-dictation-r4" data-term="1" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
               ยูนิต 2 (5 คำ)
             </button>
-            <button type="button" class="btn-toggle-option" id="btn-dictation-r5" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
+            <button type="button" class="btn-toggle-option" id="btn-dictation-r5" data-term="1" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
               ยูนิต 3 (5 คำ)
             </button>
-            <button type="button" class="btn-toggle-option" id="btn-dictation-r6" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
+            <button type="button" class="btn-toggle-option active" id="btn-dictation-r6" data-term="2" style="padding: 10px 16px; font-size: 0.9rem; font-weight: 700; border-radius: 12px; border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary-hover); cursor: pointer; transition: all 0.2s;">
               ยูนิต 5 (8 คำ)
             </button>
           </div>
 
-          <!-- 5 Words Study Guide -->
+          <!-- Words Study Guide -->
           <div class="dictation-study-guide" style="margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: 18px; border: 1.5px solid #e2e8f0; text-align: left;">
-            <h3 style="font-family: var(--font-display); font-size: 1.1rem; color: var(--dark-2); margin-bottom: 15px; text-align: center;">📖 คำศัพท์เตรียมท่องรอบที่ 1</h3>
+            <h3 style="font-family: var(--font-display); font-size: 1.1rem; color: var(--dark-2); margin-bottom: 15px; text-align: center;">📖 คำศัพท์เตรียมท่องยูนิต 5 (8 คำ)</h3>
             <div class="dictation-words-preview-grid" id="dictation-words-preview" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
               <!-- Dynamically populated 5 words with preview cards -->
             </div>

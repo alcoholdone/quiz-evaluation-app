@@ -1,6 +1,7 @@
 const VOCAB_UNITS = [
   {
     id: 'unit_1',
+    term: 1,
     title: 'Unit 1: Things for school',
     words: [
       { 
@@ -231,6 +232,7 @@ const VOCAB_UNITS = [
   },
   {
     id: 'unit_2',
+    term: 1,
     title: 'Unit 2: Colors and shapes',
     words: [
       {
@@ -455,6 +457,7 @@ const VOCAB_UNITS = [
   },
   {
     id: 'unit_3',
+    term: 1,
     title: 'Unit 3: Friends and play',
     words: [
       {
@@ -699,6 +702,7 @@ const VOCAB_UNITS = [
   },
   {
     id: 'unit_4',
+    term: 1,
     title: 'Unit 4: Family',
     words: [
       {
@@ -1630,6 +1634,7 @@ const VOCAB_UNITS = [
   },
   {
     id: 'unit_5',
+    term: 2,
     title: 'Unit 5: Birthday and Toys',
     words: [
       {

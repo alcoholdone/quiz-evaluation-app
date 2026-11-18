@@ -31,7 +31,8 @@ const DICTATION_ROUNDS = {
   r5: ['notebook', 'pencil case', 'cell phone', 'computer', 'point'], // Unit 3: friends and play
   r6: ['baseball', 'kite', 'bicycle', 'jump rope', 'puzzle', 'little', 'long', 'square'] // Unit 5: 8 words
 };
-let selectedDictationRound = 'r1';
+const DICTATION_ROUND_TERM = { r1: 1, r2: 1, r3: 1, r4: 1, r5: 1, r6: 2 };
+let selectedDictationRound = 'r6';
 const DICTATION_STORAGE_KEY = 'aura_kids_dictation_history_v1';
 
 function clearTransitionTimeout() {
@@ -50,7 +51,8 @@ const STORAGE_KEY = 'aura_kids_vocab_history_v1';
 const WEAK_STORAGE_KEY = 'aura_kids_trouble_words_v1';
 const CUSTOM_STORAGE_KEY = 'aura_kids_custom_vocab_v1';
 let ORIGINAL_VOCAB_LIST = [];
-let currentUnitId = 'unit_1';
+let currentTerm = 2;
+let currentUnitId = 'unit_5';
 let quizQuestionCount = 10;
 let VOCAB_LIST = [];
 
@@ -319,42 +321,6 @@ function setupEventListeners() {
   }
 
   // Dictation Round Selector Click Listeners
-  const updateDictationRound = (roundKey) => {
-    selectedDictationRound = roundKey;
-    ['r1', 'r2', 'r3', 'r4', 'r5', 'r6'].forEach(r => {
-      const btn = document.getElementById(`btn-dictation-${r}`);
-      if (btn) {
-        if (r === roundKey) {
-          btn.classList.add('active');
-          btn.style.border = '2px solid var(--primary)';
-          btn.style.background = 'var(--primary-light)';
-          btn.style.color = 'var(--primary-hover)';
-          btn.style.boxShadow = '0 4px 6px rgba(16, 185, 129, 0.1)';
-        } else {
-          btn.classList.remove('active');
-          btn.style.border = '2px solid #e2e8f0';
-          btn.style.background = 'white';
-          btn.style.color = 'var(--text-muted)';
-          btn.style.boxShadow = 'none';
-        }
-      }
-    });
-
-    // Update instruction texts dynamically
-    const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2', r5: 'ยูนิต 3', r6: 'ยูนิต 5' }[roundKey] || 'รอบที่ 1';
-    const roundWordCount = (DICTATION_ROUNDS[roundKey] || []).length || 5;
-    const dictationDesc = document.querySelector('#dictation-start-screen p');
-    if (dictationDesc) {
-      dictationDesc.textContent = `มา${roundLabel} ฝึกเขียนตามคำบอก ${roundWordCount} คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ`;
-    }
-    const dictationGuideHeader = document.querySelector('.dictation-study-guide h3');
-    if (dictationGuideHeader) {
-      dictationGuideHeader.textContent = `📖 คำศัพท์เตรียมท่อง${roundLabel} (${roundWordCount} คำ)`;
-    }
-
-    initDictationStudyMode();
-  };
-
   const btnR1 = document.getElementById('btn-dictation-r1');
   const btnR2 = document.getElementById('btn-dictation-r2');
   const btnR3 = document.getElementById('btn-dictation-r3');
@@ -385,6 +351,60 @@ function setupEventListeners() {
       }
     });
   });
+}
+
+function updateDictationTermUI() {
+  Object.keys(DICTATION_ROUNDS).forEach(r => {
+    const btn = document.getElementById(`btn-dictation-${r}`);
+    if (btn) {
+      const roundTerm = DICTATION_ROUND_TERM[r] || 1;
+      btn.style.display = roundTerm === currentTerm ? '' : 'none';
+    }
+  });
+}
+
+function updateDictationRound(roundKey) {
+  selectedDictationRound = roundKey;
+  const roundTerm = DICTATION_ROUND_TERM[roundKey] || 1;
+  if (roundTerm !== currentTerm) {
+    currentTerm = roundTerm;
+    renderTermSelectors();
+    renderUnitSelectors();
+  }
+  updateDictationTermUI();
+
+  Object.keys(DICTATION_ROUNDS).forEach(r => {
+    const btn = document.getElementById(`btn-dictation-${r}`);
+    if (btn) {
+      if (r === roundKey) {
+        btn.classList.add('active');
+        btn.style.border = '2px solid var(--primary)';
+        btn.style.background = 'var(--primary-light)';
+        btn.style.color = 'var(--primary-hover)';
+        btn.style.boxShadow = '0 4px 6px rgba(16, 185, 129, 0.1)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.border = '2px solid #e2e8f0';
+        btn.style.background = 'white';
+        btn.style.color = 'var(--text-muted)';
+        btn.style.boxShadow = 'none';
+      }
+    }
+  });
+
+  // Update instruction texts dynamically
+  const roundLabel = { r1: 'รอบที่ 1', r2: 'รอบที่ 2', r3: 'รอบที่ 3', r4: 'ยูนิต 2', r5: 'ยูนิต 3', r6: 'ยูนิต 5' }[roundKey] || 'รอบที่ 1';
+  const roundWordCount = (DICTATION_ROUNDS[roundKey] || []).length || 5;
+  const dictationDesc = document.querySelector('#dictation-start-screen p');
+  if (dictationDesc) {
+    dictationDesc.textContent = `มา${roundLabel} ฝึกเขียนตามคำบอก ${roundWordCount} คำแสนสนุกกันเถอะเด็กๆ! ฟังเสียงสะกดและพิมพ์ให้ถูกต้องเพื่อรับคะแนนนะจ๊ะ`;
+  }
+  const dictationGuideHeader = document.querySelector('.dictation-study-guide h3');
+  if (dictationGuideHeader) {
+    dictationGuideHeader.textContent = `📖 คำศัพท์เตรียมท่อง${roundLabel} (${roundWordCount} คำ)`;
+  }
+
+  initDictationStudyMode();
 }
 
 // MAIN TAB SWITCHING
@@ -3632,17 +3652,90 @@ function saveWeakWordList(list) {
   localStorage.setItem(WEAK_STORAGE_KEY, JSON.stringify(list));
 }
 
+function getTermForUnitId(unitId) {
+  if (unitId === 'midterm_prep' || unitId === 'final_exam_prep') return 1;
+  if (unitId === 'unit5_exam') return 2;
+  const unit = VOCAB_UNITS.find(u => u.id === unitId);
+  return (unit && unit.term) ? unit.term : 1;
+}
+
+function getTermBtnStyle(isActive, termNum) {
+  if (isActive) {
+    if (termNum === 2) {
+      return 'padding: 7px 14px; font-size: 0.85rem; font-weight: 800; border-radius: 999px; border: 2px solid #059669; background: linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%); color: #065f46; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(5, 150, 105, 0.25);';
+    }
+    return 'padding: 7px 14px; font-size: 0.85rem; font-weight: 800; border-radius: 999px; border: 2px solid #2563eb; background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); color: #1e3a8a; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);';
+  }
+  return 'padding: 7px 14px; font-size: 0.85rem; font-weight: 700; border-radius: 999px; border: 2px solid #cbd5e1; background: #ffffff; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
+}
+
+function renderTermSelectors() {
+  const containers = [
+    document.getElementById('learn-term-selector'),
+    document.getElementById('game-term-selector'),
+    document.getElementById('dictation-term-selector')
+  ];
+
+  const terms = [
+    { num: 1, label: '📘 เทอม 1 (Unit 1–4)' },
+    { num: 2, label: '📗 เทอม 2 (Unit 5)' }
+  ];
+
+  containers.forEach(container => {
+    if (!container) return;
+    container.innerHTML = '';
+    terms.forEach(t => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `btn-term-select ${currentTerm === t.num ? 'active' : ''}`;
+      btn.dataset.term = String(t.num);
+      btn.textContent = t.label;
+      btn.style.cssText = getTermBtnStyle(currentTerm === t.num, t.num);
+      btn.addEventListener('click', () => setCurrentTerm(t.num));
+      container.appendChild(btn);
+    });
+  });
+}
+
+function setCurrentTerm(termNum) {
+  currentTerm = termNum;
+  renderTermSelectors();
+  renderUnitSelectors();
+
+  // Switch active unit if current unit doesn't belong to the newly selected term
+  if (getTermForUnitId(currentUnitId) !== currentTerm) {
+    const firstUnitOfTerm = VOCAB_UNITS.find(u => (u.term || 1) === currentTerm);
+    if (firstUnitOfTerm) {
+      loadUnitVocab(firstUnitOfTerm.id);
+    }
+  } else {
+    updateUnitSelectorUI();
+  }
+
+  // Sync dictation rounds to the selected term
+  updateDictationTermUI();
+  if ((DICTATION_ROUND_TERM[selectedDictationRound] || 1) !== currentTerm) {
+    const firstRoundOfTerm = Object.keys(DICTATION_ROUNDS).find(r => (DICTATION_ROUND_TERM[r] || 1) === currentTerm);
+    if (firstRoundOfTerm) {
+      updateDictationRound(firstRoundOfTerm);
+    }
+  }
+}
+
 function initCustomVocabData() {
   // Clean legacy custom vocab once (if exists)
   if (localStorage.getItem(CUSTOM_STORAGE_KEY)) {
     localStorage.removeItem(CUSTOM_STORAGE_KEY);
   }
 
-  // Load default unit
-  loadUnitVocab(currentUnitId);
-  
-  // Render selectors initially
+  // Render term & unit selectors initially (default: Term 2 -> Unit 5)
+  renderTermSelectors();
   renderUnitSelectors();
+
+  // Load default unit & dictation round
+  loadUnitVocab(currentUnitId);
+  updateDictationRound(selectedDictationRound);
+
   setupQuizLengthSelectors();
   setupGameModeSelectors();
   
@@ -3652,6 +3745,15 @@ function initCustomVocabData() {
 
 function loadUnitVocab(unitId) {
   currentUnitId = unitId;
+
+  // Keep term UI in sync whenever a unit/exam is loaded directly
+  const unitTerm = getTermForUnitId(unitId);
+  if (unitTerm !== currentTerm) {
+    currentTerm = unitTerm;
+    renderTermSelectors();
+    renderUnitSelectors();
+    updateDictationTermUI();
+  }
   
   const subtitle = document.getElementById('subtitleText');
   if (unitId === 'midterm_prep') {
@@ -3659,25 +3761,25 @@ function loadUnitVocab(unitId) {
     const unit2 = VOCAB_UNITS.find(u => u.id === 'unit_2');
     ORIGINAL_VOCAB_LIST = [...(unit1 ? unit1.words : []), ...(unit2 ? unit2.words : [])];
     if (subtitle) {
-      subtitle.textContent = `🎓 โหมดเตรียมสอบกลางภาค ป.1 (Let's Go 1 Unit 1-2)`;
+      subtitle.textContent = `🎓 เทอม 1 · เตรียมสอบกลางภาค ป.1 (Let's Go 1 Unit 1-2)`;
     }
   } else if (unitId === 'final_exam_prep') {
     const unit3 = VOCAB_UNITS.find(u => u.id === 'unit_3');
     const unit4 = VOCAB_UNITS.find(u => u.id === 'unit_4');
     ORIGINAL_VOCAB_LIST = [...(unit3 ? unit3.words : []), ...(unit4 ? unit4.words : [])];
     if (subtitle) {
-      subtitle.textContent = `📝 โหมดเตรียมสอบปลายภาค ป.1 (Let's Go 3 Unit 3-4)`;
+      subtitle.textContent = `📝 เทอม 1 · เตรียมสอบปลายภาค ป.1 (Let's Go 1 Unit 3-4)`;
     }
   } else if (unitId === 'unit5_exam') {
     ORIGINAL_VOCAB_LIST = getUnit5ExamWords();
     if (subtitle) {
-      subtitle.textContent = `🎯 โหมดสอบท้ายบท Unit 5: Birthday and Toys (ของเล่น 10 คำ + Adjectives 8 คำ + โครงสร้าง It's a/an...)`;
+      subtitle.textContent = `🎯 เทอม 2 · สอบท้ายบท Unit 5: Birthday and Toys (ของเล่น 10 คำ + Adjectives 8 คำ + โครงสร้าง It's a/an...)`;
     }
   } else {
     const unit = VOCAB_UNITS.find(u => u.id === unitId) || VOCAB_UNITS[0];
     ORIGINAL_VOCAB_LIST = [...unit.words];
     if (subtitle) {
-      subtitle.textContent = `เรียนรู้คำศัพท์: ${unit.title} (${ORIGINAL_VOCAB_LIST.length} คำหลัก)`;
+      subtitle.textContent = `เทอม ${unit.term || 1} · เรียนรู้คำศัพท์: ${unit.title} (${ORIGINAL_VOCAB_LIST.length} คำหลัก)`;
     }
   }
 
@@ -3710,96 +3812,36 @@ function renderUnitSelectors() {
   
   learnSelector.innerHTML = '';
   gameSelector.innerHTML = '';
-  
-  VOCAB_UNITS.forEach(unit => {
-    // Learn button
-    const btnLearn = document.createElement('button');
-    btnLearn.type = 'button';
-    btnLearn.className = `btn-unit-select ${unit.id === currentUnitId ? 'active' : ''}`;
-    btnLearn.textContent = unit.title.split(':')[0]; // "Unit 1"
-    btnLearn.style.cssText = getUnitBtnStyle(unit.id === currentUnitId, false);
-    btnLearn.addEventListener('click', () => {
-      loadUnitVocab(unit.id);
-    });
-    learnSelector.appendChild(btnLearn);
-    
-    // Game button
-    const btnGame = document.createElement('button');
-    btnGame.type = 'button';
-    btnGame.className = `btn-unit-select ${unit.id === currentUnitId ? 'active' : ''}`;
-    btnGame.textContent = unit.title.split(':')[0];
-    btnGame.style.cssText = getUnitBtnStyle(unit.id === currentUnitId, false);
-    btnGame.addEventListener('click', () => {
-      loadUnitVocab(unit.id);
-    });
-    gameSelector.appendChild(btnGame);
+
+  const termUnits = VOCAB_UNITS.filter(unit => (unit.term || 1) === currentTerm);
+
+  const appendUnitButton = (container, id, label, flags = {}) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    const isActive = id === currentUnitId;
+    btn.className = `btn-unit-select ${isActive ? 'active' : ''}`;
+    btn.dataset.unitId = id;
+    btn.textContent = label;
+    btn.style.cssText = getUnitBtnStyle(isActive, !!flags.isMidterm, !!flags.isFinal, !!flags.isUnit5Exam);
+    btn.addEventListener('click', () => loadUnitVocab(id));
+    container.appendChild(btn);
+  };
+
+  termUnits.forEach(unit => {
+    const shortLabel = unit.title.split(':')[0];
+    appendUnitButton(learnSelector, unit.id, shortLabel);
+    appendUnitButton(gameSelector, unit.id, shortLabel);
   });
 
-  // Add Midterm Prep Button to Learn Mode
-  const btnLearnMidterm = document.createElement('button');
-  btnLearnMidterm.type = 'button';
-  btnLearnMidterm.className = `btn-unit-select ${currentUnitId === 'midterm_prep' ? 'active' : ''}`;
-  btnLearnMidterm.textContent = '🎓 เตรียมสอบกลางภาค';
-  btnLearnMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false, false);
-  btnLearnMidterm.addEventListener('click', () => {
-    loadUnitVocab('midterm_prep');
-  });
-  learnSelector.appendChild(btnLearnMidterm);
-
-  // Add Final Exam Prep Button to Learn Mode
-  const btnLearnFinal = document.createElement('button');
-  btnLearnFinal.type = 'button';
-  btnLearnFinal.className = `btn-unit-select ${currentUnitId === 'final_exam_prep' ? 'active' : ''}`;
-  btnLearnFinal.textContent = '🌟 เตรียมสอบปลายภาค';
-  btnLearnFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true, false);
-  btnLearnFinal.addEventListener('click', () => {
-    loadUnitVocab('final_exam_prep');
-  });
-  learnSelector.appendChild(btnLearnFinal);
-
-  // Add Unit 5 Chapter Exam Button to Learn Mode
-  const btnLearnUnit5Exam = document.createElement('button');
-  btnLearnUnit5Exam.type = 'button';
-  btnLearnUnit5Exam.className = `btn-unit-select ${currentUnitId === 'unit5_exam' ? 'active' : ''}`;
-  btnLearnUnit5Exam.textContent = '🎯 สอบท้ายบท Unit 5';
-  btnLearnUnit5Exam.style.cssText = getUnitBtnStyle(currentUnitId === 'unit5_exam', false, false, true);
-  btnLearnUnit5Exam.addEventListener('click', () => {
-    loadUnitVocab('unit5_exam');
-  });
-  learnSelector.appendChild(btnLearnUnit5Exam);
-
-  // Add Midterm Prep Button to Game Mode
-  const btnGameMidterm = document.createElement('button');
-  btnGameMidterm.type = 'button';
-  btnGameMidterm.className = `btn-unit-select ${currentUnitId === 'midterm_prep' ? 'active' : ''}`;
-  btnGameMidterm.textContent = '🎓 เตรียมสอบกลางภาค';
-  btnGameMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false, false);
-  btnGameMidterm.addEventListener('click', () => {
-    loadUnitVocab('midterm_prep');
-  });
-  gameSelector.appendChild(btnGameMidterm);
-
-  // Add Final Exam Prep Button to Game Mode
-  const btnGameFinal = document.createElement('button');
-  btnGameFinal.type = 'button';
-  btnGameFinal.className = `btn-unit-select ${currentUnitId === 'final_exam_prep' ? 'active' : ''}`;
-  btnGameFinal.textContent = '🌟 เตรียมสอบปลายภาค';
-  btnGameFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true, false);
-  btnGameFinal.addEventListener('click', () => {
-    loadUnitVocab('final_exam_prep');
-  });
-  gameSelector.appendChild(btnGameFinal);
-
-  // Add Unit 5 Chapter Exam Button to Game Mode
-  const btnGameUnit5Exam = document.createElement('button');
-  btnGameUnit5Exam.type = 'button';
-  btnGameUnit5Exam.className = `btn-unit-select ${currentUnitId === 'unit5_exam' ? 'active' : ''}`;
-  btnGameUnit5Exam.textContent = '🎯 สอบท้ายบท Unit 5';
-  btnGameUnit5Exam.style.cssText = getUnitBtnStyle(currentUnitId === 'unit5_exam', false, false, true);
-  btnGameUnit5Exam.addEventListener('click', () => {
-    loadUnitVocab('unit5_exam');
-  });
-  gameSelector.appendChild(btnGameUnit5Exam);
+  if (currentTerm === 1) {
+    appendUnitButton(learnSelector, 'midterm_prep', '🎓 เตรียมสอบกลางภาค', { isMidterm: true });
+    appendUnitButton(learnSelector, 'final_exam_prep', '🌟 เตรียมสอบปลายภาค', { isFinal: true });
+    appendUnitButton(gameSelector, 'midterm_prep', '🎓 เตรียมสอบกลางภาค', { isMidterm: true });
+    appendUnitButton(gameSelector, 'final_exam_prep', '🌟 เตรียมสอบปลายภาค', { isFinal: true });
+  } else if (currentTerm === 2) {
+    appendUnitButton(learnSelector, 'unit5_exam', '🎯 สอบท้ายบท Unit 5', { isUnit5Exam: true });
+    appendUnitButton(gameSelector, 'unit5_exam', '🎯 สอบท้ายบท Unit 5', { isUnit5Exam: true });
+  }
 }
 
 function getUnitBtnStyle(isActive, isMidterm = false, isFinal = false, isUnit5Exam = false) {
@@ -3832,53 +3874,21 @@ function getUnitBtnStyle(isActive, isMidterm = false, isFinal = false, isUnit5Ex
 }
 
 function updateUnitSelectorUI() {
-  const learnBtns = document.querySelectorAll('#learn-unit-selector button');
-  const gameBtns = document.querySelectorAll('#game-unit-selector button');
-  
-  VOCAB_UNITS.forEach((unit, idx) => {
-    const isActive = unit.id === currentUnitId;
-    if (learnBtns[idx]) {
-      learnBtns[idx].className = `btn-unit-select ${isActive ? 'active' : ''}`;
-      learnBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false, false);
-    }
-    if (gameBtns[idx]) {
-      gameBtns[idx].className = `btn-unit-select ${isActive ? 'active' : ''}`;
-      gameBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false, false);
-    }
+  const allBtns = [
+    ...document.querySelectorAll('#learn-unit-selector button'),
+    ...document.querySelectorAll('#game-unit-selector button')
+  ];
+  allBtns.forEach(btn => {
+    const id = btn.dataset.unitId;
+    const isActive = id === currentUnitId;
+    btn.className = `btn-unit-select ${isActive ? 'active' : ''}`;
+    btn.style.cssText = getUnitBtnStyle(
+      isActive,
+      id === 'midterm_prep',
+      id === 'final_exam_prep',
+      id === 'unit5_exam'
+    );
   });
-
-  const midtermIdx = VOCAB_UNITS.length;
-  const isMidtermActive = currentUnitId === 'midterm_prep';
-  if (learnBtns[midtermIdx]) {
-    learnBtns[midtermIdx].className = `btn-unit-select ${isMidtermActive ? 'active' : ''}`;
-    learnBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false, false);
-  }
-  if (gameBtns[midtermIdx]) {
-    gameBtns[midtermIdx].className = `btn-unit-select ${isMidtermActive ? 'active' : ''}`;
-    gameBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false, false);
-  }
-
-  const finalIdx = VOCAB_UNITS.length + 1;
-  const isFinalActive = currentUnitId === 'final_exam_prep';
-  if (learnBtns[finalIdx]) {
-    learnBtns[finalIdx].className = `btn-unit-select ${isFinalActive ? 'active' : ''}`;
-    learnBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true, false);
-  }
-  if (gameBtns[finalIdx]) {
-    gameBtns[finalIdx].className = `btn-unit-select ${isFinalActive ? 'active' : ''}`;
-    gameBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true, false);
-  }
-
-  const unit5ExamIdx = VOCAB_UNITS.length + 2;
-  const isUnit5ExamActive = currentUnitId === 'unit5_exam';
-  if (learnBtns[unit5ExamIdx]) {
-    learnBtns[unit5ExamIdx].className = `btn-unit-select ${isUnit5ExamActive ? 'active' : ''}`;
-    learnBtns[unit5ExamIdx].style.cssText = getUnitBtnStyle(isUnit5ExamActive, false, false, true);
-  }
-  if (gameBtns[unit5ExamIdx]) {
-    gameBtns[unit5ExamIdx].className = `btn-unit-select ${isUnit5ExamActive ? 'active' : ''}`;
-    gameBtns[unit5ExamIdx].style.cssText = getUnitBtnStyle(isUnit5ExamActive, false, false, true);
-  }
 }
 
 function setupQuizLengthSelectors() {
