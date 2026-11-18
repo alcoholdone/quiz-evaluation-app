@@ -1719,19 +1719,19 @@ function generateUnit5ExamQuestions() {
     const meta = ADJ_VISUAL_META[adjKey] || ADJ_VISUAL_META.big;
     const isSvg = typeof imgContent === 'string' && imgContent.trim().startsWith('<svg');
     const iconHtml = isSvg
-      ? `<div style="width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; ${meta.imgStyle}">${imgContent}</div>`
-      : `<div style="font-size: 64px; line-height: 1; display: flex; align-items: center; justify-content: center; width: 96px; height: 96px; ${meta.imgStyle}">${imgContent}</div>`;
-    return `<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 6px 0 4px;">
-      <div style="background: ${meta.bg}; border: 2px solid ${meta.border}; border-radius: 20px; padding: 14px 24px; display: flex; align-items: center; justify-content: center; min-width: 140px; min-height: 118px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+      ? `<div class="u5-trait-visual" style="width: 128px; height: 128px; display: flex; align-items: center; justify-content: center; ${meta.imgStyle}">${imgContent}</div>`
+      : `<div class="u5-trait-visual" style="font-size: 84px; line-height: 1; display: flex; align-items: center; justify-content: center; width: 128px; height: 128px; ${meta.imgStyle}">${imgContent}</div>`;
+    return `<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 6px 0 6px;">
+      <div style="background: ${meta.bg}; border: 2px solid ${meta.border}; border-radius: 22px; padding: 16px 26px; display: flex; align-items: center; justify-content: center; min-width: 170px; min-height: 148px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
         ${iconHtml}
       </div>
-      <span style="display: inline-block; background: ${meta.bg}; color: ${meta.color}; border: 1.5px solid ${meta.border}; padding: 4px 14px; border-radius: 999px; font-size: 0.9rem; font-weight: 800;">
+      <span style="display: inline-block; background: ${meta.bg}; color: ${meta.color}; border: 1.5px solid ${meta.border}; padding: 5px 16px; border-radius: 999px; font-size: 0.95rem; font-weight: 800;">
         🔍 ${meta.badge}
       </span>
     </div>`;
   };
 
-  // ── PART 1: TOYS VOCABULARY (5 questions) ─────────────────────────────────
+  // ── PART 1: TOYS VOCABULARY (5 questions — 5 distinct toys) ──────────────
   const toyTargets = shuffle(toyPool).slice(0, 5);
   const toyTypes = shuffle(['audio', 'audio', 'visual_word', 'visual_word', 'thai_image']);
   for (let i = 0; i < 5; i++) {
@@ -1748,8 +1748,9 @@ function generateUnit5ExamQuestions() {
     });
   }
 
-  // ── PART 2: ADJECTIVES & OPPOSITES (5 questions: 3 vocab + 2 opposites) ──
+  // ── PART 2: ADJECTIVES & OPPOSITES (5 questions: 3 vocab + 2 opposites, no overlap) ─
   const adjTargets = shuffle(adjPool).slice(0, 3);
+  const usedAdjVocabSet = new Set(adjTargets.map(w => w.word.trim().toLowerCase()));
   const adjTypes = shuffle(['visual_word', 'thai_image', 'audio']);
   for (let i = 0; i < 3; i++) {
     const tw = adjTargets[i] || adjPool[0];
@@ -1771,8 +1772,18 @@ function generateUnit5ExamQuestions() {
     { a: 'long',  aTh: 'ยาว',    b: 'short',  bTh: 'สั้น' },
     { a: 'round', aTh: 'กลม',    b: 'square', bTh: 'สี่เหลี่ยมจัตุรัส' }
   ];
-  shuffle(oppositePairs).slice(0, 2).forEach(pair => {
-    const flip = Math.random() < 0.5;
+  // Prefer pairs whose target answer hasn't just been asked in the 3 adj vocab questions
+  const prioritizedPairs = [
+    ...shuffle(oppositePairs.filter(p => !usedAdjVocabSet.has(p.a) || !usedAdjVocabSet.has(p.b))),
+    ...shuffle(oppositePairs.filter(p => usedAdjVocabSet.has(p.a) && usedAdjVocabSet.has(p.b)))
+  ].slice(0, 2);
+
+  prioritizedPairs.forEach(pair => {
+    // Pick direction so the answer word wasn't just asked in adj vocab when possible
+    let flip = Math.random() < 0.5;
+    if (usedAdjVocabSet.has(pair.b) && !usedAdjVocabSet.has(pair.a)) flip = true;
+    else if (usedAdjVocabSet.has(pair.a) && !usedAdjVocabSet.has(pair.b)) flip = false;
+
     const fromWord = flip ? pair.b : pair.a;
     const fromTh   = flip ? pair.bTh : pair.aTh;
     const ansWord  = flip ? pair.a : pair.b;
@@ -1799,16 +1810,26 @@ function generateUnit5ExamQuestions() {
     });
   });
 
+  // Track used (adj|noun) pairs & nouns across Part 3 and Part 4 to guarantee ZERO duplicate sentences
+  const usedSentenceKeys = new Set();
+  const usedPart3Nouns = new Set();
+
   // ── PART 3: GRAMMAR "It's a/an + adj + noun" (4 questions: 2 "an old" + 2 "a + adj") ─
   const anOldPool = [
-    { adj: 'old', noun: 'kite',    thai: 'ว่าวเก่า' },
     { adj: 'old', noun: 'car',     thai: 'รถยนต์ของเล่นเก่า' },
     { adj: 'old', noun: 'doll',    thai: 'ตุ๊กตาเก่า' },
     { adj: 'old', noun: 'bicycle', thai: 'รถจักรยานเก่า' },
-    { adj: 'old', noun: 'robot',   thai: 'หุ่นยนต์เก่า' }
+    { adj: 'old', noun: 'robot',   thai: 'หุ่นยนต์เก่า' },
+    { adj: 'old', noun: 'bat',     thai: 'ไม้ตีเบสบอลเก่า' }
   ];
-  shuffle(anOldPool).slice(0, 2).forEach(item => {
-    const nounObj = getWordObj(item.noun, { word: item.noun, meaning: item.thai, image: '🪁' });
+  const anOldPrompts = [
+    'Which sentence uses "a / an" correctly?',
+    'Choose the correct sentence.'
+  ];
+  shuffle(anOldPool).slice(0, 2).forEach((item, idx) => {
+    usedSentenceKeys.add(`${item.adj}|${item.noun}`);
+    usedPart3Nouns.add(item.noun);
+    const nounObj = getWordObj(item.noun, { word: item.noun, meaning: item.thai, image: '🚗' });
     const correctSent = `It's an old ${item.noun}.`;
     const opts = shuffle([
       { text: correctSent,                 isCorrect: true,  word: correctSent, meaning: item.thai },
@@ -1825,7 +1846,7 @@ function generateUnit5ExamQuestions() {
         image: buildTraitVisual(nounObj.image, 'old'),
         explanation: `💡 คำว่า "old" ขึ้นต้นด้วยเสียงสระ (o) ต้องใช้ "an" นำหน้า → "${correctSent}" (${item.thai}) จ้า`
       },
-      questionText: 'Choose the correct sentence.',
+      questionText: anOldPrompts[idx] || 'Choose the correct sentence.',
       thaiQuestionText: `เลือกประโยคที่ถูกต้องสำหรับ "${item.thai}" (สังเกต a / an นะจ๊ะ)`,
       options: opts,
       skill: 'Grammar: a/an + Adj'
@@ -1841,7 +1862,15 @@ function generateUnit5ExamQuestions() {
     { adj: 'round',  noun: 'baseball',  thai: 'ลูกเบสบอลทรงกลม' },
     { adj: 'square', noun: 'puzzle',    thai: 'ตัวต่อจิ๊กซอว์สี่เหลี่ยม' }
   ];
-  shuffle(aAdjPool).slice(0, 2).forEach(item => {
+  const aAdjPrompts = [
+    'Pick the right word order!',
+    'Which sentence is correct?'
+  ];
+  const freshAAdj = shuffle(aAdjPool.filter(item => !usedPart3Nouns.has(item.noun)));
+  const fallbackAAdj = shuffle(aAdjPool.filter(item => usedPart3Nouns.has(item.noun)));
+  [...freshAAdj, ...fallbackAAdj].slice(0, 2).forEach((item, idx) => {
+    usedSentenceKeys.add(`${item.adj}|${item.noun}`);
+    usedPart3Nouns.add(item.noun);
     const nounObj = getWordObj(item.noun, { word: item.noun, meaning: item.thai, image: '🤖' });
     const correctSent = `It's a ${item.adj} ${item.noun}.`;
     const opts = shuffle([
@@ -1859,14 +1888,14 @@ function generateUnit5ExamQuestions() {
         image: buildTraitVisual(nounObj.image, item.adj),
         explanation: `💡 ใช้โครงสร้าง It's a + คำคุณศัพท์ + คำนาม → "${correctSent}" (${item.thai}) จ้า`
       },
-      questionText: 'Choose the correct sentence.',
+      questionText: aAdjPrompts[idx] || 'Which sentence is correct?',
       thaiQuestionText: `เลือกประโยคที่ถูกต้องสำหรับ "${item.thai}"`,
       options: opts,
       skill: 'Grammar: a/an + Adj'
     });
   });
 
-  // ── PART 4: "WHAT IS IT?" DESCRIBING OBJECTS Q&A (6 questions) ──────────
+  // ── PART 4: "WHAT IS IT?" DESCRIBING OBJECTS Q&A (6 unique scenarios, 0 overlap with Part 3) ─
   const getToyImg = (name, fallbackEmoji) => getWordObj(name, { image: fallbackEmoji }).image;
 
   const coreQaScenarios = [
@@ -1881,16 +1910,34 @@ function generateUnit5ExamQuestions() {
     { adj: 'new',    opp: 'old',    noun: 'car',       altNoun: 'bicycle',   thai: 'รถยนต์ของเล่นใหม่',      img: getToyImg('car', '🚗') },
     { adj: 'little', opp: 'big',    noun: 'doll',      altNoun: 'yo-yo',     thai: 'ตุ๊กตาตัวเล็ก',          img: getToyImg('doll', '🪆') },
     { adj: 'short',  opp: 'long',   noun: 'bat',       altNoun: 'jump rope', thai: 'ไม้ตีเบสบอลอันสั้น',     img: getToyImg('bat', '🏏') },
-    { adj: 'round',  opp: 'square', noun: 'baseball',  altNoun: 'puzzle',    thai: 'ลูกเบสบอลทรงกลม',        img: getToyImg('baseball', '⚾') }
+    { adj: 'round',  opp: 'square', noun: 'baseball',  altNoun: 'puzzle',    thai: 'ลูกเบสบอลทรงกลม',        img: getToyImg('baseball', '⚾') },
+    { adj: 'new',    opp: 'old',    noun: 'bicycle',   altNoun: 'car',       thai: 'รถจักรยานใหม่',          img: getToyImg('bicycle', '🚲') }
   ];
 
-  // Always include 2 signature core scenarios + 4 shuffled extra scenarios = 6 Q&A questions
-  const selectedQa = shuffle([
-    ...shuffle(coreQaScenarios).slice(0, 2),
-    ...shuffle(extraQaScenarios).slice(0, 4)
-  ]);
+  // Exclude any (adj|noun) already used in Part 3; prefer unused nouns first
+  const availCore = shuffle(coreQaScenarios.filter(s => !usedSentenceKeys.has(`${s.adj}|${s.noun}`)));
+  const availExtraUnusedNoun = shuffle(extraQaScenarios.filter(s => !usedSentenceKeys.has(`${s.adj}|${s.noun}`) && !usedPart3Nouns.has(s.noun)));
+  const availExtraUsedNoun = shuffle(extraQaScenarios.filter(s => !usedSentenceKeys.has(`${s.adj}|${s.noun}`) && usedPart3Nouns.has(s.noun)));
 
-  selectedQa.forEach(s => {
+  const selectedQa = [];
+  const usedQaNouns = new Set();
+  const tryAddQa = (pool, limit) => {
+    for (const s of pool) {
+      if (selectedQa.length >= limit) break;
+      const key = `${s.adj}|${s.noun}`;
+      if (usedSentenceKeys.has(key) || usedQaNouns.has(s.noun)) continue;
+      usedSentenceKeys.add(key);
+      usedQaNouns.add(s.noun);
+      selectedQa.push(s);
+    }
+  };
+
+  tryAddQa(availCore, 2);
+  tryAddQa(availExtraUnusedNoun, 6);
+  tryAddQa(availExtraUsedNoun, 6);
+  tryAddQa(availCore, 6);
+
+  shuffle(selectedQa).forEach(s => {
     const artCorrect = articleFor(s.adj);
     const artOpp     = articleFor(s.opp);
     const correctAns = `It's ${artCorrect} ${s.adj} ${s.noun}.`;
@@ -1958,6 +2005,8 @@ function generateQuestions() {
     questionTypes.sort(() => Math.random() - 0.5);
   }
   
+  const usedGrammarNouns = new Set();
+
   for (let i = 0; i < quizQuestionCount; i++) {
     const targetWord = targets[i] || VOCAB_LIST[i % VOCAB_LIST.length];
     let type = questionTypes[i];
@@ -1969,11 +2018,17 @@ function generateQuestions() {
     }
 
     if (type === 'grammar_an') {
-      // We only choose words that are concrete, picturable nouns
+      // We only choose words that are concrete, picturable nouns (never repeating the same fallback noun)
       let targetNoun = targetWord;
-      if (!isConcreteNoun(targetNoun)) {
-        targetNoun = VOCAB_LIST.find(isConcreteNoun) || targetWord;
+      if (!isConcreteNoun(targetNoun) || usedGrammarNouns.has(targetNoun.word.toLowerCase())) {
+        const concretePool = VOCAB_LIST.filter(w => isConcreteNoun(w) && !usedGrammarNouns.has(w.word.toLowerCase()));
+        if (concretePool.length > 0) {
+          targetNoun = concretePool[Math.floor(Math.random() * concretePool.length)];
+        } else {
+          targetNoun = VOCAB_LIST.find(isConcreteNoun) || targetWord;
+        }
       }
+      usedGrammarNouns.add(targetNoun.word.toLowerCase());
 
       const wordLower = targetNoun.word.toLowerCase();
       const isAn = ['eraser'].includes(wordLower) || /^[aeiou]/i.test(wordLower);
@@ -2558,7 +2613,7 @@ function renderQuestion(index) {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
       
-      const imgHtml = opt.image.startsWith('<svg') ? opt.image : `<div class="option-img">${opt.image}</div>`;
+      const imgHtml = `<div class="option-img">${opt.image}</div>`;
       btn.innerHTML = `
         ${imgHtml}
         <div class="option-word-only" style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">${opt.word}</div>

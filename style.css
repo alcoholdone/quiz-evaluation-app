@@ -1437,8 +1437,18 @@ body {
 
 .option-img svg,
 .option-img .svg-icon { 
-  width: 55px;  
-  height: 55px;  
+  width: 68px;  
+  height: 68px;  
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.u5-trait-visual svg,
+.u5-trait-visual .svg-icon {
+  width: 120px;
+  height: 120px;
   max-width: 100%;
   max-height: 100%;
   display: block;
@@ -2542,6 +2552,16 @@ body {
 .dictation-preview-emoji {
   font-size: 1.8rem;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dictation-preview-emoji svg,
+.dictation-preview-emoji .svg-icon {
+  width: 44px;
+  height: 44px;
+  display: block;
 }
 
 .dictation-preview-details {

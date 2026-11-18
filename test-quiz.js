@@ -114,6 +114,18 @@ testUnits.forEach(u => {
       return;
     }
 
+    // ตรวจสอบไม่ให้มีประโยคคำตอบซ้ำกันในข้อสอบ Unit 5 Exam
+    if (u.id === 'unit5_exam') {
+      const sentTargets = qs
+        .filter(q => q.skill === 'Grammar: a/an + Adj' || q.skill === 'Sentence Q&A')
+        .map(q => q.targetWord.word.toLowerCase());
+      if (new Set(sentTargets).size !== sentTargets.length) {
+        console.error(`❌ ${u.name}: พบประโยคซ้ำในชุดข้อสอบ!`, sentTargets);
+        allPassed = false;
+        return;
+      }
+    }
+
     // ทดสอบ Render ข้อสอบทุกข้อว่าไม่มี Error
     for (let i = 0; i < qs.length; i++) {
       renderQuestion(i);
