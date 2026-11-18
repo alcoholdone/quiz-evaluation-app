@@ -58,6 +58,8 @@ let VOCAB_LIST = [];
 const MIDTERM_QUESTION_COUNT = 21;
 // Total questions in the final exam simulation (Unit 3 + Unit 4 — Let's Go 3).
 const FINAL_EXAM_QUESTION_COUNT = 29;
+// Total questions in the Unit 5 chapter test (5 toys + 5 adj/opposites + 4 a/an grammar + 6 What is it? Q&A).
+const UNIT5_EXAM_QUESTION_COUNT = 20;
 
 // Each shape's drawn SVG fill is a fixed color, so the "This is a ___. It's ___"
 // answer must match the picture the child actually sees.
@@ -365,6 +367,24 @@ function setupEventListeners() {
   if (btnR4) btnR4.addEventListener('click', () => updateDictationRound('r4'));
   if (btnR5) btnR5.addEventListener('click', () => updateDictationRound('r5'));
   if (btnR6) btnR6.addEventListener('click', () => updateDictationRound('r6'));
+
+  // Unit 5 Exam Study Guide buttons
+  const btnGoUnit5Exam = document.getElementById('btn-go-unit5-exam');
+  if (btnGoUnit5Exam) {
+    btnGoUnit5Exam.addEventListener('click', () => {
+      loadUnitVocab('unit5_exam');
+      switchTab('game');
+    });
+  }
+  document.querySelectorAll('.u5-example-speak').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.getAttribute('data-text');
+      if (text) {
+        stopAllSpeech();
+        speakEN(text, 0.8);
+      }
+    });
+  });
 }
 
 // MAIN TAB SWITCHING
@@ -1625,6 +1645,267 @@ function generateFinalExamQuestions() {
   return list;
 }
 
+// ============================================================
+// GENERATE UNIT 5 CHAPTER EXAM QUESTIONS (Birthday and Toys)
+// 20 questions: 5 Toys Vocab · 5 Adjectives & Opposites ·
+//               4 Grammar (It's a/an + adj + noun) · 6 What is it? Q&A
+// ============================================================
+const UNIT5_EXAM_TOY_WORDS = ['yo-yo', 'baseball', 'bat', 'kite', 'doll', 'car', 'robot', 'bicycle', 'jump rope', 'puzzle'];
+const UNIT5_EXAM_ADJ_WORDS = ['big', 'little', 'new', 'old', 'long', 'short', 'round', 'square'];
+
+function getUnit5ExamWords() {
+  const unit5 = VOCAB_UNITS.find(u => u.id === 'unit_5');
+  if (!unit5 || !unit5.words) return [];
+  const examKeys = [...UNIT5_EXAM_TOY_WORDS, ...UNIT5_EXAM_ADJ_WORDS];
+  const result = [];
+  examKeys.forEach(key => {
+    const found = unit5.words.find(w => w.word.trim().toLowerCase() === key);
+    if (found) result.push(found);
+  });
+  return result;
+}
+
+function generateUnit5ExamQuestions() {
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+  const articleFor = (adj) => (/^[aeiou]/i.test(adj) ? 'an' : 'a');
+  const list = [];
+  let qId = 1;
+
+  const unit5 = VOCAB_UNITS.find(u => u.id === 'unit_5');
+  const unit5Words = unit5 ? unit5.words : [];
+  const getWordObj = (name, fallback) =>
+    unit5Words.find(w => w.word.trim().toLowerCase() === name.toLowerCase()) || fallback;
+
+  const toyPool = UNIT5_EXAM_TOY_WORDS
+    .map(w => getWordObj(w, null))
+    .filter(Boolean);
+  const adjPool = UNIT5_EXAM_ADJ_WORDS
+    .map(w => getWordObj(w, null))
+    .filter(Boolean);
+
+  // Visual card builder showing item + trait cue (Thai badge + subtle visual styling without leaking English adj)
+  const ADJ_VISUAL_META = {
+    big:    { badge: 'ขนาด: ใหญ่ ⬆️',       bg: '#eff6ff', border: '#3b82f6', color: '#1d4ed8', imgStyle: 'transform: scale(1.15);' },
+    little: { badge: 'ขนาด: เล็ก ⬇️',       bg: '#fdf2f8', border: '#ec4899', color: '#be185d', imgStyle: 'transform: scale(0.68);' },
+    new:    { badge: 'สภาพ: ใหม่ ✨',       bg: '#ecfdf5', border: '#10b981', color: '#047857', imgStyle: 'filter: drop-shadow(0 0 8px rgba(16,185,129,0.45));' },
+    old:    { badge: 'สภาพ: เก่า 🕰️',       bg: '#fef3c7', border: '#d97706', color: '#92400e', imgStyle: 'filter: sepia(0.55) contrast(0.92); opacity: 0.88;' },
+    long:   { badge: 'ความยาว: ยาว ↔️',     bg: '#eff6ff', border: '#2563eb', color: '#1e40af', imgStyle: 'transform: scaleX(1.22);' },
+    short:  { badge: 'ความยาว: สั้น ✂️',    bg: '#fef2f2', border: '#ef4444', color: '#b91c1c', imgStyle: 'transform: scaleX(0.75);' },
+    round:  { badge: 'รูปร่าง: กลม ⭕',      bg: '#fffbeb', border: '#f59e0b', color: '#b45309', imgStyle: 'border: 3px dashed #f59e0b; border-radius: 50%; padding: 6px;' },
+    square: { badge: 'รูปร่าง: สี่เหลี่ยม 🟦', bg: '#eff6ff', border: '#2563eb', color: '#1d4ed8', imgStyle: 'border: 3px dashed #2563eb; border-radius: 10px; padding: 6px;' }
+  };
+
+  const buildTraitVisual = (imgContent, adjKey) => {
+    const meta = ADJ_VISUAL_META[adjKey] || ADJ_VISUAL_META.big;
+    const isSvg = typeof imgContent === 'string' && imgContent.trim().startsWith('<svg');
+    const iconHtml = isSvg
+      ? `<div style="width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; ${meta.imgStyle}">${imgContent}</div>`
+      : `<div style="font-size: 64px; line-height: 1; display: flex; align-items: center; justify-content: center; width: 96px; height: 96px; ${meta.imgStyle}">${imgContent}</div>`;
+    return `<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 6px 0 4px;">
+      <div style="background: ${meta.bg}; border: 2px solid ${meta.border}; border-radius: 20px; padding: 14px 24px; display: flex; align-items: center; justify-content: center; min-width: 140px; min-height: 118px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+        ${iconHtml}
+      </div>
+      <span style="display: inline-block; background: ${meta.bg}; color: ${meta.color}; border: 1.5px solid ${meta.border}; padding: 4px 14px; border-radius: 999px; font-size: 0.9rem; font-weight: 800;">
+        🔍 ${meta.badge}
+      </span>
+    </div>`;
+  };
+
+  // ── PART 1: TOYS VOCABULARY (5 questions) ─────────────────────────────────
+  const toyTargets = shuffle(toyPool).slice(0, 5);
+  const toyTypes = shuffle(['audio', 'audio', 'visual_word', 'visual_word', 'thai_image']);
+  for (let i = 0; i < 5; i++) {
+    const tw = toyTargets[i] || toyPool[0];
+    const type = toyTypes[i];
+    const distractors = shuffle(toyPool.filter(w => w.word !== tw.word)).slice(0, 3);
+    const opts = shuffle([tw, ...distractors]);
+    list.push({
+      id: qId++,
+      type,
+      targetWord: tw,
+      options: opts,
+      skill: type === 'audio' ? 'Listening' : type === 'visual_word' ? 'Word Recognition' : 'Visual Matching'
+    });
+  }
+
+  // ── PART 2: ADJECTIVES & OPPOSITES (5 questions: 3 vocab + 2 opposites) ──
+  const adjTargets = shuffle(adjPool).slice(0, 3);
+  const adjTypes = shuffle(['visual_word', 'thai_image', 'audio']);
+  for (let i = 0; i < 3; i++) {
+    const tw = adjTargets[i] || adjPool[0];
+    const type = adjTypes[i];
+    const distractors = shuffle(adjPool.filter(w => w.word !== tw.word)).slice(0, 3);
+    const opts = shuffle([tw, ...distractors]);
+    list.push({
+      id: qId++,
+      type,
+      targetWord: tw,
+      options: opts,
+      skill: 'Adjectives'
+    });
+  }
+
+  const oppositePairs = [
+    { a: 'big',   aTh: 'ใหญ่',   b: 'little', bTh: 'เล็ก' },
+    { a: 'new',   aTh: 'ใหม่',   b: 'old',    bTh: 'เก่า' },
+    { a: 'long',  aTh: 'ยาว',    b: 'short',  bTh: 'สั้น' },
+    { a: 'round', aTh: 'กลม',    b: 'square', bTh: 'สี่เหลี่ยมจัตุรัส' }
+  ];
+  shuffle(oppositePairs).slice(0, 2).forEach(pair => {
+    const flip = Math.random() < 0.5;
+    const fromWord = flip ? pair.b : pair.a;
+    const fromTh   = flip ? pair.bTh : pair.aTh;
+    const ansWord  = flip ? pair.a : pair.b;
+    const ansTh    = flip ? pair.aTh : pair.bTh;
+    const fromObj  = getWordObj(fromWord, { word: fromWord, meaning: fromTh, image: '🎨' });
+    const otherAdjs = shuffle(UNIT5_EXAM_ADJ_WORDS.filter(w => w !== fromWord && w !== ansWord)).slice(0, 3);
+    const opts = shuffle([
+      { text: ansWord, isCorrect: true, word: ansWord, meaning: ansTh },
+      ...otherAdjs.map(w => ({ text: w, isCorrect: false, word: w, meaning: getWordObj(w, { meaning: w }).meaning }))
+    ]);
+    list.push({
+      id: qId++,
+      type: 'grammar_midterm',
+      targetWord: {
+        word: ansWord,
+        meaning: ansTh,
+        image: fromObj.image,
+        explanation: `🔄 คำตรงข้ามของ "${fromWord}" (${fromTh}) คือ "${ansWord}" (${ansTh}) จ้า`
+      },
+      questionText: `What is the opposite of "${fromWord}"?`,
+      thaiQuestionText: `คำตรงข้ามกับคำว่า "${fromWord} (${fromTh})" คือคำว่าอะไร?`,
+      options: opts,
+      skill: 'Adjectives'
+    });
+  });
+
+  // ── PART 3: GRAMMAR "It's a/an + adj + noun" (4 questions: 2 "an old" + 2 "a + adj") ─
+  const anOldPool = [
+    { adj: 'old', noun: 'kite',    thai: 'ว่าวเก่า' },
+    { adj: 'old', noun: 'car',     thai: 'รถยนต์ของเล่นเก่า' },
+    { adj: 'old', noun: 'doll',    thai: 'ตุ๊กตาเก่า' },
+    { adj: 'old', noun: 'bicycle', thai: 'รถจักรยานเก่า' },
+    { adj: 'old', noun: 'robot',   thai: 'หุ่นยนต์เก่า' }
+  ];
+  shuffle(anOldPool).slice(0, 2).forEach(item => {
+    const nounObj = getWordObj(item.noun, { word: item.noun, meaning: item.thai, image: '🪁' });
+    const correctSent = `It's an old ${item.noun}.`;
+    const opts = shuffle([
+      { text: correctSent,                 isCorrect: true,  word: correctSent, meaning: item.thai },
+      { text: `It's a old ${item.noun}.`,  isCorrect: false, word: `It's a old ${item.noun}.`,  meaning: 'ผิด article' },
+      { text: `It's an ${item.noun} old.`, isCorrect: false, word: `It's an ${item.noun} old.`, meaning: 'ผิดลำดับคำ' },
+      { text: `It's old a ${item.noun}.`,  isCorrect: false, word: `It's old a ${item.noun}.`,  meaning: 'ผิดโครงสร้าง' }
+    ]);
+    list.push({
+      id: qId++,
+      type: 'grammar_midterm',
+      targetWord: {
+        word: correctSent,
+        meaning: item.thai,
+        image: buildTraitVisual(nounObj.image, 'old'),
+        explanation: `💡 คำว่า "old" ขึ้นต้นด้วยเสียงสระ (o) ต้องใช้ "an" นำหน้า → "${correctSent}" (${item.thai}) จ้า`
+      },
+      questionText: 'Choose the correct sentence.',
+      thaiQuestionText: `เลือกประโยคที่ถูกต้องสำหรับ "${item.thai}" (สังเกต a / an นะจ๊ะ)`,
+      options: opts,
+      skill: 'Grammar: a/an + Adj'
+    });
+  });
+
+  const aAdjPool = [
+    { adj: 'big',    noun: 'robot',     thai: 'หุ่นยนต์ตัวใหญ่' },
+    { adj: 'new',    noun: 'bicycle',   thai: 'รถจักรยานใหม่' },
+    { adj: 'little', noun: 'doll',      thai: 'ตุ๊กตาตัวเล็ก' },
+    { adj: 'long',   noun: 'jump rope', thai: 'เชือกกระโดดเส้นยาว' },
+    { adj: 'short',  noun: 'bat',       thai: 'ไม้ตีเบสบอลอันสั้น' },
+    { adj: 'round',  noun: 'baseball',  thai: 'ลูกเบสบอลทรงกลม' },
+    { adj: 'square', noun: 'puzzle',    thai: 'ตัวต่อจิ๊กซอว์สี่เหลี่ยม' }
+  ];
+  shuffle(aAdjPool).slice(0, 2).forEach(item => {
+    const nounObj = getWordObj(item.noun, { word: item.noun, meaning: item.thai, image: '🤖' });
+    const correctSent = `It's a ${item.adj} ${item.noun}.`;
+    const opts = shuffle([
+      { text: correctSent,                        isCorrect: true,  word: correctSent, meaning: item.thai },
+      { text: `It's an ${item.adj} ${item.noun}.`, isCorrect: false, word: `It's an ${item.adj} ${item.noun}.`, meaning: 'ผิด article' },
+      { text: `It's a ${item.noun} ${item.adj}.`,  isCorrect: false, word: `It's a ${item.noun} ${item.adj}.`,  meaning: 'ผิดลำดับคำ' },
+      { text: `It's ${item.adj} ${item.noun}.`,    isCorrect: false, word: `It's ${item.adj} ${item.noun}.`,    meaning: 'ลืม a' }
+    ]);
+    list.push({
+      id: qId++,
+      type: 'grammar_midterm',
+      targetWord: {
+        word: correctSent,
+        meaning: item.thai,
+        image: buildTraitVisual(nounObj.image, item.adj),
+        explanation: `💡 ใช้โครงสร้าง It's a + คำคุณศัพท์ + คำนาม → "${correctSent}" (${item.thai}) จ้า`
+      },
+      questionText: 'Choose the correct sentence.',
+      thaiQuestionText: `เลือกประโยคที่ถูกต้องสำหรับ "${item.thai}"`,
+      options: opts,
+      skill: 'Grammar: a/an + Adj'
+    });
+  });
+
+  // ── PART 4: "WHAT IS IT?" DESCRIBING OBJECTS Q&A (6 questions) ──────────
+  const getToyImg = (name, fallbackEmoji) => getWordObj(name, { image: fallbackEmoji }).image;
+
+  const coreQaScenarios = [
+    { adj: 'big',    opp: 'little', noun: 'bag',       altNoun: 'robot',     thai: 'กระเป๋าใบใหญ่',          img: '💼' },
+    { adj: 'round',  opp: 'square', noun: 'yo-yo',     altNoun: 'kite',      thai: 'ลูกดิ่งโยโย่ทรงกลม',     img: getToyImg('yo-yo', '🪀') },
+    { adj: 'old',    opp: 'new',    noun: 'kite',      altNoun: 'doll',      thai: 'ว่าวเก่า',               img: getToyImg('kite', '🪁') }
+  ];
+  const extraQaScenarios = [
+    { adj: 'big',    opp: 'little', noun: 'robot',     altNoun: 'car',       thai: 'หุ่นยนต์ตัวใหญ่',        img: getToyImg('robot', '🤖') },
+    { adj: 'long',   opp: 'short',  noun: 'jump rope', altNoun: 'bat',       thai: 'เชือกกระโดดเส้นยาว',     img: getToyImg('jump rope', '🪢') },
+    { adj: 'square', opp: 'round',  noun: 'puzzle',    altNoun: 'baseball',  thai: 'ตัวต่อจิ๊กซอว์สี่เหลี่ยม', img: getToyImg('puzzle', '🧩') },
+    { adj: 'new',    opp: 'old',    noun: 'car',       altNoun: 'bicycle',   thai: 'รถยนต์ของเล่นใหม่',      img: getToyImg('car', '🚗') },
+    { adj: 'little', opp: 'big',    noun: 'doll',      altNoun: 'yo-yo',     thai: 'ตุ๊กตาตัวเล็ก',          img: getToyImg('doll', '🪆') },
+    { adj: 'short',  opp: 'long',   noun: 'bat',       altNoun: 'jump rope', thai: 'ไม้ตีเบสบอลอันสั้น',     img: getToyImg('bat', '🏏') },
+    { adj: 'round',  opp: 'square', noun: 'baseball',  altNoun: 'puzzle',    thai: 'ลูกเบสบอลทรงกลม',        img: getToyImg('baseball', '⚾') }
+  ];
+
+  // Always include 2 signature core scenarios + 4 shuffled extra scenarios = 6 Q&A questions
+  const selectedQa = shuffle([
+    ...shuffle(coreQaScenarios).slice(0, 2),
+    ...shuffle(extraQaScenarios).slice(0, 4)
+  ]);
+
+  selectedQa.forEach(s => {
+    const artCorrect = articleFor(s.adj);
+    const artOpp     = articleFor(s.opp);
+    const correctAns = `It's ${artCorrect} ${s.adj} ${s.noun}.`;
+    const wrong1     = `It's ${artOpp} ${s.opp} ${s.noun}.`;
+    const wrong2     = `It's ${artCorrect} ${s.adj} ${s.altNoun}.`;
+    const wrong3     = s.adj === 'old'
+      ? `It's a old ${s.noun}.`
+      : `It's ${artOpp} ${s.opp} ${s.altNoun}.`;
+
+    const opts = shuffle([
+      { text: correctAns, isCorrect: true,  word: correctAns, meaning: s.thai },
+      { text: wrong1,     isCorrect: false, word: wrong1,     meaning: 'ผิดคำคุณศัพท์' },
+      { text: wrong2,     isCorrect: false, word: wrong2,     meaning: 'ผิดคำนาม' },
+      { text: wrong3,     isCorrect: false, word: wrong3,     meaning: 'ผิดโครงสร้าง/คำศัพท์' }
+    ]);
+
+    list.push({
+      id: qId++,
+      type: 'grammar_midterm',
+      targetWord: {
+        word: correctAns,
+        meaning: s.thai,
+        image: buildTraitVisual(s.img, s.adj),
+        explanation: `💬 What is it? → "${correctAns}" แปลว่า มันคือ${s.thai} จ้า`
+      },
+      questionText: 'What is it?',
+      thaiQuestionText: 'นี่คืออะไร? (ดูภาพและลักษณะแล้วตอบให้ถูกต้อง)',
+      options: opts,
+      skill: 'Sentence Q&A'
+    });
+  });
+
+  return list;
+}
+
 // GENERATE CHALLENGE QUESTIONS DYNAMICALLY
 function generateQuestions() {
   if (currentUnitId === 'midterm_prep') {
@@ -1632,6 +1913,9 @@ function generateQuestions() {
   }
   if (currentUnitId === 'final_exam_prep') {
     return generateFinalExamQuestions();
+  }
+  if (currentUnitId === 'unit5_exam') {
+    return generateUnit5ExamQuestions();
   }
 
 
@@ -2578,6 +2862,8 @@ function submitAssessment() {
     finalStarsEarned += 20; // โบนัสเพิ่ม 20 ดาวพิเศษสำหรับการจำลองสอบกลางภาค ป.1!
   } else if (currentUnitId === 'final_exam_prep') {
     finalStarsEarned += 25; // โบนัสเพิ่ม 25 ดาวพิเศษสำหรับการจำลองสอบปลายภาค ป.1!
+  } else if (currentUnitId === 'unit5_exam') {
+    finalStarsEarned += 20; // โบนัสเพิ่ม 20 ดาวพิเศษสำหรับการสอบท้ายบท Unit 5!
   }
   addStars(finalStarsEarned);
   
@@ -3382,12 +3668,23 @@ function loadUnitVocab(unitId) {
     if (subtitle) {
       subtitle.textContent = `📝 โหมดเตรียมสอบปลายภาค ป.1 (Let's Go 3 Unit 3-4)`;
     }
+  } else if (unitId === 'unit5_exam') {
+    ORIGINAL_VOCAB_LIST = getUnit5ExamWords();
+    if (subtitle) {
+      subtitle.textContent = `🎯 โหมดสอบท้ายบท Unit 5: Birthday and Toys (ของเล่น 10 คำ + Adjectives 8 คำ + โครงสร้าง It's a/an...)`;
+    }
   } else {
     const unit = VOCAB_UNITS.find(u => u.id === unitId) || VOCAB_UNITS[0];
     ORIGINAL_VOCAB_LIST = [...unit.words];
     if (subtitle) {
       subtitle.textContent = `เรียนรู้คำศัพท์: ${unit.title} (${ORIGINAL_VOCAB_LIST.length} คำหลัก)`;
     }
+  }
+
+  // Show / hide Unit 5 Exam grammar study guide in Learn mode
+  const unit5Guide = document.getElementById('unit5-exam-study-guide');
+  if (unit5Guide) {
+    unit5Guide.style.display = unitId === 'unit5_exam' ? 'block' : 'none';
   }
   
   refreshVocabList();
@@ -3443,7 +3740,7 @@ function renderUnitSelectors() {
   btnLearnMidterm.type = 'button';
   btnLearnMidterm.className = `btn-unit-select ${currentUnitId === 'midterm_prep' ? 'active' : ''}`;
   btnLearnMidterm.textContent = '🎓 เตรียมสอบกลางภาค';
-  btnLearnMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false);
+  btnLearnMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false, false);
   btnLearnMidterm.addEventListener('click', () => {
     loadUnitVocab('midterm_prep');
   });
@@ -3454,18 +3751,29 @@ function renderUnitSelectors() {
   btnLearnFinal.type = 'button';
   btnLearnFinal.className = `btn-unit-select ${currentUnitId === 'final_exam_prep' ? 'active' : ''}`;
   btnLearnFinal.textContent = '🌟 เตรียมสอบปลายภาค';
-  btnLearnFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true);
+  btnLearnFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true, false);
   btnLearnFinal.addEventListener('click', () => {
     loadUnitVocab('final_exam_prep');
   });
   learnSelector.appendChild(btnLearnFinal);
+
+  // Add Unit 5 Chapter Exam Button to Learn Mode
+  const btnLearnUnit5Exam = document.createElement('button');
+  btnLearnUnit5Exam.type = 'button';
+  btnLearnUnit5Exam.className = `btn-unit-select ${currentUnitId === 'unit5_exam' ? 'active' : ''}`;
+  btnLearnUnit5Exam.textContent = '🎯 สอบท้ายบท Unit 5';
+  btnLearnUnit5Exam.style.cssText = getUnitBtnStyle(currentUnitId === 'unit5_exam', false, false, true);
+  btnLearnUnit5Exam.addEventListener('click', () => {
+    loadUnitVocab('unit5_exam');
+  });
+  learnSelector.appendChild(btnLearnUnit5Exam);
 
   // Add Midterm Prep Button to Game Mode
   const btnGameMidterm = document.createElement('button');
   btnGameMidterm.type = 'button';
   btnGameMidterm.className = `btn-unit-select ${currentUnitId === 'midterm_prep' ? 'active' : ''}`;
   btnGameMidterm.textContent = '🎓 เตรียมสอบกลางภาค';
-  btnGameMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false);
+  btnGameMidterm.style.cssText = getUnitBtnStyle(currentUnitId === 'midterm_prep', true, false, false);
   btnGameMidterm.addEventListener('click', () => {
     loadUnitVocab('midterm_prep');
   });
@@ -3476,14 +3784,32 @@ function renderUnitSelectors() {
   btnGameFinal.type = 'button';
   btnGameFinal.className = `btn-unit-select ${currentUnitId === 'final_exam_prep' ? 'active' : ''}`;
   btnGameFinal.textContent = '🌟 เตรียมสอบปลายภาค';
-  btnGameFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true);
+  btnGameFinal.style.cssText = getUnitBtnStyle(currentUnitId === 'final_exam_prep', false, true, false);
   btnGameFinal.addEventListener('click', () => {
     loadUnitVocab('final_exam_prep');
   });
   gameSelector.appendChild(btnGameFinal);
+
+  // Add Unit 5 Chapter Exam Button to Game Mode
+  const btnGameUnit5Exam = document.createElement('button');
+  btnGameUnit5Exam.type = 'button';
+  btnGameUnit5Exam.className = `btn-unit-select ${currentUnitId === 'unit5_exam' ? 'active' : ''}`;
+  btnGameUnit5Exam.textContent = '🎯 สอบท้ายบท Unit 5';
+  btnGameUnit5Exam.style.cssText = getUnitBtnStyle(currentUnitId === 'unit5_exam', false, false, true);
+  btnGameUnit5Exam.addEventListener('click', () => {
+    loadUnitVocab('unit5_exam');
+  });
+  gameSelector.appendChild(btnGameUnit5Exam);
 }
 
-function getUnitBtnStyle(isActive, isMidterm = false, isFinal = false) {
+function getUnitBtnStyle(isActive, isMidterm = false, isFinal = false, isUnit5Exam = false) {
+  if (isUnit5Exam) {
+    if (isActive) {
+      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #ea580c; background: linear-gradient(135deg, #fed7aa 0%, #fb923c 100%); color: #7c2d12; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.35); animation: pulse-gold 2s infinite;';
+    } else {
+      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #fed7aa; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #c2410c; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.1);';
+    }
+  }
   if (isFinal) {
     if (isActive) {
       return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #a855f7; background: linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%); color: #581c87; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.35); animation: pulse-gold 2s infinite;';
@@ -3513,11 +3839,11 @@ function updateUnitSelectorUI() {
     const isActive = unit.id === currentUnitId;
     if (learnBtns[idx]) {
       learnBtns[idx].className = `btn-unit-select ${isActive ? 'active' : ''}`;
-      learnBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false);
+      learnBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false, false);
     }
     if (gameBtns[idx]) {
       gameBtns[idx].className = `btn-unit-select ${isActive ? 'active' : ''}`;
-      gameBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false);
+      gameBtns[idx].style.cssText = getUnitBtnStyle(isActive, false, false, false);
     }
   });
 
@@ -3525,22 +3851,33 @@ function updateUnitSelectorUI() {
   const isMidtermActive = currentUnitId === 'midterm_prep';
   if (learnBtns[midtermIdx]) {
     learnBtns[midtermIdx].className = `btn-unit-select ${isMidtermActive ? 'active' : ''}`;
-    learnBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false);
+    learnBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false, false);
   }
   if (gameBtns[midtermIdx]) {
     gameBtns[midtermIdx].className = `btn-unit-select ${isMidtermActive ? 'active' : ''}`;
-    gameBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false);
+    gameBtns[midtermIdx].style.cssText = getUnitBtnStyle(isMidtermActive, true, false, false);
   }
 
   const finalIdx = VOCAB_UNITS.length + 1;
   const isFinalActive = currentUnitId === 'final_exam_prep';
   if (learnBtns[finalIdx]) {
     learnBtns[finalIdx].className = `btn-unit-select ${isFinalActive ? 'active' : ''}`;
-    learnBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true);
+    learnBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true, false);
   }
   if (gameBtns[finalIdx]) {
     gameBtns[finalIdx].className = `btn-unit-select ${isFinalActive ? 'active' : ''}`;
-    gameBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true);
+    gameBtns[finalIdx].style.cssText = getUnitBtnStyle(isFinalActive, false, true, false);
+  }
+
+  const unit5ExamIdx = VOCAB_UNITS.length + 2;
+  const isUnit5ExamActive = currentUnitId === 'unit5_exam';
+  if (learnBtns[unit5ExamIdx]) {
+    learnBtns[unit5ExamIdx].className = `btn-unit-select ${isUnit5ExamActive ? 'active' : ''}`;
+    learnBtns[unit5ExamIdx].style.cssText = getUnitBtnStyle(isUnit5ExamActive, false, false, true);
+  }
+  if (gameBtns[unit5ExamIdx]) {
+    gameBtns[unit5ExamIdx].className = `btn-unit-select ${isUnit5ExamActive ? 'active' : ''}`;
+    gameBtns[unit5ExamIdx].style.cssText = getUnitBtnStyle(isUnit5ExamActive, false, false, true);
   }
 }
 
@@ -3685,6 +4022,16 @@ function updateGameStartMeta() {
     }
     if (startTitle) startTitle.textContent = '🌟 ภารกิจจำลองสอบปลายภาค ป.1 (Let\'s Go 1)';
     if (startDesc) startDesc.textContent = `น้องๆ จะได้ทำข้อสอบ ${FINAL_EXAM_QUESTION_COUNT} ข้อ รวมคำศัพท์ สิ่งของในห้องเรียน/คนในครอบครัว, ไวยากรณ์ Singular/Plural, ประโยคถาม-ตอบ, บทสนทนา และฝึกโฟนิกส์ (Phonics Dd, Tt, Aa) ของบทเรียน Unit 3-4 เพื่อรับโบนัสดาวทองคำพิเศษ 25 ดวง!`;
+  } else if (currentUnitId === 'unit5_exam') {
+    quizQuestionCount = UNIT5_EXAM_QUESTION_COUNT;
+    if (gameModeSetup) gameModeSetup.style.display = 'none';
+    if (quizLengthSetup) quizLengthSetup.style.display = 'none';
+    if (startMetaInfo) {
+      startMetaInfo.innerHTML = `🎯 ข้อสอบท้ายบท Unit 5 มีทั้งหมด <span style="color:#ea580c; font-weight:800;">${UNIT5_EXAM_QUESTION_COUNT} ข้อ</span> ครบทั้งของเล่น, Adjectives และประโยค It's a/an จ้า`;
+      startMetaInfo.style.cssText = 'background: #fff7ed; border: 1.5px solid #fdba74; padding: 10px 16px; border-radius: 12px; display: inline-block; font-size: 0.95rem; font-weight: 600; color: #c2410c; margin-bottom: 24px; animation: pulse-gold 2s infinite;';
+    }
+    if (startTitle) startTitle.textContent = '🎯 ภารกิจสอบท้ายบท Unit 5: Birthday and Toys';
+    if (startDesc) startDesc.textContent = `น้องๆ จะได้ทำข้อสอบ ${UNIT5_EXAM_QUESTION_COUNT} ข้อ ครบทั้งคำศัพท์ของเล่น 10 คำ, คำคุณศัพท์ 8 คำ & คู่ตรงข้าม, ไวยากรณ์ It's a/an + adj + noun (ระวัง an old!) และประโยคถาม-ตอบ What is it? เพื่อรับโบนัสดาวทองคำพิเศษ 20 ดวง!`;
   } else {
     if (gameModeSetup) gameModeSetup.style.display = 'block';
     if (quizLengthSetup) quizLengthSetup.style.display = 'block';
@@ -4458,6 +4805,21 @@ function celebrateQuizResult(correctCount, starsEarned) {
     playFeedbackSounds([
       makeUtterance('เย้! สอบจำลองปลายภาคสำเร็จแล้วค่ะ', 'th-TH', 1),
       makeUtterance(`น้องตอบถูก ${correctCount} จาก ${challengeQuestions.length} ข้อ และได้รับโบนัสดาวทองคำพิเศษ 25 ดวงยอดเยี่ยมที่สุดเลยจ้า!`, 'th-TH', 1)
+    ]);
+    return;
+  }
+
+  if (currentUnitId === 'unit5_exam') {
+    // Grand celebration for Unit 5 chapter exam completion!
+    spawnStarConfetti(x - 120, y, 25);
+    spawnStarConfetti(x + 120, y, 25);
+    setTimeout(() => spawnStarConfetti(x, y - 60, 35), 250);
+    setTimeout(() => spawnStarConfetti(x, y, 20), 500);
+
+    stopAllSpeech();
+    playFeedbackSounds([
+      makeUtterance('เย้! ทำข้อสอบท้ายบท Unit 5 สำเร็จแล้วค่ะ', 'th-TH', 1),
+      makeUtterance(`น้องตอบถูก ${correctCount} จาก ${challengeQuestions.length} ข้อ และได้รับโบนัสดาวทองคำพิเศษ 20 ดวงเก่งมากเลยจ้า!`, 'th-TH', 1)
     ]);
     return;
   }

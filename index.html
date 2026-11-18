@@ -83,6 +83,63 @@
           <span class="info-icon">💡</span>
           <span class="info-text">กดที่การ์ดคำศัพท์เพื่อฟังเสียงสะกดคำและคำแปลภาษาไทยนะจ๊ะเด็กๆ</span>
         </div>
+
+        <!-- Unit 5 End-of-Chapter Exam Grammar Study Guide (Shown only in unit5_exam mode) -->
+        <div id="unit5-exam-study-guide" class="card" style="display: none; margin-bottom: 22px; padding: 20px 22px; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 2px solid #fdba74; border-radius: 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 1.6rem;">🎯</span>
+              <div>
+                <h3 style="font-family: var(--font-display); font-size: 1.15rem; color: #9a3412; margin: 0;">สรุปติวสอบท้ายบท Unit 5: Birthday and Toys</h3>
+                <p style="font-size: 0.85rem; color: #c2410c; margin: 2px 0 0 0;">คำศัพท์ของเล่น 10 คำ + คำคุณศัพท์ 8 คำ + โครงสร้างประโยคบอกลักษณะ</p>
+              </div>
+            </div>
+            <button type="button" id="btn-go-unit5-exam" class="btn btn-primary" style="padding: 9px 18px; font-size: 0.9rem; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);">
+              🚀 เริ่มทำข้อสอบท้ายบท (20 ข้อ)
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+            <!-- Structure Box -->
+            <div style="background: #ffffff; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 14px;">
+              <div style="font-weight: 800; color: #9a3412; font-size: 0.92rem; margin-bottom: 6px;">📌 โครงสร้างประโยคบอกลักษณะ</div>
+              <div style="background: #fff7ed; border: 1px dashed #fb923c; border-radius: 10px; padding: 8px 10px; font-weight: 800; color: #c2410c; font-size: 0.95rem; text-align: center; margin-bottom: 8px;">
+                It's a / an + (คำคุณศัพท์) + (คำนาม).
+              </div>
+              <div style="font-size: 0.84rem; color: var(--dark-3); line-height: 1.55;">
+                • ใช้ <strong>a</strong> หน้าคำคุณศัพท์ทั่วไป เช่น <strong>It's a big robot.</strong><br>
+                • ใช้ <strong style="color: #dc2626;">an</strong> หน้าเสียงสระ (a, e, i, o, u) เช่น <strong style="color: #dc2626;">It's an old kite.</strong>
+              </div>
+            </div>
+
+            <!-- Opposite Adjectives Box -->
+            <div style="background: #ffffff; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 14px;">
+              <div style="font-weight: 800; color: #9a3412; font-size: 0.92rem; margin-bottom: 6px;">🎨 คำคุณศัพท์ 4 คู่ตรงข้าม (Adjectives)</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.85rem; color: var(--dark-3);">
+                <div style="background: #f8fafc; padding: 5px 8px; border-radius: 8px;"><strong>big</strong> (ใหญ่) ↔ <strong>little</strong> (เล็ก)</div>
+                <div style="background: #f8fafc; padding: 5px 8px; border-radius: 8px;"><strong>new</strong> (ใหม่) ↔ <strong>old</strong> (เก่า)</div>
+                <div style="background: #f8fafc; padding: 5px 8px; border-radius: 8px;"><strong>long</strong> (ยาว) ↔ <strong>short</strong> (สั้น)</div>
+                <div style="background: #f8fafc; padding: 5px 8px; border-radius: 8px;"><strong>round</strong> (กลม) ↔ <strong>square</strong> (สี่เหลี่ยม)</div>
+              </div>
+            </div>
+
+            <!-- Q&A Examples Box -->
+            <div style="background: #ffffff; border: 1.5px solid #fed7aa; border-radius: 14px; padding: 14px;">
+              <div style="font-weight: 800; color: #9a3412; font-size: 0.92rem; margin-bottom: 6px;">💬 ตัวอย่างถาม-ตอบ (กดฟังเสียงได้)</div>
+              <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem;">
+                <button type="button" class="u5-example-speak" data-text="What is it? It's a big bag." style="text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; cursor: pointer; font-weight: 600; color: var(--dark-2);">
+                  🔊 💼 What is it? → <strong>It's a big bag.</strong>
+                </button>
+                <button type="button" class="u5-example-speak" data-text="What is it? It's a round yo-yo." style="text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; cursor: pointer; font-weight: 600; color: var(--dark-2);">
+                  🔊 🪀 What is it? → <strong>It's a round yo-yo.</strong>
+                </button>
+                <button type="button" class="u5-example-speak" data-text="What is it? It's an old kite." style="text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; cursor: pointer; font-weight: 600; color: var(--dark-2);">
+                  🔊 🪁 What is it? → <strong>It's an old kite.</strong>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         
         <div class="vocab-grid" id="vocabGrid">
           <!-- Dynamically populated cards from questions.js -->
