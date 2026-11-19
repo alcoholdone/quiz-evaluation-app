@@ -13,6 +13,7 @@ try {
 // 2. Mock Browser Environment สำหรับทดสอบ Logic In-Memory
 const questionsCode = fs.readFileSync('./questions.js', 'utf8').replace('const VOCAB_UNITS =', 'global.VOCAB_UNITS =');
 const appCode = fs.readFileSync('./app.js', 'utf8')
+  .replace('let ORIGINAL_VOCAB_LIST =', 'global.ORIGINAL_VOCAB_LIST =')
   .replace('let challengeQuestions =', 'global.challengeQuestions =')
   .replace('let dictationSessionList =', 'global.dictationSessionList =')
   .replace('let selectedDictationRound =', 'global.selectedDictationRound =')
@@ -87,7 +88,16 @@ if (currentTerm !== 2 || currentUnitId !== 'unit_5' || selectedDictationRound !=
   console.error(`❌ สลับกลับเทอม 2 ไม่ถูกต้อง: term=${currentTerm}, unit=${currentUnitId}, dictation=${selectedDictationRound}`);
   allPassed = false;
 } else {
-  console.log('✅ สลับกลับเทอม 2 ผ่านฉลุย! (unit_5 + dictation r6)\n');
+  console.log('✅ สลับกลับเทอม 2 ผ่านฉลุย! (unit_5 + dictation r6)');
+}
+
+// ทดสอบโหลด Unit 6 และตรวจสอบว่าอยู่ในเทอม 2
+loadUnitVocab('unit_6');
+if (currentTerm !== 2 || currentUnitId !== 'unit_6' || ORIGINAL_VOCAB_LIST.length !== 4) {
+  console.error(`❌ โหลด Unit 6 ไม่ถูกต้อง: term=${currentTerm}, unit=${currentUnitId}, count=${ORIGINAL_VOCAB_LIST ? ORIGINAL_VOCAB_LIST.length : 0}`);
+  allPassed = false;
+} else {
+  console.log('✅ โหลด Unit 6 Outdoors สำเร็จ (อยู่ในเทอม 2 ครบ 4 คำหลัก)\n');
 }
 
 // 3. ทดสอบการสร้างข้อสอบและ Render ในแต่ละโหมด

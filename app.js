@@ -1121,10 +1121,10 @@ function getSentenceQA(item) {
     };
   } else if (wordLower === 'weather') {
     return {
-      question: "How’s the weather?",
-      answer: "It’s sunny.",
-      thaiQuestion: "สภาพอากาศเป็นอย่างไร?",
-      thaiAnswer: "มีแดดแรง (สภาพอากาศ)"
+      question: "What’s this?",
+      answer: "It’s the weather.",
+      thaiQuestion: "นี่คืออะไร?",
+      thaiAnswer: "มันคือสภาพอากาศ"
     };
   } else {
     // Default fallback based on vowel detection
