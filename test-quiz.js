@@ -98,6 +98,7 @@ const testUnits = [
   { id: 'unit_3', expected: 10, name: 'Unit 3: At the Store' },
   { id: 'unit_4', expected: 10, name: 'Unit 4: People at Home' },
   { id: 'unit_5', expected: 10, name: 'Unit 5: Birthday and Toys' },
+  { id: 'unit_6', expected: 10, name: 'Unit 6: Outdoors' },
   { id: 'midterm_prep', expected: 21, name: '🎓 เตรียมสอบกลางภาค (Let\'s Go 1 Unit 1-2)' },
   { id: 'final_exam_prep', expected: 29, name: '🌟 เตรียมสอบปลายภาค (Let\'s Go 3 Unit 3-4)' },
   { id: 'unit5_exam', expected: 20, name: '🎯 สอบท้ายบท Unit 5 (Birthday and Toys)' }

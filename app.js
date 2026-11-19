@@ -79,12 +79,12 @@ const SHAPE_COLOR_MAP = {
 // --- Word classification helpers (single source of truth) ---
 // Words that are NOT singular countable nouns: action verbs, adjectives,
 // greetings and colors. They must never get "a/an" or "Is this a ___?" framing.
-const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many', 'tall', 'short', 'young', 'old', 'pretty', 'handsome', 'say', 'read', 'write', 'ask', 'answer', 'big', 'little', 'new', 'long', 'round', 'square', 'ride', 'throw', 'catch'];
+const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many', 'tall', 'short', 'young', 'old', 'pretty', 'handsome', 'say', 'read', 'write', 'ask', 'answer', 'big', 'little', 'new', 'long', 'round', 'square', 'ride', 'throw', 'catch', 'sunny', 'rainy', 'windy'];
 
 // "color" and "shape" ARE nouns, but they are abstract category headers whose
 // picture is a generic icon — so we never frame them as "Is this a ___?" /
 // "It's a ___" or use them as a picture quiz target.
-const CATEGORY_NOUNS = ['color', 'shape', 'birthday', 'year'];
+const CATEGORY_NOUNS = ['color', 'shape', 'birthday', 'year', 'weather'];
 
 // True for any noun (used to decide part-of-speech style behavior).
 function isNounWord(item) {
@@ -1112,6 +1112,20 @@ function getSentenceQA(item) {
       thaiQuestion: "นี่คือสีอะไร?",
       thaiAnswer: `มันคือ${item.meaning}`
     };
+  } else if (['sunny', 'rainy', 'windy', 'cloudy', 'snowy'].includes(wordLower)) {
+    return {
+      question: "How’s the weather?",
+      answer: `It’s ${wordLower}.`,
+      thaiQuestion: "สภาพอากาศเป็นอย่างไร?",
+      thaiAnswer: `มัน${item.meaning}`
+    };
+  } else if (wordLower === 'weather') {
+    return {
+      question: "How’s the weather?",
+      answer: "It’s sunny.",
+      thaiQuestion: "สภาพอากาศเป็นอย่างไร?",
+      thaiAnswer: "มีแดดแรง (สภาพอากาศ)"
+    };
   } else {
     // Default fallback based on vowel detection
     const isVowel = /^[aeiou]/i.test(wordLower);
@@ -2018,50 +2032,55 @@ function generateQuestions() {
     }
 
     if (type === 'grammar_an') {
-      // We only choose words that are concrete, picturable nouns (never repeating the same fallback noun)
-      let targetNoun = targetWord;
-      if (!isConcreteNoun(targetNoun) || usedGrammarNouns.has(targetNoun.word.toLowerCase())) {
-        const concretePool = VOCAB_LIST.filter(w => isConcreteNoun(w) && !usedGrammarNouns.has(w.word.toLowerCase()));
-        if (concretePool.length > 0) {
-          targetNoun = concretePool[Math.floor(Math.random() * concretePool.length)];
-        } else {
-          targetNoun = VOCAB_LIST.find(isConcreteNoun) || targetWord;
+      // Fallback if the unit has no concrete nouns to frame with a/an
+      if (!VOCAB_LIST.some(isConcreteNoun)) {
+        type = 'visual_word';
+      } else {
+        // We only choose words that are concrete, picturable nouns (never repeating the same fallback noun)
+        let targetNoun = targetWord;
+        if (!isConcreteNoun(targetNoun) || usedGrammarNouns.has(targetNoun.word.toLowerCase())) {
+          const concretePool = VOCAB_LIST.filter(w => isConcreteNoun(w) && !usedGrammarNouns.has(w.word.toLowerCase()));
+          if (concretePool.length > 0) {
+            targetNoun = concretePool[Math.floor(Math.random() * concretePool.length)];
+          } else {
+            targetNoun = VOCAB_LIST.find(isConcreteNoun) || targetWord;
+          }
         }
+        usedGrammarNouns.add(targetNoun.word.toLowerCase());
+
+        const wordLower = targetNoun.word.toLowerCase();
+        const isAn = ['eraser'].includes(wordLower) || /^[aeiou]/i.test(wordLower);
+
+        const correctText = `It’s ${isAn ? 'an' : 'a'} ${wordLower}.`;
+        const incorrectArticleText = `It’s ${isAn ? 'a' : 'an'} ${wordLower}.`;
+
+        const otherNouns = VOCAB_LIST.filter(w => w.word.toLowerCase() !== wordLower && isConcreteNoun(w));
+        otherNouns.sort(() => Math.random() - 0.5);
+
+        const incorrectNoun1 = otherNouns[0] || { word: 'Pen', meaning: 'ปากกา', image: '🖊️' };
+        const incorrectNoun2 = otherNouns[1] || { word: 'Pencil', meaning: 'ดินสอ', image: '✏️' };
+        
+        const isAn1 = ['eraser'].includes(incorrectNoun1.word.toLowerCase()) || /^[aeiou]/i.test(incorrectNoun1.word.toLowerCase());
+        const isAn2 = ['eraser'].includes(incorrectNoun2.word.toLowerCase()) || /^[aeiou]/i.test(incorrectNoun2.word.toLowerCase());
+        
+        const options = [
+          { isCorrect: true, text: correctText, word: targetNoun.word, meaning: targetNoun.meaning, image: targetNoun.image },
+          { isCorrect: false, text: incorrectArticleText, word: targetNoun.word, meaning: targetNoun.meaning, image: targetNoun.image },
+          { isCorrect: false, text: `It’s ${isAn1 ? 'an' : 'a'} ${incorrectNoun1.word.toLowerCase()}.`, word: incorrectNoun1.word, meaning: incorrectNoun1.meaning, image: incorrectNoun1.image },
+          { isCorrect: false, text: `It’s ${isAn2 ? 'an' : 'a'} ${incorrectNoun2.word.toLowerCase()}.`, word: incorrectNoun2.word, meaning: incorrectNoun2.meaning, image: incorrectNoun2.image }
+        ];
+        
+        options.sort(() => Math.random() - 0.5);
+        
+        list.push({
+          id: i + 1,
+          type: 'grammar_an',
+          targetWord: targetNoun,
+          options: options,
+          skill: 'Sentence Q&A'
+        });
+        continue;
       }
-      usedGrammarNouns.add(targetNoun.word.toLowerCase());
-
-      const wordLower = targetNoun.word.toLowerCase();
-      const isAn = ['eraser'].includes(wordLower) || /^[aeiou]/i.test(wordLower);
-
-      const correctText = `It’s ${isAn ? 'an' : 'a'} ${wordLower}.`;
-      const incorrectArticleText = `It’s ${isAn ? 'a' : 'an'} ${wordLower}.`;
-
-      const otherNouns = VOCAB_LIST.filter(w => w.word.toLowerCase() !== wordLower && isConcreteNoun(w));
-      otherNouns.sort(() => Math.random() - 0.5);
-
-      const incorrectNoun1 = otherNouns[0] || { word: 'Pen', meaning: 'ปากกา', image: '🖊️' };
-      const incorrectNoun2 = otherNouns[1] || { word: 'Pencil', meaning: 'ดินสอ', image: '✏️' };
-      
-      const isAn1 = ['eraser'].includes(incorrectNoun1.word.toLowerCase()) || /^[aeiou]/i.test(incorrectNoun1.word.toLowerCase());
-      const isAn2 = ['eraser'].includes(incorrectNoun2.word.toLowerCase()) || /^[aeiou]/i.test(incorrectNoun2.word.toLowerCase());
-      
-      const options = [
-        { isCorrect: true, text: correctText, word: targetNoun.word, meaning: targetNoun.meaning, image: targetNoun.image },
-        { isCorrect: false, text: incorrectArticleText, word: targetNoun.word, meaning: targetNoun.meaning, image: targetNoun.image },
-        { isCorrect: false, text: `It’s ${isAn1 ? 'an' : 'a'} ${incorrectNoun1.word.toLowerCase()}.`, word: incorrectNoun1.word, meaning: incorrectNoun1.meaning, image: incorrectNoun1.image },
-        { isCorrect: false, text: `It’s ${isAn2 ? 'an' : 'a'} ${incorrectNoun2.word.toLowerCase()}.`, word: incorrectNoun2.word, meaning: incorrectNoun2.meaning, image: incorrectNoun2.image }
-      ];
-      
-      options.sort(() => Math.random() - 0.5);
-      
-      list.push({
-        id: i + 1,
-        type: 'grammar_an',
-        targetWord: targetNoun,
-        options: options,
-        skill: 'Sentence Q&A'
-      });
-      continue;
     }
     
     if (type === 'sentence_qa') {
