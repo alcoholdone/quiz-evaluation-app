@@ -1,0 +1,307 @@
+/* ============================================================
+   Page Shell, Top Utility Bar, Header, Accessible Tabs & Cloud Bar
+   ============================================================ */
+.container {
+  max-inline-size: 1080px;
+  margin-inline: auto;
+  padding: max(14px, env(safe-area-inset-top)) 20px 40px;
+}
+
+/* --- Unified Top Utility Bar (no fixed overlaps) --- */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-block-end: 16px;
+}
+
+.topbar-sync-slot {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+}
+
+.topbar-utilities {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+
+#cloud-sync-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px 5px 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-bottom-width: 3px;
+  border-radius: var(--radius-pill);
+  color: var(--ink-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  max-inline-size: 100%;
+}
+
+#cloud-sync-bar .cs-dot {
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 50%;
+  background: var(--ink-light);
+  flex: 0 0 auto;
+  transition: background-color 0.25s ease;
+}
+
+#cloud-sync-bar .cs-dot[data-status="synced"] { background: var(--primary); }
+#cloud-sync-bar .cs-dot[data-status="error"]  { background: var(--danger); }
+#cloud-sync-bar .cs-dot[data-status="idle"],
+#cloud-sync-bar .cs-dot[data-status="offline"] { background: var(--ink-light); }
+
+#cloud-sync-bar #cs-label {
+  max-inline-size: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#cloud-sync-bar #cs-btn {
+  touch-action: manipulation;
+  border: 1px solid var(--secondary-dark);
+  border-bottom-width: 2px;
+  cursor: pointer;
+  background: var(--secondary);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 4px 11px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+#cloud-sync-bar #cs-btn:active {
+  transform: translateY(1px);
+}
+
+.total-stars-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold-border);
+  border-bottom-width: 3px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--gold-dark);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.14s ease;
+}
+
+.total-stars-badge:active {
+  transform: translateY(1px);
+}
+
+.stars-count-num {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  color: var(--gold-dark);
+}
+
+.btn-voice-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-block-size: 38px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-strong);
+  border-bottom-width: 3px;
+  background: var(--surface);
+  color: var(--ink-1);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.14s ease, background-color 0.15s ease;
+}
+
+.btn-voice-test:active {
+  transform: translateY(1px);
+}
+
+/* --- Editorial Storybook Header --- */
+.app-header {
+  text-align: center;
+  padding: 4px 8px 6px;
+}
+
+.app-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--ink-1);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.subtitle {
+  display: inline-block;
+  margin-block-start: 8px;
+  padding: 5px 14px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+/* --- Navigation Tabs (Single row, shape-indicated selection per WCAG 1.4.1) --- */
+.tab-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: inline proximity;
+  gap: 6px;
+  padding: 6px;
+  background: var(--surface-subtle);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-block: 16px 22px;
+}
+
+.tab-container::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  flex: 1 0 auto;
+  scroll-snap-align: start;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 16px;
+  min-block-size: 44px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.94rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.tab-btn[aria-selected="true"],
+.tab-btn.active {
+  background: var(--surface);
+  color: var(--primary-dark);
+}
+
+/* Mandatory non-color shape indicator (3px underline via ::after) */
+.tab-btn[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 3px;
+  inset-inline: 18px;
+  border-block-end: 3px solid var(--primary);
+  border-radius: 2px;
+}
+
+.tab-btn-special[aria-selected="true"],
+.tab-btn-special.active {
+  color: var(--plum-dark);
+  background: var(--plum-light);
+}
+
+.tab-btn-special[aria-selected="true"]::after {
+  border-block-end-color: var(--plum);
+}
+
+.tab-btn .t-ico {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.tab-btn .t-short {
+  display: none;
+}
+
+/* Feature gate lock indicator (uses ::before so ::after underline remains intact) */
+.tab-btn.cs-locked {
+  opacity: 0.58;
+}
+
+.tab-btn.cs-locked::before {
+  content: "🔒";
+  font-size: 0.78em;
+  margin-inline-end: 2px;
+}
+
+/* --- Main Panel Container --- */
+.main-panel-container {
+  min-block-size: 420px;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+  animation: slide-up 0.24s ease;
+}
+
+/* --- Cloud Sync Update Toast --- */
+#cs-toast {
+  position: fixed;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--ink-1);
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 14px;
+  box-shadow: var(--shadow-dialog);
+  animation: cs-toast-in 0.25s ease;
+  max-inline-size: calc(100dvw - 32px);
+}
+
+#cs-toast button {
+  touch-action: manipulation;
+  border: none;
+  cursor: pointer;
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* --- App Footer --- */
+.app-footer {
+  text-align: center;
+  margin-block-start: 36px;
+  padding-block: 14px;
+  border-block-start: 1.5px dashed var(--border);
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}

@@ -1,0 +1,293 @@
+/* ============================================================
+   Base Styles, Typography, SVG Visual Sizing & Animations
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink-1);
+  background-color: var(--bg-paper);
+  background-image: radial-gradient(var(--bg-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+  min-block-size: 100dvh;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-highlight {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.margin-bottom-md {
+  margin-block-end: 18px;
+}
+
+.margin-top-lg {
+  margin-block-start: 24px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink-1);
+  margin-block-end: 6px;
+}
+
+.section-desc {
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+  margin-block-end: 16px;
+  line-height: 1.55;
+}
+
+/* ============================================================
+   SVG Icon & Visual Sizing (Built-in & Sanitized Custom SVGs)
+   ============================================================ */
+.svg-icon {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.vocab-image svg,
+.vocab-image .svg-icon {
+  width: 80px;
+  height: 80px;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.question-visual svg,
+.question-visual .svg-icon {
+  width: 140px;
+  height: 140px;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.option-img svg,
+.option-img .svg-icon {
+  width: 64px;
+  height: 64px;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.u5-trait-visual {
+  width: 128px;
+  height: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.u5-trait-visual svg,
+.u5-trait-visual .svg-icon {
+  width: 120px;
+  height: 120px;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.vocab-table td svg {
+  width: 32px;
+  height: 32px;
+  max-width: 100%;
+  max-height: 100%;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.review-option svg {
+  width: 28px;
+  height: 28px;
+  max-width: 100%;
+  max-height: 100%;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.spelling-modal-visual svg,
+.spelling-modal-visual .svg-icon {
+  width: 128px;
+  height: 128px;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.dictation-preview-emoji svg,
+.dictation-preview-emoji .svg-icon {
+  width: 42px;
+  height: 42px;
+  display: block;
+}
+
+.sp-svg-wrap svg,
+.sp-svg-wrap .svg-icon {
+  width: clamp(4rem, 16vw, 6.5rem);
+  height: clamp(4rem, 16vw, 6.5rem);
+  display: block;
+  margin: 0 auto;
+}
+
+.sp-plural-display-svg .sp-svg-wrap svg,
+.sp-plural-display-svg .sp-svg-wrap .svg-icon {
+  width: clamp(2rem, 8vw, 3.2rem);
+  height: clamp(2rem, 8vw, 3.2rem);
+}
+
+/* ============================================================
+   Shared Keyframes
+   ============================================================ */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+
+@keyframes bounce-up {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(-6px); }
+}
+
+@keyframes letter-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.22); }
+  100% { transform: scale(1.1); }
+}
+
+@keyframes word-glow {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+@keyframes star-entrance {
+  from { opacity: 0; transform: scale(0.4) rotate(-18deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes star-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--scale, 1)) rotate(var(--rot, 180deg));
+  }
+}
+
+@keyframes reveal-correct-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(31, 122, 90, 0.25); }
+  50%      { box-shadow: 0 0 0 5px var(--primary-border); }
+}
+
+@keyframes sheet-up-modal {
+  from { transform: translateY(100%); opacity: 0.6; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes chat-pop-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sp-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sp-bounce-in {
+  0%   { opacity: 0; transform: scale(0.85); }
+  65%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sp-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sp-blank-pulse {
+  0%, 100% { border-color: var(--plum); }
+  50%      { border-color: var(--plum-border); }
+}
+
+@keyframes sp-correct-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes sp-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cs-toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}

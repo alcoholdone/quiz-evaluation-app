@@ -1,5 +1,6 @@
 import { state } from '../state/store.js';
 import { escapeHTML, sanitizeCustomImage, renderVisualHTML } from '../utils/sanitize.js';
+import { showToast } from '../utils/toast.js';
 import { getCustomVocabList, saveCustomVocabList } from '../services/storage.js';
 import { refreshVocabList, updateGameStartMeta } from './catalog.js';
 
@@ -15,19 +16,19 @@ export function setupVocabAddForm() {
     const explanation = document.getElementById('vocab-explanation').value.trim();
 
     if (!word || !meaning || !rawImage || !explanation) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วนทุกช่องด้วยนะจ๊ะ');
+      showToast('กรุณากรอกข้อมูลให้ครบถ้วนทุกช่องด้วยนะจ๊ะ', 'warning');
       return;
     }
 
     const imgCheck = sanitizeCustomImage(rawImage);
     if (!imgCheck.ok) {
-      alert('รูปแบบภาพไม่ถูกต้อง กรุณาใส่อิโมจิ (เช่น 🐱) หรือโค้ด <svg>...</svg> ที่ปลอดภัยเท่านั้นจ้า');
+      showToast('รูปแบบภาพไม่ถูกต้อง กรุณาใส่อิโมจิ (เช่น 🐱) หรือโค้ด <svg>...</svg> ที่ปลอดภัยเท่านั้นจ้า', 'error');
       return;
     }
 
     const exists = state.VOCAB_LIST.some(item => item.word.toLowerCase() === word.toLowerCase());
     if (exists) {
-      alert('คำศัพท์นี้มีอยู่ในคลังแล้วจ้า ลองเพิ่มคำอื่นนะ');
+      showToast('คำศัพท์นี้มีอยู่ในคลังแล้วจ้า ลองเพิ่มคำอื่นนะ', 'warning');
       return;
     }
 
@@ -37,7 +38,7 @@ export function setupVocabAddForm() {
     saveCustomVocabList(list);
 
     addForm.reset();
-    alert('บันทึกคำศัพท์ใหม่เรียบร้อยแล้วจ้า! สามารถไปทบทวนในโหมดฝึกสะกดคำได้เลย');
+    showToast('บันทึกคำศัพท์ใหม่เรียบร้อยแล้วจ้า! ไปทบทวนในโหมดฝึกสะกดคำได้เลย', 'success');
 
     refreshVocabList();
     renderCustomVocabTable();
@@ -74,18 +75,17 @@ export function renderCustomVocabTable() {
 
   custom.forEach((item, idx) => {
     const tr = document.createElement('tr');
-    tr.style.height = '50px';
 
     const safeVisual = renderVisualHTML(item.image, { trusted: false });
     const imgHtml = safeVisual.startsWith('<svg')
       ? safeVisual
-      : `<span style="font-size:1.5rem;">${safeVisual}</span>`;
+      : `<span class="table-emoji">${safeVisual}</span>`;
 
     tr.innerHTML = `
-      <td data-label="ภาพ" style="padding: 10px; width: 60px;">${imgHtml}</td>
-      <td data-label="อังกฤษ" style="padding: 10px; font-weight:700; color:var(--dark-2);">${escapeHTML(item.word)}</td>
-      <td data-label="แปลไทย" style="padding: 10px; color:var(--text-muted);">${escapeHTML(item.meaning)}</td>
-      <td data-label="จัดการ" style="padding: 10px; text-align: center;">
+      <td data-label="ภาพ" class="cell-visual">${imgHtml}</td>
+      <td data-label="อังกฤษ" class="cell-word">${escapeHTML(item.word)}</td>
+      <td data-label="แปลไทย" class="cell-meaning">${escapeHTML(item.meaning)}</td>
+      <td data-label="จัดการ" class="cell-action">
         <button type="button" class="btn-delete-vocab" data-delete-idx="${idx}">ลบ</button>
       </td>
     `;

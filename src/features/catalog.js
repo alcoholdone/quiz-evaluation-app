@@ -1,7 +1,8 @@
 import { state, nodes, STORAGE_KEYS, clearScopedTimers } from '../state/store.js';
-import { VOCAB_UNITS, EXAM_COUNTS } from '../data/units.js';
+import { VOCAB_UNITS, EXAM_COUNTS, UNIT_META, EXAM_PREP_CATALOG } from '../data/units.js';
 import { DICTATION_ROUNDS, DICTATION_ROUND_TERM } from '../data/dictation-rounds.js';
 import { getCustomVocabList } from '../services/storage.js';
+import { escapeHTML } from '../utils/sanitize.js';
 import { initLearnMode } from './learn.js';
 import { getUnit5ExamWords } from './quiz-generator.js';
 import { renderCustomVocabTable } from './vocab-manager.js';
@@ -12,20 +13,10 @@ import { pauseTimer, clearTransitionTimeout } from './game.js';
 import { renderDashboard } from './dashboard.js';
 
 export function getTermForUnitId(unitId) {
-  if (unitId === 'midterm_prep' || unitId === 'final_exam_prep') return 1;
-  if (unitId === 'unit5_exam') return 2;
+  const examEntry = EXAM_PREP_CATALOG.find(e => e.id === unitId);
+  if (examEntry) return examEntry.term;
   const unit = VOCAB_UNITS.find(u => u.id === unitId);
   return (unit && unit.term) ? unit.term : 1;
-}
-
-export function getTermBtnStyle(isActive, termNum) {
-  if (isActive) {
-    if (termNum === 2) {
-      return 'padding: 7px 14px; font-size: 0.85rem; font-weight: 800; border-radius: 999px; border: 2px solid #059669; background: linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%); color: #065f46; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(5, 150, 105, 0.25);';
-    }
-    return 'padding: 7px 14px; font-size: 0.85rem; font-weight: 800; border-radius: 999px; border: 2px solid #2563eb; background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); color: #1e3a8a; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);';
-  }
-  return 'padding: 7px 14px; font-size: 0.85rem; font-weight: 700; border-radius: 999px; border: 2px solid #cbd5e1; background: #ffffff; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
 }
 
 function formatTermUnitRange(termNum) {
@@ -57,12 +48,13 @@ export function renderTermSelectors() {
     if (!container) return;
     container.innerHTML = '';
     terms.forEach(t => {
+      const isActive = state.currentTerm === t.num;
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `btn-term-select ${state.currentTerm === t.num ? 'active' : ''}`;
+      btn.className = `btn-term-select term-${t.num}${isActive ? ' active' : ''}`;
       btn.dataset.term = String(t.num);
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       btn.textContent = t.label;
-      btn.style.cssText = getTermBtnStyle(state.currentTerm === t.num, t.num);
       btn.addEventListener('click', () => setCurrentTerm(t.num));
       container.appendChild(btn);
     });
@@ -100,7 +92,7 @@ export function initCustomVocabData() {
     localStorage.removeItem(STORAGE_KEYS.CUSTOM_VOCAB);
   }
 
-  // Render term & unit selectors initially (default: Term 2 -> Unit 5)
+  // Render term & unit shelf selectors initially (default: Term 2 -> Unit 5)
   renderTermSelectors();
   renderUnitSelectors();
 
@@ -128,6 +120,7 @@ export function loadUnitVocab(unitId) {
   state.gameTotalSeconds = 0;
   state.questionStartTime = null;
   state.hasCompletedAssessment = false;
+  state.learnCategoryFilter = 'all';
 
   state.currentUnitId = unitId;
 
@@ -182,7 +175,6 @@ export function loadUnitVocab(unitId) {
   const hasSpecial = unitId === 'unit_3';
   if (nodes.tabSpecial) {
     nodes.tabSpecial.style.display = hasSpecial ? '' : 'none';
-    // If current tab is special and we switch away, go back to learn
     if (!hasSpecial && state.activeTab === 'special') {
       switchTab('learn');
     }
@@ -196,105 +188,134 @@ export function loadUnitVocab(unitId) {
   }
 }
 
-export function renderUnitSelectors() {
-  const learnSelector = document.getElementById('learn-unit-selector');
-  const gameSelector = document.getElementById('game-unit-selector');
+function buildLessonShelfInto(container, termUnits, termExams) {
+  if (!container) return;
+  container.innerHTML = '';
 
-  if (!learnSelector || !gameSelector) return;
+  // Group 1: Unit Lessons
+  const unitsGroup = document.createElement('div');
+  unitsGroup.className = 'shelf-group';
 
-  learnSelector.innerHTML = '';
-  gameSelector.innerHTML = '';
+  const unitsLabel = document.createElement('div');
+  unitsLabel.className = 'shelf-group-label';
+  unitsLabel.textContent = '📖 บทเรียนประจำหน่วย';
+  unitsGroup.appendChild(unitsLabel);
 
-  const termUnits = VOCAB_UNITS.filter(unit => (unit.term || 1) === state.currentTerm);
-
-  const appendUnitButton = (container, id, label, flags = {}) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    const isActive = id === state.currentUnitId;
-    btn.className = `btn-unit-select ${isActive ? 'active' : ''}`;
-    btn.dataset.unitId = id;
-    btn.textContent = label;
-    btn.style.cssText = getUnitBtnStyle(isActive, !!flags.isMidterm, !!flags.isFinal, !!flags.isUnit5Exam);
-    btn.addEventListener('click', () => loadUnitVocab(id));
-    container.appendChild(btn);
-  };
+  const unitsGrid = document.createElement('div');
+  unitsGrid.className = 'shelf-grid shelf-grid--units';
 
   termUnits.forEach(unit => {
-    const shortLabel = unit.title.split(':')[0];
-    appendUnitButton(learnSelector, unit.id, shortLabel);
-    appendUnitButton(gameSelector, unit.id, shortLabel);
+    const meta = UNIT_META[unit.id] || {
+      icon: '📘',
+      code: unit.title.split(':')[0],
+      titleEn: unit.title,
+      titleTh: '',
+      accent: 'sage'
+    };
+    const isActive = unit.id === state.currentUnitId;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `btn-unit-select unit-tile${isActive ? ' active' : ''}`;
+    btn.dataset.unitId = unit.id;
+    btn.dataset.accent = meta.accent;
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+
+    const specialBadge = (unit.specialPractice || meta.hasSpecial)
+      ? `<span class="unit-tile-badge unit-tile-badge--special">⭐ แบบฝึกพิเศษ</span>`
+      : '';
+
+    btn.innerHTML = `
+      <span class="unit-tile-icon" aria-hidden="true">${escapeHTML(meta.icon)}</span>
+      <span class="unit-tile-body">
+        <span class="unit-tile-code">${escapeHTML(meta.code)} · ${escapeHTML(meta.titleEn)}</span>
+        ${meta.titleTh ? `<span class="unit-tile-sub">${escapeHTML(meta.titleTh)}</span>` : ''}
+        <span class="unit-tile-meta">
+          <span>${unit.words.length} คำ</span>
+          ${specialBadge}
+        </span>
+      </span>
+    `;
+    btn.addEventListener('click', () => loadUnitVocab(unit.id));
+    unitsGrid.appendChild(btn);
   });
 
-  if (state.currentTerm === 1) {
-    appendUnitButton(learnSelector, 'midterm_prep', '🎓 เตรียมสอบกลางภาค', { isMidterm: true });
-    appendUnitButton(learnSelector, 'final_exam_prep', '🌟 เตรียมสอบปลายภาค', { isFinal: true });
-    appendUnitButton(gameSelector, 'midterm_prep', '🎓 เตรียมสอบกลางภาค', { isMidterm: true });
-    appendUnitButton(gameSelector, 'final_exam_prep', '🌟 เตรียมสอบปลายภาค', { isFinal: true });
-  } else if (state.currentTerm === 2) {
-    appendUnitButton(learnSelector, 'unit5_exam', '🎯 สอบท้ายบท Unit 5', { isUnit5Exam: true });
-    appendUnitButton(gameSelector, 'unit5_exam', '🎯 สอบท้ายบท Unit 5', { isUnit5Exam: true });
+  unitsGroup.appendChild(unitsGrid);
+  container.appendChild(unitsGroup);
+
+  // Group 2: Exam Preps
+  if (termExams.length > 0) {
+    const examsGroup = document.createElement('div');
+    examsGroup.className = 'shelf-group';
+
+    const examsLabel = document.createElement('div');
+    examsLabel.className = 'shelf-group-label';
+    examsLabel.textContent = '🎯 ชุดติวสอบ & เก็บโบนัสดาว';
+    examsGroup.appendChild(examsLabel);
+
+    const examsGrid = document.createElement('div');
+    examsGrid.className = 'shelf-grid shelf-grid--exams';
+
+    termExams.forEach(exam => {
+      const isActive = exam.id === state.currentUnitId;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `btn-unit-select unit-tile unit-tile--exam exam-${exam.theme}${isActive ? ' active' : ''}`;
+      btn.dataset.unitId = exam.id;
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      btn.innerHTML = `
+        <span class="unit-tile-icon" aria-hidden="true">${escapeHTML(exam.icon)}</span>
+        <span class="unit-tile-body">
+          <span class="unit-tile-code">${escapeHTML(exam.title)}</span>
+          <span class="unit-tile-sub">${escapeHTML(exam.subtitle)}</span>
+          <span class="unit-tile-meta">
+            <span>${exam.count} ข้อ</span>
+            <span class="unit-tile-badge unit-tile-badge--bonus">+${exam.bonusStars} ⭐</span>
+          </span>
+        </span>
+      `;
+      btn.addEventListener('click', () => loadUnitVocab(exam.id));
+      examsGrid.appendChild(btn);
+    });
+
+    examsGroup.appendChild(examsGrid);
+    container.appendChild(examsGroup);
   }
 }
 
-export function getUnitBtnStyle(isActive, isMidterm = false, isFinal = false, isUnit5Exam = false) {
-  if (isUnit5Exam) {
-    if (isActive) {
-      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #ea580c; background: linear-gradient(135deg, #fed7aa 0%, #fb923c 100%); color: #7c2d12; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.35); animation: pulse-gold 2s infinite;';
-    } else {
-      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #fed7aa; background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); color: #c2410c; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.1);';
-    }
-  }
-  if (isFinal) {
-    if (isActive) {
-      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #a855f7; background: linear-gradient(135deg, #f3e8ff 0%, #c084fc 100%); color: #581c87; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.35); animation: pulse-gold 2s infinite;';
-    } else {
-      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #e9d5ff; background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); color: #7e22ce; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(168, 85, 247, 0.1);';
-    }
-  }
-  if (isMidterm) {
-    if (isActive) {
-      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #eab308; background: linear-gradient(135deg, #fef08a 0%, #facc15 100%); color: #78350f; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.35); animation: pulse-gold 2s infinite;';
-    } else {
-      return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 800; border-radius: 10px; border: 2px solid #fef08a; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); color: #b45309; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(234, 179, 8, 0.1);';
-    }
-  }
-  if (isActive) {
-    return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 700; border-radius: 10px; border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary-hover); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);';
-  } else {
-    return 'padding: 8px 16px; font-size: 0.88rem; font-weight: 700; border-radius: 10px; border: 2px solid #cbd5e1; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
-  }
+export function renderUnitSelectors() {
+  const learnSelector = document.getElementById('learn-unit-selector');
+  const gameSelector = document.getElementById('game-unit-selector');
+  if (!learnSelector || !gameSelector) return;
+
+  const termUnits = VOCAB_UNITS.filter(unit => (unit.term || 1) === state.currentTerm);
+  const termExams = EXAM_PREP_CATALOG.filter(exam => exam.term === state.currentTerm);
+
+  buildLessonShelfInto(learnSelector, termUnits, termExams);
+  buildLessonShelfInto(gameSelector, termUnits, termExams);
 }
 
 export function updateUnitSelectorUI() {
   const allBtns = [
-    ...document.querySelectorAll('#learn-unit-selector button'),
-    ...document.querySelectorAll('#game-unit-selector button')
+    ...document.querySelectorAll('#learn-unit-selector button[data-unit-id]'),
+    ...document.querySelectorAll('#game-unit-selector button[data-unit-id]')
   ];
   allBtns.forEach(btn => {
-    const id = btn.dataset.unitId;
-    const isActive = id === state.currentUnitId;
-    btn.className = `btn-unit-select ${isActive ? 'active' : ''}`;
-    btn.style.cssText = getUnitBtnStyle(
-      isActive,
-      id === 'midterm_prep',
-      id === 'final_exam_prep',
-      id === 'unit5_exam'
-    );
+    const isActive = btn.dataset.unitId === state.currentUnitId;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 
 export function setupQuizLengthSelectors() {
   const btn10 = document.getElementById('quiz-length-10');
   const btnFinal = document.getElementById('quiz-length-final');
-
   if (!btn10 || !btnFinal) return;
 
   btn10.addEventListener('click', () => {
     btn10.classList.add('active');
     btnFinal.classList.remove('active');
-
-    btn10.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary-hover); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);';
-    btnFinal.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
+    btn10.setAttribute('aria-pressed', 'true');
+    btnFinal.setAttribute('aria-pressed', 'false');
 
     state.quizQuestionCount = 10;
     updateGameStartMeta();
@@ -303,9 +324,8 @@ export function setupQuizLengthSelectors() {
   btnFinal.addEventListener('click', () => {
     btnFinal.classList.add('active');
     btn10.classList.remove('active');
-
-    btnFinal.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary-hover); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);';
-    btn10.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
+    btnFinal.setAttribute('aria-pressed', 'true');
+    btn10.setAttribute('aria-pressed', 'false');
 
     state.quizQuestionCount = Math.min(20, state.VOCAB_LIST.length);
     updateGameStartMeta();
@@ -315,25 +335,22 @@ export function setupQuizLengthSelectors() {
 export function setupGameModeSelectors() {
   const btnMixed = document.getElementById('game-mode-mixed');
   const btnQA = document.getElementById('game-mode-qa');
-
   if (!btnMixed || !btnQA) return;
 
   btnMixed.addEventListener('click', () => {
     state.selectedGameMode = 'mixed';
     btnMixed.classList.add('active');
     btnQA.classList.remove('active');
-
-    btnMixed.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary-hover); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);';
-    btnQA.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
+    btnMixed.setAttribute('aria-pressed', 'true');
+    btnQA.setAttribute('aria-pressed', 'false');
   });
 
   btnQA.addEventListener('click', () => {
     state.selectedGameMode = 'qa';
     btnQA.classList.add('active');
     btnMixed.classList.remove('active');
-
-    btnQA.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid var(--primary); background: var(--primary-light); color: var(--primary-hover); cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);';
-    btnMixed.style.cssText = 'flex: 1; padding: 10px 14px; font-size: 0.88rem; font-weight: 700; border-radius: 12px; border: 2px solid #e2e8f0; background: white; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
+    btnQA.setAttribute('aria-pressed', 'true');
+    btnMixed.setAttribute('aria-pressed', 'false');
   });
 }
 
@@ -367,8 +384,8 @@ export function updateGameStartMeta() {
     if (gameModeSetup) gameModeSetup.style.display = 'none';
     if (quizLengthSetup) quizLengthSetup.style.display = 'none';
     if (startMetaInfo) {
-      startMetaInfo.innerHTML = `🎓 แบบทดสอบกลางภาค ป.1 มีทั้งหมด <span style="color:#d97706; font-weight:800;">${EXAM_COUNTS.midterm} ข้อ</span> ครบทุกแนวข้อสอบจ้า`;
-      startMetaInfo.style.cssText = 'background: #fffbeb; border: 1.5px solid #fef08a; padding: 10px 16px; border-radius: 12px; display: inline-block; font-size: 0.95rem; font-weight: 600; color: #b45309; margin-bottom: 24px; animation: pulse-gold 2s infinite;';
+      startMetaInfo.className = 'start-meta-info meta-midterm';
+      startMetaInfo.innerHTML = `🎓 แบบทดสอบกลางภาค ป.1 มีทั้งหมด <span class="start-meta-highlight">${EXAM_COUNTS.midterm} ข้อ</span> ครบทุกแนวข้อสอบจ้า`;
     }
     if (startTitle) startTitle.textContent = '🏆 ภารกิจจำลองสอบกลางภาค ป.1 (Let\'s Go 1)';
     if (startDesc) startDesc.textContent = `น้องๆ จะได้ทำข้อสอบ ${EXAM_COUNTS.midterm} ข้อ รวมคำศัพท์ ไวยากรณ์ (Grammar) และฝึกโฟนิกส์ (Phonics Bb, Pp, Cc, Gg) ของบทเรียน Unit 1-2 เพื่อสะสมดาวทองเป็นกรณีพิเศษ!`;
@@ -377,8 +394,8 @@ export function updateGameStartMeta() {
     if (gameModeSetup) gameModeSetup.style.display = 'none';
     if (quizLengthSetup) quizLengthSetup.style.display = 'none';
     if (startMetaInfo) {
-      startMetaInfo.innerHTML = `🌟 แบบทดสอบปลายภาค ป.1 มีทั้งหมด <span style="color:#7e22ce; font-weight:800;">${EXAM_COUNTS.finalExam} ข้อ</span> ครบทุกแนวข้อสอบ Unit 3-4 จ้า`;
-      startMetaInfo.style.cssText = 'background: #faf5ff; border: 1.5px solid #e9d5ff; padding: 10px 16px; border-radius: 12px; display: inline-block; font-size: 0.95rem; font-weight: 600; color: #7e22ce; margin-bottom: 24px; animation: pulse-gold 2s infinite;';
+      startMetaInfo.className = 'start-meta-info meta-final';
+      startMetaInfo.innerHTML = `🌟 แบบทดสอบปลายภาค ป.1 มีทั้งหมด <span class="start-meta-highlight">${EXAM_COUNTS.finalExam} ข้อ</span> ครบทุกแนวข้อสอบ Unit 3-4 จ้า`;
     }
     if (startTitle) startTitle.textContent = '🌟 ภารกิจจำลองสอบปลายภาค ป.1 (Let\'s Go 1)';
     if (startDesc) startDesc.textContent = `น้องๆ จะได้ทำข้อสอบ ${EXAM_COUNTS.finalExam} ข้อ รวมคำศัพท์ สิ่งของในห้องเรียน/คนในครอบครัว, ไวยากรณ์ Singular/Plural, ประโยคถาม-ตอบ, บทสนทนา และฝึกโฟนิกส์ (Phonics Dd, Tt, Aa) ของบทเรียน Unit 3-4 เพื่อรับโบนัสดาวทองคำพิเศษ 25 ดวง!`;
@@ -387,8 +404,8 @@ export function updateGameStartMeta() {
     if (gameModeSetup) gameModeSetup.style.display = 'none';
     if (quizLengthSetup) quizLengthSetup.style.display = 'none';
     if (startMetaInfo) {
-      startMetaInfo.innerHTML = `🎯 ข้อสอบท้ายบท Unit 5 มีทั้งหมด <span style="color:#ea580c; font-weight:800;">${EXAM_COUNTS.unit5Exam} ข้อ</span> ครบทั้งของเล่น, Adjectives และประโยค It's a/an จ้า`;
-      startMetaInfo.style.cssText = 'background: #fff7ed; border: 1.5px solid #fdba74; padding: 10px 16px; border-radius: 12px; display: inline-block; font-size: 0.95rem; font-weight: 600; color: #c2410c; margin-bottom: 24px; animation: pulse-gold 2s infinite;';
+      startMetaInfo.className = 'start-meta-info meta-unit5';
+      startMetaInfo.innerHTML = `🎯 ข้อสอบท้ายบท Unit 5 มีทั้งหมด <span class="start-meta-highlight">${EXAM_COUNTS.unit5Exam} ข้อ</span> ครบทั้งของเล่น, Adjectives และประโยค It's a/an จ้า`;
     }
     if (startTitle) startTitle.textContent = '🎯 ภารกิจสอบท้ายบท Unit 5: Birthday and Toys';
     if (startDesc) startDesc.textContent = `น้องๆ จะได้ทำข้อสอบ ${EXAM_COUNTS.unit5Exam} ข้อ ครบทั้งคำศัพท์ของเล่น 10 คำ, คำคุณศัพท์ 8 คำ & คู่ตรงข้าม, ไวยากรณ์ It's a/an + adj + noun (ระวัง an old!) และประโยคถาม-ตอบ What is it? เพื่อรับโบนัสดาวทองคำพิเศษ 20 ดวง!`;
@@ -400,8 +417,8 @@ export function updateGameStartMeta() {
     state.quizQuestionCount = isLength10 ? 10 : Math.min(20, state.VOCAB_LIST.length);
 
     if (startMetaInfo) {
-      startMetaInfo.innerHTML = `คลังคำศัพท์ปัจจุบันมีทั้งหมด <span id="start-screen-vocab-count" style="color: var(--primary-hover); font-weight: 700;">${state.VOCAB_LIST.length}</span> คำจ้า`;
-      startMetaInfo.style.cssText = 'background: var(--secondary-light); border: 1px solid var(--secondary-border); padding: 10px 16px; border-radius: 12px; display: inline-block; font-size: 0.95rem; font-weight: 600; color: var(--secondary-dark); margin-bottom: 24px;';
+      startMetaInfo.className = 'start-meta-info meta-unit';
+      startMetaInfo.innerHTML = `คลังคำศัพท์ปัจจุบันมีทั้งหมด <span id="start-screen-vocab-count" class="start-meta-highlight">${state.VOCAB_LIST.length}</span> คำจ้า`;
     }
     if (startTitle) startTitle.textContent = 'ภารกิจเกมท้าทายสะกดคำ!';
     if (startDesc) startDesc.textContent = 'น้องๆ จะต้องตอบคำถามทั้งหมด 10 ข้อ โดยมีทั้งการฟังเสียง การเลือกคำอังกฤษ และการเชื่อมโยงภาพความหมายภาษาไทยจ้า';

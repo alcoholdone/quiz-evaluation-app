@@ -1,5 +1,6 @@
 import { state } from '../state/store.js';
 import { escapeHTML } from '../utils/sanitize.js';
+import { showToast } from '../utils/toast.js';
 import {
   getTotalStars,
   subtractStars,
@@ -28,7 +29,7 @@ export function initStarsSystem() {
         // Revert the dropdown to the previously committed rate
         e.target.value = committedRate;
         updateRateDisplayText(committedRate);
-        alert('🔒 ยังไม่ได้เปลี่ยนอัตราการแลกนะคะ ต้องให้คุณพ่อคุณแม่ยืนยันก่อนจ้า');
+        showToast('🔒 ยังไม่ได้เปลี่ยนอัตราการแลกนะคะ ต้องให้คุณพ่อคุณแม่ยืนยันก่อนจ้า', 'warning');
         return;
       }
 
@@ -312,20 +313,23 @@ export function updateRedeemPreview() {
   const starsToRedeem = parseInt(starsInput.value, 10);
   if (isNaN(starsToRedeem) || starsToRedeem <= 0) {
     previewText.textContent = '';
+    previewText.classList.remove('is-error', 'is-success');
     return;
   }
 
   const totalStars = getTotalStars();
   if (starsToRedeem > totalStars) {
     previewText.textContent = `❌ ยอดดาวทองไม่เพียงพอจ้า (มีอยู่ ${totalStars} ดวง)`;
-    previewText.style.color = '#ef4444';
+    previewText.classList.add('is-error');
+    previewText.classList.remove('is-success');
     return;
   }
 
   const rate = getExchangeRate();
   const amount = starsToRedeem * rate;
   previewText.textContent = `💰 แลกเงินรางวัลได้ทั้งหมด: ${amount} บาทจ้า!`;
-  previewText.style.color = '#16a34a';
+  previewText.classList.add('is-success');
+  previewText.classList.remove('is-error');
 }
 
 export function handleRedeemSubmit() {
@@ -337,19 +341,19 @@ export function handleRedeemSubmit() {
   const totalStars = getTotalStars();
 
   if (isNaN(starsToRedeem) || starsToRedeem <= 0) {
-    alert('กรุณากรอกจำนวนดาวที่จะแลกให้ถูกต้องนะจ๊ะ');
+    showToast('กรุณากรอกจำนวนดาวที่จะแลกให้ถูกต้องนะจ๊ะ', 'warning');
     return;
   }
 
   if (starsToRedeem > totalStars) {
-    alert(`ยอดดาวทองสะสมไม่พอจ้า ตอนนี้น้องมีอยู่ ${totalStars} ดวง`);
+    showToast(`ยอดดาวทองสะสมไม่พอจ้า ตอนนี้น้องมีอยู่ ${totalStars} ดวง`, 'warning');
     return;
   }
 
   // Verify Parental Lock Answer
   const parentAnswer = parseInt(answerInput.value, 10);
   if (parentAnswer !== state.currentParentLockAnswer) {
-    alert('🔒 คำตอบวิเคราะห์โจทย์เลขไม่ถูกต้องจ้า! ให้คุณพ่อคุณแม่ช่วยคิดคำนวณและกดยืนยันนะจ๊ะ');
+    showToast('🔒 คำตอบวิเคราะห์โจทย์เลขไม่ถูกต้องจ้า! ให้คุณพ่อคุณแม่ช่วยยืนยันนะจ๊ะ', 'error');
     generateParentLockQuestion();
     answerInput.value = '';
     return;
@@ -433,12 +437,10 @@ export function renderRedeemHistoryTable() {
   }
 
   emptyState.style.display = 'none';
-  tbody.parentElement.style.display = 'table';
+  if (tbody.parentElement) tbody.parentElement.style.display = '';
 
   log.forEach((item, idx) => {
     const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid #e2e8f0';
-    tr.style.height = '48px';
 
     // Status Badge
     let statusClass = 'status-unpaid';
@@ -449,10 +451,10 @@ export function renderRedeemHistoryTable() {
     }
 
     tr.innerHTML = `
-      <td data-label="วันที่-เวลา" style="padding: 10px; color: var(--text-muted); font-size: 0.85rem;">${escapeHTML(item.dateTime)}</td>
-      <td data-label="ดาวที่แลก" style="padding: 10px; text-align: center; font-weight: 700; color: #d97706;">⭐ ${Number(item.starsRedeemed) || 0} ดวง</td>
-      <td data-label="เงินที่ได้รับ" style="padding: 10px; text-align: center; font-weight: 800; color: #16a34a;">${Number(item.amountEarned) || 0} บาท</td>
-      <td data-label="สถานะคุณแม่" style="padding: 10px; text-align: center;">
+      <td data-label="วันที่-เวลา" class="cell-date">${escapeHTML(item.dateTime)}</td>
+      <td data-label="ดาวที่แลก" class="cell-stars">⭐ ${Number(item.starsRedeemed) || 0} ดวง</td>
+      <td data-label="เงินที่ได้รับ" class="cell-amount">${Number(item.amountEarned) || 0} บาท</td>
+      <td data-label="สถานะคุณแม่" class="cell-status">
         <span role="button" tabindex="0" class="${statusClass}" data-toggle-idx="${idx}">${statusText}</span>
       </td>
     `;

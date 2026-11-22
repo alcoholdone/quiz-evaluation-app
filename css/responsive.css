@@ -1,0 +1,290 @@
+/* ============================================================
+   Responsive Breakpoints, Hover Guards & Mobile Layout (<640px)
+   Preserves all MOBILE_REDESIGN_PLAN.md behaviors cleanly.
+   ============================================================ */
+
+/* Prevent sticky hover on touch screens (iPad / phones) */
+@media (hover: hover) {
+  .vocab-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+    border-color: var(--primary);
+  }
+  .vocab-card:hover .vocab-image {
+    transform: scale(1.08);
+  }
+  .unit-tile:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+  }
+  .option-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--secondary);
+  }
+  .sp-option-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--plum);
+  }
+  .btn:hover:not(:disabled),
+  .play-btn:hover:not(:disabled) {
+    filter: brightness(0.97);
+  }
+  .dictation-preview-card:hover {
+    border-color: var(--secondary);
+    transform: translateY(-2px);
+  }
+}
+
+/* Comfortable touch targets on coarse pointers (iPad / phone) */
+@media (pointer: coarse) {
+  .letter-btn {
+    min-inline-size: 50px;
+    block-size: 54px;
+  }
+  .slow-spell-btn,
+  .spelling-practice-btn {
+    min-block-size: 42px;
+  }
+}
+
+/* Tablet breakpoint */
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablet / iPad portrait tab-bar fit (prevents label clipping on 768–960px screens) */
+@media (min-width: 641px) and (max-width: 960px) {
+  .tab-container {
+    gap: 4px;
+    padding: 5px;
+  }
+  .tab-btn {
+    padding: 9px 6px;
+    gap: 4px;
+    font-size: 0.8rem;
+  }
+  .tab-btn[aria-selected="true"]::after {
+    inset-inline: 10px;
+  }
+  .tab-btn .t-ico {
+    font-size: 0.98rem;
+  }
+  .tab-btn.cs-locked::before {
+    font-size: 0.72em;
+    margin-inline-end: 1px;
+  }
+}
+
+/* Narrow phone breakpoint (<= 640px) */
+@media (max-width: 640px) {
+  .container {
+    padding-inline: 14px;
+  }
+
+  /* Compact topbar so sync + stars + voice button never collide */
+  .app-topbar {
+    gap: 8px;
+    margin-block-end: 12px;
+  }
+
+  #cloud-sync-bar {
+    font-size: 0.74rem;
+    padding: 4px 6px 4px 10px;
+  }
+
+  #cloud-sync-bar #cs-label {
+    max-inline-size: 36vw;
+  }
+
+  .total-stars-badge {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+
+  .total-stars-badge .stars-label-text {
+    display: none;
+  }
+
+  .btn-voice-test {
+    padding: 6px 10px;
+  }
+
+  .btn-voice-test .voice-label {
+    display: none;
+  }
+
+  .subtitle {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+  }
+
+  /* Fixed bottom navigation bar */
+  .tab-container {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1000;
+    margin: 0;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    gap: 2px;
+    border-radius: 0;
+    border: none;
+    border-block-start: 1.5px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 -4px 16px rgba(31, 41, 51, 0.08);
+    justify-content: space-around;
+  }
+
+  .tab-btn {
+    flex: 1 1 0;
+    min-inline-size: 0;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 2px;
+    min-block-size: 48px;
+    border-radius: 10px;
+  }
+
+  .tab-btn[aria-selected="true"]::after {
+    inset-block-start: 0;
+    inset-block-end: auto;
+    inset-inline: 14px;
+  }
+
+  .tab-btn .t-ico {
+    font-size: 1.3rem;
+  }
+
+  .tab-btn .t-full {
+    display: none;
+  }
+
+  .tab-btn .t-short {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 800;
+  }
+
+  .main-panel-container {
+    padding-block-end: calc(84px + env(safe-area-inset-bottom));
+  }
+
+  #cs-toast,
+  .toast-region {
+    inset-block-end: calc(78px + env(safe-area-inset-bottom));
+  }
+
+  /* Native <dialog> -> Bottom Sheet on Mobile */
+  dialog.spelling-dialog[open] {
+    margin: auto 0 0 0;
+    max-inline-size: 100%;
+    inline-size: 100%;
+  }
+
+  .spelling-modal-content {
+    border-radius: 24px 24px 0 0;
+    padding: 20px 16px calc(22px + env(safe-area-inset-bottom));
+    max-block-size: 92dvh;
+    animation: sheet-up-modal 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .spelling-modal-content::before {
+    content: "";
+    display: block;
+    inline-size: 42px;
+    block-size: 4px;
+    border-radius: 99px;
+    background: var(--border-strong);
+    margin: 0 auto 12px;
+  }
+
+  /* Cards & Grids on Mobile */
+  .card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .shelf-grid--units,
+  .shelf-grid--exams {
+    grid-template-columns: 1fr;
+  }
+
+  .vocab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .vocab-image {
+    font-size: 48px;
+    block-size: 64px;
+  }
+
+  .vocab-image svg,
+  .vocab-image .svg-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .options-grid,
+  .sp-options-grid,
+  .special-activity-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .special-activity-selector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-subtabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .subtab-btn {
+    font-size: 0.82rem;
+    padding: 9px 8px;
+  }
+
+  .stats-overview-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mini-stat-card {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .mini-stat-icon {
+    inline-size: 38px;
+    block-size: 38px;
+    font-size: 1.1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .canvas-wrapper {
+    block-size: 220px;
+  }
+
+  .btn-start-cta {
+    max-inline-size: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .vocab-grid {
+    grid-template-columns: 1fr;
+  }
+  .stats-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}

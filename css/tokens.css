@@ -1,0 +1,88 @@
+/* ============================================================
+   Design Tokens — Warm Classroom Workbook & Tactile Flashcards
+   ============================================================ */
+:root {
+  /* Paper & Ink Palette */
+  --bg-paper: #FBF8F1;
+  --bg-dot: #E6DDD0;
+  --surface: #FFFFFF;
+  --surface-subtle: #F4EFE6;
+  --surface-hover: #FAF6EE;
+
+  --border: #E6DFD3;
+  --border-strong: #D2C7B5;
+
+  --ink-1: #1F2933;
+  --ink-2: #3E4C59;
+  --ink-muted: #52606D;
+  --ink-light: #7B8794;
+
+  /* Compatibility aliases for shared text tokens */
+  --dark-2: var(--ink-1);
+  --dark-3: var(--ink-2);
+  --text-muted: var(--ink-muted);
+  --text-light: var(--ink-light);
+
+  /* Brand & Accent Colors (WCAG AA+ contrast) */
+  --primary: #1F7A5A;
+  --primary-hover: #175E45;
+  --primary-dark: #134E3A;
+  --primary-light: #E8F5EF;
+  --primary-border: #A7DAC4;
+
+  --secondary: #2554B0;
+  --secondary-hover: #1D428E;
+  --secondary-dark: #173472;
+  --secondary-light: #EAF1FB;
+  --secondary-border: #B8CEF2;
+
+  --coral: #DC5A38;
+  --coral-dark: #A83E22;
+  --coral-light: #FDF0EC;
+  --coral-border: #F5C3B5;
+
+  --gold: #D98A00;
+  --gold-bright: #F5B727;
+  --gold-dark: #7A4D00;
+  --gold-light: #FEF7E0;
+  --gold-border: #F2D27C;
+
+  --plum: #6D42B8;
+  --plum-dark: #4E2D89;
+  --plum-light: #F3EEFC;
+  --plum-border: #D2C0F1;
+
+  --danger: #C93B3B;
+  --danger-dark: #9B2828;
+  --danger-light: #FDECEC;
+  --danger-border: #F5BDBD;
+
+  /* Typography */
+  --font-display: 'Fredoka', 'Sarabun', sans-serif;
+  --font-body: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --fs-xs: clamp(0.75rem, 0.72rem + 0.2vw, 0.85rem);
+  --fs-sm: clamp(0.85rem, 0.82rem + 0.2vw, 0.95rem);
+  --fs-md: clamp(0.95rem, 0.92rem + 0.25vw, 1.08rem);
+  --fs-lg: clamp(1.25rem, 1.1rem + 0.8vw, 1.65rem);
+  --fs-xl: clamp(1.45rem, 1.25rem + 1.2vw, 2.1rem);
+
+  /* Radii & Shadows */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 2px 0 var(--border), 0 4px 12px rgba(31, 41, 51, 0.04);
+  --shadow-lift: 0 6px 16px rgba(31, 41, 51, 0.08);
+  --shadow-dialog: 0 20px 50px rgba(31, 41, 51, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

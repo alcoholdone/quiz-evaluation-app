@@ -6,6 +6,55 @@ import { initDictationStudyMode } from './dictation.js';
 import { initSpecialPanel } from './special.js';
 import { renderDashboard } from './dashboard.js';
 
+function scrollTabIntoView(tabEl) {
+  if (tabEl && typeof tabEl.scrollIntoView === 'function') {
+    try {
+      tabEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    } catch {
+      // Ignore in non-DOM/older environments
+    }
+  }
+}
+
+export function setupTabKeyboardNavigation() {
+  const tabList = typeof document !== 'undefined' ? document.querySelector('.tab-container') : null;
+  if (!tabList || tabList.dataset.kbBound === 'true') return;
+  tabList.dataset.kbBound = 'true';
+
+  const tabIdToKey = {
+    'tab-learn': 'learn',
+    'tab-game': 'game',
+    'tab-dictation': 'dictation',
+    'tab-special': 'special',
+    'tab-dashboard': 'dashboard'
+  };
+
+  tabList.addEventListener('keydown', (e) => {
+    const current = e.target.closest('.tab-btn');
+    if (!current) return;
+
+    const visibleTabs = Array.from(tabList.querySelectorAll('.tab-btn')).filter(
+      btn => btn.style.display !== 'none'
+    );
+    const idx = visibleTabs.indexOf(current);
+    if (idx === -1) return;
+
+    let nextIdx = -1;
+    if (e.key === 'ArrowRight') nextIdx = (idx + 1) % visibleTabs.length;
+    else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + visibleTabs.length) % visibleTabs.length;
+    else if (e.key === 'Home') nextIdx = 0;
+    else if (e.key === 'End') nextIdx = visibleTabs.length - 1;
+    else return;
+
+    e.preventDefault();
+    const targetBtn = visibleTabs[nextIdx];
+    if (!targetBtn) return;
+    targetBtn.focus();
+    const targetKey = tabIdToKey[targetBtn.id];
+    if (targetKey) switchTab(targetKey);
+  });
+}
+
 // MAIN TAB SWITCHING
 export function switchTab(tabId) {
   clearTransitionTimeout();
@@ -44,12 +93,13 @@ export function switchTab(tabId) {
     nodes.tabLearn.classList.add('active');
     nodes.tabLearn.setAttribute('aria-selected', 'true');
     nodes.panelLearn.classList.add('active');
+    scrollTabIntoView(nodes.tabLearn);
   } else if (tabId === 'game') {
     nodes.tabGame.classList.add('active');
     nodes.tabGame.setAttribute('aria-selected', 'true');
     nodes.panelGame.classList.add('active');
+    scrollTabIntoView(nodes.tabGame);
 
-    // If not currently in a session, or session is already finished, show start screen
     if (state.challengeQuestions.length === 0 || state.hasCompletedAssessment) {
       nodes.gameStartScreen.style.display = 'block';
       nodes.gamePlayArea.style.display = 'none';
@@ -63,6 +113,7 @@ export function switchTab(tabId) {
     if (nodes.tabDictation) {
       nodes.tabDictation.classList.add('active');
       nodes.tabDictation.setAttribute('aria-selected', 'true');
+      scrollTabIntoView(nodes.tabDictation);
     }
     if (nodes.panelDictation) nodes.panelDictation.classList.add('active');
     pauseTimer();
@@ -71,6 +122,7 @@ export function switchTab(tabId) {
     if (nodes.tabSpecial) {
       nodes.tabSpecial.classList.add('active');
       nodes.tabSpecial.setAttribute('aria-selected', 'true');
+      scrollTabIntoView(nodes.tabSpecial);
     }
     if (nodes.panelSpecial) nodes.panelSpecial.classList.add('active');
     pauseTimer();
@@ -79,9 +131,9 @@ export function switchTab(tabId) {
     nodes.tabDashboard.classList.add('active');
     nodes.tabDashboard.setAttribute('aria-selected', 'true');
     nodes.panelDashboard.classList.add('active');
+    scrollTabIntoView(nodes.tabDashboard);
     pauseTimer();
 
-    // Render Dashboard
     renderDashboard();
   }
 }

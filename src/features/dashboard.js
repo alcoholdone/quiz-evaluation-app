@@ -199,14 +199,10 @@ export function renderDashboard() {
       const starEl = document.createElement('span');
       if (s < starsCount) {
         starEl.className = `dashboard-star delay-${s}`;
-        starEl.style.cssText = 'cursor:default;';
         starEl.textContent = '⭐';
       } else {
-        const starEmptyEl = document.createElement('span');
-        starEmptyEl.style.cssText = 'color:#cbd5e1; opacity:0.6; filter:none; font-size:2rem; cursor:default;';
-        starEmptyEl.textContent = '☆';
-        starsRow.appendChild(starEmptyEl);
-        continue;
+        starEl.className = 'dashboard-star--empty';
+        starEl.textContent = '☆';
       }
       starsRow.appendChild(starEl);
     }
@@ -236,19 +232,19 @@ export function renderDashboard() {
   badge.className = 'kids-perf-badge';
   if (scaledScore >= 450) {
     badge.textContent = '🌟 อัจฉริยะตัวน้อย (SUPERSTAR)';
-    badge.style.backgroundColor = '#10b981';
+    badge.classList.add('perf-superstar');
     summary.textContent = `ยอดเยี่ยมที่สุดเลยจ้า! น้องสะกดและเข้าใจคำศัพท์ทั้งหมด ${state.ORIGINAL_VOCAB_LIST.length} คำหลักได้อย่างคล่องแคล่วว่องไว พร้อมเรียนรู้คำศัพท์ระดับที่สูงขึ้นแล้ว!`;
   } else if (scaledScore >= 350) {
     badge.textContent = '🏅 เด็กเก่งคนดี (GREAT JOB)';
-    badge.style.backgroundColor = '#3b82f6';
+    badge.classList.add('perf-great');
     summary.textContent = 'เก่งมากจ้า! น้องมีความรู้คำศัพท์ในเกณฑ์ดี จดจำอักษรสะกดคำได้ถูกต้องเกือบทั้งหมด มีเพียงส่วนเล็กๆ น้อยๆ ที่อาจจะสับสนเวลาฟัง';
   } else if (scaledScore >= 200) {
     badge.textContent = '👍 พยายามได้ดี (GOOD TRY)';
-    badge.style.backgroundColor = '#f59e0b';
+    badge.classList.add('perf-good');
     summary.textContent = 'ทำได้ดีครับ! น้องมีความเข้าใจคำศัพท์ระดับปานกลาง อาจมีหลงลืมสะกดตัวอักษรบางตัวหรือสับสนเวลาฟังเสียง แนะนำฝึกทบทวนเพิ่มอีกนิด';
   } else {
     badge.textContent = '💪 สู้ๆ นะจ๊ะ (DEVELOPING)';
-    badge.style.backgroundColor = '#ef4444';
+    badge.classList.add('perf-developing');
     summary.textContent = 'ไม่เป็นไรนะจ๊ะ! ฝึกฝนสะกดคำทีละนิดทุกวัน ลองกลับไปเปิดโหมดฝึกสะกดคำแล้วเล่นใหม่อีกรอบ น้องจะสะกดได้เก่งขึ้นแน่นอนจ้า!';
   }
 
@@ -324,13 +320,13 @@ export function generateRecommendationsForParents(skills) {
 
   if (suggestions.length === 0) {
     recContent.innerHTML = `
-      <p style="color: var(--primary-hover); font-weight: 700; margin-bottom: 8px;">🎉 วิเคราะห์แล้ว: น้องเก่งและรอบรู้ครบทุกด้านเลยจ้า!</p>
+      <p class="rec-lead-ok">🎉 วิเคราะห์แล้ว: น้องเก่งและรอบรู้ครบทุกด้านเลยจ้า!</p>
       <p><strong>คำแนะนำ:</strong> ตอนนี้น้องมีความเข้าใจและพร้อมขึ้นไปท่องสะกดคำศัพท์ในบทเรียนต่อไปของ ป.1/ป.2 แล้ว ผู้ปกครองสามารถหาบัตรคำศัพท์หมวดหมู่สัตว์หรือผักผลไม้มาเล่นทายศัพท์เพิ่มเติมกับน้องได้เลยจ้า</p>
     `;
   } else {
     recContent.innerHTML = `
-      <p style="margin-bottom: 10px; font-weight: 600;">แนะนำข้อควรพัฒนาสำหรับเด็ก ป.1:</p>
-      <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px; list-style-type: disc;">
+      <p class="rec-lead-improve">แนะนำข้อควรพัฒนาสำหรับเด็ก ป.1:</p>
+      <ul class="rec-list">
         ${suggestions.join('')}
       </ul>
     `;
@@ -378,7 +374,7 @@ export async function renderEvaluationCharts(skills, history) {
       const lowest = assessedEntries.reduce((min, cur) => (cur.pct < min.pct ? cur : min), assessedEntries[0]);
       const lowLabel = SKILL_DISPLAY_NAMES[lowest.key] || lowest.key;
       skillsInsightEl.innerHTML = `
-        💡 <strong>จุดสังเกต:</strong> น้องทำคะแนนด้าน <span class="text-highlight" style="font-weight: 700;">${escapeHTML(lowLabel)}</span> ได้น้อยที่สุด (${lowest.pct}%) ผู้ปกครองสามารถร่วมฝึกทักษะนี้กับน้องได้จ้า
+        💡 <strong>จุดสังเกต:</strong> น้องทำคะแนนด้าน <span class="text-highlight">${escapeHTML(lowLabel)}</span> ได้น้อยที่สุด (${lowest.pct}%) ผู้ปกครองสามารถร่วมฝึกทักษะนี้กับน้องได้จ้า
       `;
     }
   }
@@ -396,15 +392,15 @@ export async function renderEvaluationCharts(skills, history) {
       const diff = cur - prev;
       if (diff > 0) {
         progressInsightEl.innerHTML = `
-          🚀 <strong>พัฒนาการดีขึ้น:</strong> คะแนนเพิ่มขึ้นจากรอบที่แล้ว <span style="color: var(--primary-hover); font-weight: 700;">+${diff} คะแนน</span> เก่งขึ้นแบบก้าวกระโดดเลยจ้า!
+          🚀 <strong>พัฒนาการดีขึ้น:</strong> คะแนนเพิ่มขึ้นจากรอบที่แล้ว <span class="insight-pos">+${diff} คะแนน</span> เก่งขึ้นแบบก้าวกระโดดเลยจ้า!
         `;
       } else if (diff < 0) {
         progressInsightEl.innerHTML = `
-          ⚠️ <strong>คำแนะนำประวัติ:</strong> คะแนนครั้งนี้ลดลงกว่ารอบที่แล้ว <span style="color: var(--danger); font-weight: 700;">${diff} คะแนน</span> ลองทบทวนคำศัพท์และไปสู้ใหม่อีกรอบนะจ๊ะ!
+          ⚠️ <strong>คำแนะนำประวัติ:</strong> คะแนนครั้งนี้ลดลงกว่ารอบที่แล้ว <span class="insight-neg">${diff} คะแนน</span> ลองทบทวนคำศัพท์และไปสู้ใหม่อีกรอบนะจ๊ะ!
         `;
       } else {
         progressInsightEl.innerHTML = `
-          📊 <strong>ความก้าวหน้า:</strong> คะแนนคงที่อยู่ที่ <span class="text-highlight" style="font-weight: 700;">${cur} คะแนน</span> รอบหน้าลองเร่งความเร็วในการตอบให้ไวขึ้นดูจ้า
+          📊 <strong>ความก้าวหน้า:</strong> คะแนนคงที่อยู่ที่ <span class="text-highlight">${cur} คะแนน</span> รอบหน้าลองเร่งความเร็วในการตอบให้ไวขึ้นดูจ้า
         `;
       }
     }
@@ -439,9 +435,9 @@ export async function renderEvaluationCharts(skills, history) {
         datasets: [{
           label: 'สัดส่วนทักษะของน้อง (%)',
           data: radarData,
-          backgroundColor: 'rgba(34, 197, 94, 0.15)',
-          borderColor: '#22c55e',
-          pointBackgroundColor: '#3b82f6',
+          backgroundColor: 'rgba(31, 122, 90, 0.16)',
+          borderColor: '#1F7A5A',
+          pointBackgroundColor: '#2554B0',
           pointBorderColor: '#fff',
           borderWidth: 3
         }]
@@ -452,10 +448,10 @@ export async function renderEvaluationCharts(skills, history) {
         plugins: { legend: { display: false } },
         scales: {
           r: {
-            angleLines: { color: '#e2e8f0' },
-            grid: { color: '#e2e8f0' },
-            pointLabels: { color: '#475569', font: { family: 'Sarabun', size: 11, weight: 'bold' } },
-            ticks: { color: '#94a3b8', backdropColor: 'transparent', stepSize: 20 },
+            angleLines: { color: '#E6DFD3' },
+            grid: { color: '#E6DFD3' },
+            pointLabels: { color: '#3E4C59', font: { family: 'Sarabun', size: 11, weight: 'bold' } },
+            ticks: { color: '#7B8794', backdropColor: 'transparent', stepSize: 20 },
             min: 0,
             max: 100
           }
@@ -483,8 +479,8 @@ export async function renderEvaluationCharts(skills, history) {
         labels: [labelText],
         datasets: [{
           data: [history[0] ? history[0].score : 0],
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderColor: '#2554B0',
+          backgroundColor: 'rgba(37, 84, 176, 0.12)',
           fill: true,
           tension: 0.3
         }]
@@ -494,8 +490,8 @@ export async function renderEvaluationCharts(skills, history) {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { min: 0, max: 500, grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8' } },
-          x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          y: { min: 0, max: 500, grid: { color: '#F4EFE6' }, ticks: { color: '#7B8794' } },
+          x: { grid: { display: false }, ticks: { color: '#7B8794' } }
         }
       }
     });
@@ -515,12 +511,12 @@ export async function renderEvaluationCharts(skills, history) {
         labels: labels,
         datasets: [{
           data: scores,
-          borderColor: '#3b82f6',
+          borderColor: '#2554B0',
           borderWidth: 4,
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          backgroundColor: 'rgba(37, 84, 176, 0.12)',
           fill: true,
           tension: 0.3,
-          pointBackgroundColor: '#2563eb',
+          pointBackgroundColor: '#1D428E',
           pointHoverRadius: 8
         }]
       },
@@ -532,12 +528,12 @@ export async function renderEvaluationCharts(skills, history) {
           y: {
             min: 0,
             max: 500,
-            grid: { color: '#e2e8f0' },
-            ticks: { color: '#64748b', font: { family: 'Fredoka', weight: 'bold' } }
+            grid: { color: '#E6DFD3' },
+            ticks: { color: '#52606D', font: { family: 'Fredoka', weight: 'bold' } }
           },
           x: {
             grid: { display: false },
-            ticks: { color: '#64748b', font: { family: 'Sarabun', size: 10 } }
+            ticks: { color: '#52606D', font: { family: 'Sarabun', size: 10 } }
           }
         }
       }
@@ -563,7 +559,7 @@ export function renderDetailedReview() {
 
   if (questions.length === 0) {
     container.innerHTML = `
-      <div class="text-center" style="padding: 30px; color: var(--text-muted);">
+      <div class="text-center table-empty-msg">
         ยังไม่มีเฉลยรายข้อให้ดูจ้า ลองทำแบบทดสอบสักรอบก่อนนะ แล้วเฉลยละเอียดจะมาแสดงตรงนี้เลย! 📖
       </div>`;
     return;
@@ -617,12 +613,12 @@ export function renderDetailedReview() {
     header.className = 'review-item-header';
     header.innerHTML = `
       <div class="review-header-left">
-        <div class="review-tag-row" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <span class="category-badge" style="font-size:0.75rem; font-weight:700; background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; padding:2px 8px; border-radius:50px;">
+        <div class="review-tag-row">
+          <span class="category-badge">
             ${escapeHTML(q.skill)}
           </span>
           ${badgesHtml}
-          <span class="question-tracker" style="font-size:0.8rem; font-weight:700;">ข้อที่ ${idx + 1}</span>
+          <span class="question-tracker">ข้อที่ ${idx + 1}</span>
         </div>
         <div class="review-item-q-text">${escapeHTML(qText)}</div>
       </div>
@@ -683,8 +679,8 @@ export function renderDetailedReview() {
       }
 
       optDiv.innerHTML = `
-        <span style="display:flex; align-items:center; gap:10px;">${optLabelStr}</span>
-        <div class="review-option-badges" style="display:flex; gap:6px; align-items:center; margin-left:auto; flex-wrap:wrap; justify-content:flex-end;">
+        <span class="review-option-main">${optLabelStr}</span>
+        <div class="review-option-badges">
           ${optBadgesHtml}
         </div>
       `;
@@ -702,10 +698,8 @@ export function renderDetailedReview() {
 
     // Speaker trigger inside review to let kids listen to it again
     const speakButton = document.createElement('button');
-    speakButton.className = 'play-btn';
-    speakButton.style.padding = '8px 16px';
-    speakButton.style.fontSize = '0.9rem';
-    speakButton.style.marginTop = '15px';
+    speakButton.type = 'button';
+    speakButton.className = 'play-btn play-btn--sm review-speak-btn';
     speakButton.innerHTML = '🔊 กดฟังการออกเสียงและคำแปลอีกรอบ';
     speakButton.addEventListener('click', () => {
       clearScopedTimers('review');

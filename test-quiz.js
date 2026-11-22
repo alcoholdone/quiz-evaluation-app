@@ -49,13 +49,22 @@ console.log('✅ ไม่พบ inline onclick=/onsubmit= ใน index.html แ
 function createMockEl(tagName = 'div', id = '') {
   const classes = new Set();
   const listeners = new Map();
+  const attributes = new Map();
   const el = {
     tagName: tagName.toUpperCase(),
     id,
+    open: false,
     children: [],
     dataset: {},
     style: { setProperty: () => {} },
-    innerHTML: '',
+    _innerHTML: '',
+    get innerHTML() {
+      return el._innerHTML;
+    },
+    set innerHTML(val) {
+      el._innerHTML = String(val ?? '');
+      if (el._innerHTML === '') el.children.length = 0;
+    },
     textContent: '',
     disabled: false,
     _className: '',
@@ -90,6 +99,15 @@ function createMockEl(tagName = 'div', id = '') {
         fn(payload);
       }
     },
+    showModal: () => {
+      el.open = true;
+    },
+    close: () => {
+      if (el.open) {
+        el.open = false;
+        el.dispatchMockEvent('close', {});
+      }
+    },
     appendChild: (child) => {
       el.children.push(child);
       if (el.tagName === 'HEAD' && child && child.tagName === 'SCRIPT') {
@@ -97,13 +115,18 @@ function createMockEl(tagName = 'div', id = '') {
       }
       return child;
     },
-    setAttribute: () => {},
-    getAttribute: () => null,
+    setAttribute: (k, v) => {
+      attributes.set(String(k), String(v));
+    },
+    getAttribute: (k) => (attributes.has(String(k)) ? attributes.get(String(k)) : null),
+    removeAttribute: (k) => {
+      attributes.delete(String(k));
+    },
     remove: () => {},
     querySelector: () => createMockEl(),
     querySelectorAll: () => [],
     closest: () => createMockEl(),
-    getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 40 })
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 40, right: 100, bottom: 40 })
   };
   return el;
 }
@@ -175,17 +198,26 @@ global.document = {
 
 async function runTests() {
   const [
-    { VOCAB_UNITS },
+    { VOCAB_UNITS, UNIT_META, EXAM_PREP_CATALOG },
     { state, initNodes, clearAllScopedTimers },
     { initCustomVocabData, setCurrentTerm, loadUnitVocab },
     { startNewChallenge, renderQuestion },
     { initDictationStudyMode, resetDictationSpelling },
     { switchSpecialActivity },
-    { resetSpellingPractice },
+    {
+      resetSpellingPractice,
+      getWordCategory,
+      setLearnCategoryFilter,
+      openSpellingPractice,
+      closeSpellingPractice,
+      initSpellingDialogEvents
+    },
     { calcSkillPct, generateRecommendationsForParents, renderEvaluationCharts, clearHistoryData },
     { escapeHTML, sanitizeSVG, sanitizeCustomImage, renderVisualHTML },
     { shuffle, shuffleScrambled },
     { getSentenceQA },
+    { saveWeakWordList },
+    { showToast },
     { LOCKED_TABS, applyBlob }
   ] = await Promise.all([
     import('./src/data/units.js'),
@@ -199,6 +231,8 @@ async function runTests() {
     import('./src/utils/sanitize.js'),
     import('./src/utils/shuffle.js'),
     import('./src/utils/word-helpers.js'),
+    import('./src/services/storage.js'),
+    import('./src/utils/toast.js'),
     import('./src/services/sync.js')
   ]);
 
@@ -449,6 +483,84 @@ async function runTests() {
     console.error('❌ Special Practice พบ Error:', err.message);
     allPassed = false;
   }
+
+  // ==========================================================
+  // F. ทดสอบ Phase 3 Architecture, Lesson Shelf, Category Filter & Native <dialog>
+  // ==========================================================
+  console.log('\n🎨 กำลังทดสอบ Phase 3 UI Architecture, Lesson Shelf, Category Filter และ Native <dialog>...');
+  const expectedCssFiles = [
+    'css/tokens.css',
+    'css/base.css',
+    'css/layout.css',
+    'css/components.css',
+    'css/features.css',
+    'css/responsive.css'
+  ];
+  for (const cssFile of expectedCssFiles) {
+    assert(fs.existsSync(cssFile), `Missing modular stylesheet: ${cssFile}`);
+    assert(htmlSource.includes(`href="${cssFile}"`), `index.html missing link to ${cssFile}`);
+  }
+  assert(!fs.existsSync('style.css'), 'Obsolete root style.css should be deleted');
+
+  // Verify native <dialog>, light-dismiss closedby="any", and zero .bubble blobs
+  assert(
+    /<dialog\b[^>]*id="spelling-practice-modal"[^>]*closedby="any"[^>]*aria-labelledby="spelling-modal-title"/i.test(htmlSource),
+    'index.html must use native <dialog id="spelling-practice-modal" closedby="any" aria-labelledby="spelling-modal-title">'
+  );
+  assert(!/role="dialog"|aria-modal=/i.test(htmlSource), 'Native <dialog> must not duplicate role="dialog" or aria-modal');
+  assert(!/<div class="bubble/i.test(htmlSource), 'Decorative .bubble blobs should be removed from index.html');
+
+  // Verify zero style.cssText in catalog.js and dictation.js
+  assert(!/cssText/.test(fs.readFileSync('src/features/catalog.js', 'utf8')), 'catalog.js must not assign style.cssText');
+  assert(!/cssText/.test(fs.readFileSync('src/features/dictation.js', 'utf8')), 'dictation.js must not assign style.cssText');
+
+  // Verify UNIT_META and EXAM_PREP_CATALOG completeness
+  VOCAB_UNITS.forEach(u => {
+    assert(Boolean(UNIT_META[u.id]), `UNIT_META missing entry for ${u.id}`);
+  });
+  const examIds = EXAM_PREP_CATALOG.map(e => e.id);
+  assert(
+    examIds.includes('midterm_prep') && examIds.includes('final_exam_prep') && examIds.includes('unit5_exam'),
+    'EXAM_PREP_CATALOG must cover midterm_prep, final_exam_prep, unit5_exam'
+  );
+
+  // Verify word category classifier & filter pills
+  assert(getWordCategory({ word: 'Bag', label: 'n' }) === 'noun', 'getWordCategory failed for noun');
+  assert(getWordCategory({ word: 'Open', label: 'v.t' }) === 'verb', 'getWordCategory failed for v.t');
+  assert(getWordCategory({ word: 'Sing', label: 'v.i' }) === 'verb', 'getWordCategory failed for v.i');
+  assert(getWordCategory({ word: 'Run', label: 'v' }) === 'verb', 'getWordCategory failed for v');
+  assert(getWordCategory({ word: 'Big', label: 'adj' }) === 'adj', 'getWordCategory failed for adj');
+  assert(getWordCategory({ word: 'Stand up', type: 'command' }) === 'command', 'getWordCategory failed for command');
+  assert(getWordCategory({ word: "Here you are", label: 'phrase' }) === 'command', 'getWordCategory failed for phrase');
+  assert(getWordCategory({ word: 'Custom' }) === 'other', 'getWordCategory failed for custom/unlabeled');
+
+  loadUnitVocab('unit_5');
+  setLearnCategoryFilter('adj');
+  const adjCards = getMockById('vocabGrid').children;
+  assert(adjCards.length === 8, `Unit 5 adj filter expected 8 cards, got ${adjCards.length}`);
+
+  saveWeakWordList(['Kite', 'Robot']);
+  setLearnCategoryFilter('weak');
+  const weakCards = getMockById('vocabGrid').children;
+  assert(weakCards.length === 2, `Unit 5 weak filter expected 2 cards, got ${weakCards.length}`);
+  saveWeakWordList([]);
+  setLearnCategoryFilter('all');
+
+  // Verify native <dialog> lifecycle
+  initSpellingDialogEvents();
+  const modalEl = getMockById('spelling-practice-modal');
+  openSpellingPractice(yoyo);
+  assert(modalEl.open === true && state.currentPracticeItem === yoyo, 'openSpellingPractice must open <dialog> and set item');
+  closeSpellingPractice();
+  assert(modalEl.open === false && state.currentPracticeItem === null, 'closeSpellingPractice must close <dialog> and clear item');
+
+  // Verify toast helper
+  const toastEl = showToast('ทดสอบการแจ้งเตือน', 'success');
+  assert(
+    toastEl && toastEl.className.includes('app-toast--success') && getMockById('app-toast-region').children.length >= 1,
+    'showToast must append styled toast element into #app-toast-region'
+  );
+  console.log('✅ Phase 3 UX/UI Architecture, Lesson Shelf, Category Filter & Native <dialog> ผ่านครบทุกกรณี!');
 
   // Clear any pending scoped timers/intervals from tests so Node exits immediately
   clearAllScopedTimers();

@@ -6,9 +6,13 @@ import {
   spellAndSpeak,
   testAndResetVoice
 } from './services/speech.js';
-import { switchTab } from './features/navigation.js';
+import { switchTab, setupTabKeyboardNavigation } from './features/navigation.js';
 import { initCustomVocabData, loadUnitVocab } from './features/catalog.js';
-import { resetSpellingPractice, closeSpellingPractice } from './features/learn.js';
+import {
+  resetSpellingPractice,
+  closeSpellingPractice,
+  initSpellingDialogEvents
+} from './features/learn.js';
 import { startNewChallenge, skipQuestion } from './features/game.js';
 import {
   updateDictationRound,
@@ -40,6 +44,7 @@ export function setupEventListeners() {
   }
 
   // Main Tab Navigation
+  setupTabKeyboardNavigation();
   nodes.tabLearn.addEventListener('click', () => switchTab('learn'));
   nodes.tabGame.addEventListener('click', () => switchTab('game'));
   nodes.tabDashboard.addEventListener('click', () => switchTab('dashboard'));
@@ -113,6 +118,7 @@ export function setupEventListeners() {
   }
 
   // Spelling Modal Listeners
+  initSpellingDialogEvents();
   if (nodes.btnCloseSpellingModal) {
     nodes.btnCloseSpellingModal.addEventListener('click', closeSpellingPractice);
   }

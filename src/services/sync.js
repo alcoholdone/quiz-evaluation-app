@@ -415,10 +415,11 @@ function buildUI() {
   const wrap = document.createElement("div");
   wrap.id = "cloud-sync-bar";
   wrap.innerHTML = `
-    <span id="cs-dot" class="cs-dot"></span>
+    <span id="cs-dot" class="cs-dot" data-status="idle"></span>
     <span id="cs-label">☁️</span>
     <button id="cs-btn" type="button">เข้าสู่ระบบ</button>`;
-  document.body.appendChild(wrap);
+  const mountTarget = document.getElementById("cloud-sync-slot") || document.body;
+  mountTarget.appendChild(wrap);
 
   barEl = wrap.querySelector("#cs-label");
   btnEl = wrap.querySelector("#cs-btn");
@@ -446,8 +447,9 @@ function setBar(text, signedIn) {
 
 function setStatus(s) {
   if (!statusDot) return;
-  const colors = { synced: "#22c55e", idle: "#94a3b8", offline: "#94a3b8", error: "#ef4444" };
-  statusDot.style.background = colors[s] || "#94a3b8";
+  if (statusDot.dataset) {
+    statusDot.dataset.status = s || "idle";
+  }
 }
 
 function showUpdateToast(onApply) {

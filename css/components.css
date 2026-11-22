@@ -1,0 +1,882 @@
+/* ============================================================
+   Reusable Components: Cards, Buttons, Lesson Shelf, Filter Chips,
+   Native Modal Dialog, Letter Tiles, Forms, Responsive Tables, Toasts
+   ============================================================ */
+
+/* --- Tactile Paper Card --- */
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+}
+
+/* --- Tactile Buttons (3D bottom border press) --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  min-block-size: 44px;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.96rem;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  border-bottom-width: 4px;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary-dark);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: var(--secondary-light);
+  border-color: var(--secondary-border);
+  border-bottom-color: var(--secondary);
+  color: var(--secondary-dark);
+}
+
+.btn-tertiary {
+  background: var(--surface-subtle);
+  border-color: var(--border);
+  border-bottom-color: var(--border-strong);
+  color: var(--ink-2);
+}
+
+.btn-accent-coral {
+  background: var(--coral);
+  border-color: var(--coral-dark);
+  color: #ffffff;
+}
+
+.btn-accent-gold {
+  background: var(--gold-bright);
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+
+.btn-block {
+  inline-size: 100%;
+}
+
+.btn-start-cta {
+  padding: 13px 28px;
+  inline-size: 100%;
+  max-inline-size: 320px;
+  margin-inline: auto;
+}
+
+/* --- Audio Play Buttons --- */
+.play-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  min-block-size: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--secondary);
+  border: 1.5px solid var(--secondary-dark);
+  border-bottom-width: 4px;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.96rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.12s ease, background-color 0.15s ease;
+}
+
+.play-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.play-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.play-btn--sage {
+  background: var(--primary);
+  border-color: var(--primary-dark);
+}
+
+.play-btn--sm {
+  padding: 7px 15px;
+  min-block-size: 38px;
+  font-size: 0.86rem;
+  border-bottom-width: 3px;
+}
+
+/* --- Option Toggle Pills (Game Setup / Dictation Rounds) --- */
+.btn-toggle-option {
+  flex: 1 1 180px;
+  padding: 10px 14px;
+  min-block-size: 44px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  border-bottom-width: 3px;
+  background: var(--surface);
+  color: var(--ink-muted);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.12s ease, border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-toggle-option.active {
+  border-color: var(--primary);
+  border-bottom-color: var(--primary-dark);
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.btn-toggle-option:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ============================================================
+   Lesson Shelf: Term Segmented Track & Categorized Unit Tiles
+   ============================================================ */
+.unit-selector-card {
+  margin-block-end: 18px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.unit-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.unit-selector-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unit-selector-heading-ico {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.unit-selector-heading h3 {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  color: var(--ink-1);
+  margin: 0;
+}
+
+.unit-selector-heading p {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin: 2px 0 0;
+}
+
+.term-selector-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface-subtle);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+
+.btn-term-select {
+  padding: 6px 14px;
+  min-block-size: 36px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-term-select.active.term-1 {
+  background: var(--secondary-light);
+  border-color: var(--secondary-border);
+  color: var(--secondary-dark);
+  font-weight: 800;
+}
+
+.btn-term-select.active.term-2 {
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.unit-buttons-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-block-start: 1.5px dashed var(--border);
+  padding-block-start: 14px;
+}
+
+.shelf-group-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+  margin-block-end: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shelf-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.shelf-grid--units {
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+}
+
+.shelf-grid--exams {
+  grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+}
+
+.unit-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  padding: 10px 12px;
+  min-block-size: 58px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-bottom-width: 3px;
+  color: var(--ink-1);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.14s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.unit-tile:active {
+  transform: translateY(1px);
+  border-bottom-width: 2px;
+}
+
+.unit-tile-icon {
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  flex: 0 0 auto;
+  background: var(--surface-subtle);
+}
+
+.unit-tile[data-accent="sage"] .unit-tile-icon     { background: var(--primary-light); }
+.unit-tile[data-accent="cobalt"] .unit-tile-icon   { background: var(--secondary-light); }
+.unit-tile[data-accent="plum"] .unit-tile-icon     { background: var(--plum-light); }
+.unit-tile[data-accent="coral"] .unit-tile-icon    { background: var(--coral-light); }
+.unit-tile[data-accent="marigold"] .unit-tile-icon { background: var(--gold-light); }
+
+.unit-tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+  flex: 1;
+}
+
+.unit-tile-code {
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--ink-1);
+  line-height: 1.25;
+}
+
+.unit-tile-sub {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.unit-tile-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-block-start: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.unit-tile-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.unit-tile-badge--special {
+  background: var(--plum-light);
+  color: var(--plum-dark);
+  border: 1px solid var(--plum-border);
+}
+
+.unit-tile-badge--bonus {
+  background: var(--gold-light);
+  color: var(--gold-dark);
+  border: 1px solid var(--gold-border);
+}
+
+.unit-tile.active {
+  border-color: var(--primary);
+  border-bottom-color: var(--primary-dark);
+  background: var(--primary-light);
+}
+
+.unit-tile.active .unit-tile-code {
+  color: var(--primary-dark);
+}
+
+/* Exam Shelf Tile Accents */
+.unit-tile--exam.exam-midterm {
+  border-color: var(--gold-border);
+  background: #FFFDF5;
+}
+.unit-tile--exam.exam-midterm .unit-tile-icon { background: var(--gold-light); }
+.unit-tile--exam.exam-midterm.active {
+  border-color: var(--gold);
+  border-bottom-color: var(--gold-dark);
+  background: var(--gold-light);
+}
+.unit-tile--exam.exam-midterm.active .unit-tile-code { color: var(--gold-dark); }
+
+.unit-tile--exam.exam-final {
+  border-color: var(--plum-border);
+  background: #FAF8FE;
+}
+.unit-tile--exam.exam-final .unit-tile-icon { background: var(--plum-light); }
+.unit-tile--exam.exam-final.active {
+  border-color: var(--plum);
+  border-bottom-color: var(--plum-dark);
+  background: var(--plum-light);
+}
+.unit-tile--exam.exam-final.active .unit-tile-code { color: var(--plum-dark); }
+
+.unit-tile--exam.exam-unit5 {
+  border-color: var(--coral-border);
+  background: #FFF9F7;
+}
+.unit-tile--exam.exam-unit5 .unit-tile-icon { background: var(--coral-light); }
+.unit-tile--exam.exam-unit5.active {
+  border-color: var(--coral);
+  border-bottom-color: var(--coral-dark);
+  background: var(--coral-light);
+}
+.unit-tile--exam.exam-unit5.active .unit-tile-code { color: var(--coral-dark); }
+
+/* ============================================================
+   Category Filter Chips (Learn Mode)
+   ============================================================ */
+.learn-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  flex-wrap: balance;
+  gap: 8px;
+  align-items: center;
+  margin-block-end: 16px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  min-block-size: 36px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.filter-chip .chip-count {
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-subtle);
+  color: var(--ink-muted);
+}
+
+.filter-chip.active {
+  background: var(--primary);
+  border-color: var(--primary-dark);
+  color: #ffffff;
+}
+
+.filter-chip.active .chip-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.filter-chip--weak {
+  border-color: var(--gold-border);
+  background: var(--gold-light);
+  color: var(--gold-dark);
+}
+
+.filter-chip--weak.active {
+  background: var(--gold-dark);
+  border-color: var(--gold-dark);
+  color: #ffffff;
+}
+
+/* ============================================================
+   Native <dialog> Spelling Practice Modal (with scroll containment)
+   ============================================================ */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  background: rgba(31, 41, 51, 0.56);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+dialog.spelling-dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-inline-size: min(520px, calc(100dvw - 24px));
+  inline-size: 100%;
+  max-block-size: 92dvh;
+  overflow: visible;
+}
+
+dialog.spelling-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+
+.spelling-modal-content {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px 24px;
+  box-shadow: var(--shadow-dialog);
+  position: relative;
+  text-align: center;
+  max-block-size: 90dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.spelling-modal-content.shake {
+  border-color: var(--danger);
+  animation: shake 0.42s ease;
+}
+
+.spelling-modal-content.success {
+  border-color: var(--primary);
+  background: #F7FCF9;
+}
+
+.spelling-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  inline-size: 38px;
+  block-size: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--ink-2);
+  font-size: 1.45rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.spelling-modal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--ink-1);
+  padding-inline: 34px;
+}
+
+.spelling-modal-visual {
+  font-size: 5.5rem;
+  margin: 14px 0 8px;
+  min-block-size: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spelling-modal-meaning {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--secondary-dark);
+  margin-block-end: 16px;
+}
+
+.spelling-modal-feedback {
+  min-block-size: 34px;
+  margin-block-start: 14px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--primary-dark);
+}
+
+.spelling-modal-feedback .wrong {
+  color: var(--danger);
+}
+
+.spelling-modal-footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-block-start: 18px;
+}
+
+/* ============================================================
+   Tactile Letter Tiles & Spelling Slots
+   ============================================================ */
+.spelling-slots-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 16px;
+}
+
+.spelling-slot {
+  min-inline-size: 42px;
+  block-size: 48px;
+  padding-inline: 6px;
+  border-radius: 12px;
+  border: 2px dashed var(--border-strong);
+  background: var(--surface-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--ink-1);
+}
+
+.spelling-slot.filled {
+  border-style: solid;
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  animation: pop-in 0.16s ease;
+}
+
+.spelling-slot-space {
+  inline-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.spelling-slot-hyphen {
+  inline-size: 20px;
+  font-size: 1.4rem;
+  color: var(--ink-muted);
+}
+
+.scrambled-letters-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-block-start: 18px;
+}
+
+.letter-btn {
+  min-inline-size: 46px;
+  block-size: 50px;
+  padding-inline: 10px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-bottom: 4px solid var(--border-strong);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink-1);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.letter-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.letter-btn:disabled {
+  opacity: 0.32;
+  cursor: default;
+  background: var(--surface-subtle);
+}
+
+/* ============================================================
+   Progress Bar
+   ============================================================ */
+.progress-wrapper {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  block-size: 12px;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-block-end: 20px;
+}
+
+.progress-fill {
+  block-size: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+/* ============================================================
+   Forms & Container-Query Responsive Tables (per guide)
+   ============================================================ */
+.vocab-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ink-1);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select,
+.field-input,
+.field-select {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink-1);
+  font-size: 0.95rem;
+  min-inline-size: 0;
+}
+
+.form-group textarea {
+  min-block-size: 84px;
+  resize: vertical;
+}
+
+.vocab-table-wrapper {
+  overflow: auto;
+  max-inline-size: 100%;
+  max-block-size: 480px;
+  margin-block-start: 14px;
+  container-type: inline-size;
+}
+
+.vocab-table {
+  inline-size: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+.vocab-table thead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  background: var(--surface-subtle);
+}
+
+.vocab-table th {
+  padding: 10px 12px;
+  color: var(--ink-1);
+  font-weight: 800;
+  border-block-end: 2px solid var(--border-strong);
+}
+
+.vocab-table td {
+  padding: 10px 12px;
+  border-block-end: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.vocab-table .col-visual { inline-size: 64px; }
+.vocab-table .col-action { inline-size: 84px; text-align: center; }
+.vocab-table .col-status { inline-size: 144px; text-align: center; }
+.vocab-table .col-center { text-align: center; }
+
+.vocab-table .cell-word { font-weight: 800; color: var(--ink-1); }
+.vocab-table .cell-meaning { color: var(--ink-muted); }
+.vocab-table .cell-action { text-align: center; }
+.vocab-table .cell-date { color: var(--ink-muted); font-size: 0.85rem; }
+.vocab-table .cell-stars { text-align: center; font-weight: 800; color: var(--gold-dark); }
+.vocab-table .cell-amount { text-align: center; font-weight: 800; color: var(--primary-dark); }
+.vocab-table .cell-status { text-align: center; }
+.table-emoji { font-size: 1.5rem; }
+
+.table-empty-msg {
+  padding: 28px 16px;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
+@container (width < 560px) {
+  .vocab-table,
+  .vocab-table tbody,
+  .vocab-table tr,
+  .vocab-table td {
+    display: block;
+    inline-size: 100%;
+  }
+
+  .vocab-table thead {
+    display: none;
+  }
+
+  .vocab-table tr {
+    margin-block-end: 12px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+  }
+
+  .vocab-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    text-align: right;
+    border-block-end: 1px solid var(--surface-subtle);
+  }
+
+  .vocab-table tr td:last-child {
+    border-block-end: none;
+  }
+
+  .vocab-table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-weight: 700;
+    color: var(--ink-muted);
+    text-align: left;
+  }
+}
+
+/* ============================================================
+   Non-Blocking App Toast Region & Star Confetti
+   ============================================================ */
+.toast-region {
+  position: fixed;
+  inset-block-end: max(18px, env(safe-area-inset-bottom));
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  max-inline-size: calc(100dvw - 24px);
+}
+
+.app-toast {
+  pointer-events: auto;
+  background: var(--surface);
+  color: var(--ink-1);
+  border: 1.5px solid var(--border-strong);
+  border-inline-start: 5px solid var(--secondary);
+  border-radius: 14px;
+  padding: 11px 16px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-dialog);
+  animation: toast-in 0.22s ease;
+}
+
+.app-toast--success { border-inline-start-color: var(--primary); }
+.app-toast--warning { border-inline-start-color: var(--gold); }
+.app-toast--error   { border-inline-start-color: var(--danger); }
+
+.star-particle {
+  position: fixed;
+  z-index: 10001;
+  pointer-events: none;
+  font-size: 1.6rem;
+  animation: star-burst var(--duration, 1s) cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}

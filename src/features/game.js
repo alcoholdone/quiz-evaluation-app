@@ -126,8 +126,8 @@ export function renderQuestion(index) {
 
     // Play button
     nodes.questionArea.innerHTML = `
-      <button class="play-btn" id="btn-play-sound">🔊 ฟังเสียงอีกครั้ง</button>
-      <div class="question-visual" style="margin-left: 20px;">❓</div>
+      <button type="button" class="play-btn" id="btn-play-sound">🔊 ฟังเสียงอีกครั้ง</button>
+      <div class="question-visual question-visual--audio">❓</div>
     `;
 
     document.getElementById('btn-play-sound').addEventListener('click', () => {
@@ -159,8 +159,10 @@ export function renderQuestion(index) {
 
     // Show image + meaning
     nodes.questionArea.innerHTML = `
-      <div class="question-visual">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
-      <div class="question-hint" style="font-size: 1rem; color: var(--text-muted); margin-top: 8px;">${escapeHTML(q.targetWord.meaning)}</div>
+      <div class="question-stack">
+        <div class="question-visual">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
+        <div class="question-hint">${escapeHTML(q.targetWord.meaning)}</div>
+      </div>
     `;
 
     // Options: English words
@@ -177,8 +179,10 @@ export function renderQuestion(index) {
     nodes.gameModeTitle.innerHTML = '🔤 ภารกิจ: ดูภาพแล้วเรียงตัวอักษรสะกดคำให้ถูกต้อง!';
 
     nodes.questionArea.innerHTML = `
-      <div class="question-visual">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
-      <div class="question-hint" style="font-size: 1rem; color: var(--text-muted); margin-top: 8px;">${escapeHTML(q.targetWord.meaning)}</div>
+      <div class="question-stack">
+        <div class="question-visual">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
+        <div class="question-hint">${escapeHTML(q.targetWord.meaning)}</div>
+      </div>
     `;
 
     // Auto speak the word so kids hear it
@@ -283,8 +287,8 @@ export function renderQuestion(index) {
 
     // Undo button
     undoBtn = document.createElement('button');
-    undoBtn.className = 'play-btn';
-    undoBtn.style.cssText = 'margin-top:10px; padding:6px 16px; font-size:0.85rem;';
+    undoBtn.type = 'button';
+    undoBtn.className = 'play-btn play-btn--sage play-btn--sm';
     undoBtn.innerHTML = '↩️ ลบตัวสุดท้าย';
     undoBtn.addEventListener('click', () => {
       if (selectedLetters.length === 0) return;
@@ -304,8 +308,8 @@ export function renderQuestion(index) {
 
     // Listen again button
     const listenBtn = document.createElement('button');
-    listenBtn.className = 'play-btn';
-    listenBtn.style.cssText = 'margin-top:10px; padding:6px 16px; font-size:0.85rem; margin-left:8px;';
+    listenBtn.type = 'button';
+    listenBtn.className = 'play-btn play-btn--sm';
     listenBtn.innerHTML = '🔊 ฟังเสียงอีกครั้ง';
     listenBtn.addEventListener('click', () => {
       stopAllSpeech();
@@ -313,7 +317,7 @@ export function renderQuestion(index) {
     });
 
     const btnRow = document.createElement('div');
-    btnRow.style.cssText = 'display:flex; gap:8px; justify-content:center; flex-wrap:wrap;';
+    btnRow.className = 'spelling-controls-row';
     btnRow.appendChild(undoBtn);
     btnRow.appendChild(listenBtn);
 
@@ -325,7 +329,7 @@ export function renderQuestion(index) {
     nodes.gameModeTitle.innerHTML = '🧩 ภารกิจ: ดูคำภาษาไทยแล้วเลือกรูปภาพให้ถูกต้อง!';
 
     // Show Thai word
-    nodes.questionArea.innerHTML = `<div class="question-visual" style="font-size: 3rem; font-weight: 800; color: #1e3a8a;">${escapeHTML(q.targetWord.meaning)}</div>`;
+    nodes.questionArea.innerHTML = `<div class="question-visual question-visual--thai">${escapeHTML(q.targetWord.meaning)}</div>`;
 
     registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
@@ -339,7 +343,7 @@ export function renderQuestion(index) {
       btn.className = 'option-btn';
       btn.innerHTML = `
         <div class="option-img">${renderVisualHTML(opt.image, { trusted: !opt.isCustom })}</div>
-        <div class="option-word-only" style="font-size: 1.2rem;">${escapeHTML(opt.word)}</div>
+        <div class="option-word-only">${escapeHTML(opt.word)}</div>
       `;
       btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
@@ -354,8 +358,8 @@ export function renderQuestion(index) {
 
     // UI Layout: Image + Chat Game Container
     nodes.questionArea.innerHTML = `
-      <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-        <div class="question-visual" style="height:100px; font-size:75px; margin: 5px 0;">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
+      <div class="question-stack">
+        <div class="question-visual question-visual--compact">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
         <div class="chat-game-container">
           <div class="chat-row teacher-row">
             <div class="chat-avatar">👩‍🏫</div>
@@ -400,8 +404,8 @@ export function renderQuestion(index) {
       const optThaiText = q.isYesNo ? opt.thaiText : getSentenceQA(opt).thaiAnswer;
 
       btn.innerHTML = `
-        <span style="font-size:1.3rem; font-weight:bold; margin-right:12px; color:var(--primary-dark);">${String.fromCharCode(65 + optIdx)}.</span>
-        <span class="option-word-only" style="font-size: 1.15rem; font-weight: 700;">${escapeHTML(optText)}</span>
+        <span class="option-prefix">${String.fromCharCode(65 + optIdx)}.</span>
+        <span class="option-word-only">${escapeHTML(optText)}</span>
       `;
 
       btn.onclick = () => {
@@ -424,10 +428,10 @@ export function renderQuestion(index) {
 
     // Show image + question
     nodes.questionArea.innerHTML = `
-      <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-        <div class="question-visual" style="font-size: 4.5rem; margin-bottom: 8px;">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
-        <div style="font-size: 1.4rem; font-weight: 700; color: var(--dark-2); margin-bottom: 4px;">What’s this?</div>
-        <div class="question-hint" style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">(คำแปล: ${escapeHTML(q.targetWord.meaning)})</div>
+      <div class="question-stack">
+        <div class="question-visual question-visual--compact">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
+        <div class="question-prompt-title">What’s this?</div>
+        <div class="question-hint">(คำแปล: ${escapeHTML(q.targetWord.meaning)})</div>
       </div>
     `;
 
@@ -446,8 +450,8 @@ export function renderQuestion(index) {
       btn.className = 'option-btn';
 
       btn.innerHTML = `
-        <span style="font-size:1.3rem; font-weight:bold; margin-right:12px; color:var(--primary-dark);">${String.fromCharCode(65 + optIdx)}.</span>
-        <span class="option-word-only" style="font-size: 1.15rem; font-weight: 700;">${escapeHTML(opt.text)}</span>
+        <span class="option-prefix">${String.fromCharCode(65 + optIdx)}.</span>
+        <span class="option-word-only">${escapeHTML(opt.text)}</span>
       `;
 
       btn.onclick = () => selectOption(opt, btn);
@@ -457,10 +461,10 @@ export function renderQuestion(index) {
     nodes.gameModeTitle.innerHTML = '🔤 ภารกิจ Phonics: เลือกคำศัพท์ที่ขึ้นต้นด้วยเสียงตัวอักษร!';
 
     nodes.questionArea.innerHTML = `
-      <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-        <div class="question-visual" style="font-size: 5rem; margin-bottom: 8px;">❓</div>
-        <div style="font-size: 1.4rem; font-weight: 700; color: var(--dark-2); margin-bottom: 4px; text-align: center; max-width: 90%;">Which word starts with the "${escapeHTML(q.phonicsLetter.toLowerCase())}" sound?</div>
-        <button class="play-btn" id="btn-speak-phonics" style="margin-top: 5px;">🔊 ฟังเสียงตัวอักษร</button>
+      <div class="question-stack">
+        <div class="question-visual question-visual--compact">❓</div>
+        <div class="question-prompt-title">Which word starts with the "${escapeHTML(q.phonicsLetter.toLowerCase())}" sound?</div>
+        <button type="button" class="play-btn" id="btn-speak-phonics">🔊 ฟังเสียงตัวอักษร</button>
       </div>
     `;
 
@@ -483,8 +487,8 @@ export function renderQuestion(index) {
       const imgHtml = `<div class="option-img">${renderVisualHTML(opt.image, { trusted: !opt.isCustom })}</div>`;
       btn.innerHTML = `
         ${imgHtml}
-        <div class="option-word-only" style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">${escapeHTML(opt.word)}</div>
-        <div class="option-label" style="font-size: 0.8rem; color: var(--text-muted);">${escapeHTML(opt.meaning)}</div>
+        <div class="option-word-only">${escapeHTML(opt.word)}</div>
+        <div class="option-label">${escapeHTML(opt.meaning)}</div>
       `;
       btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
@@ -497,26 +501,26 @@ export function renderQuestion(index) {
     if (renderedTargetVisual.startsWith('<div')) {
       imgHtml = renderedTargetVisual;
     } else {
-      imgHtml = `<div class="question-visual" style="min-height: 125px; margin: 8px 0;">${renderedTargetVisual}</div>`;
+      imgHtml = `<div class="question-visual question-visual--compact">${renderedTargetVisual}</div>`;
     }
 
     nodes.questionArea.innerHTML = `
-      <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+      <div class="question-stack">
         ${imgHtml}
-        <div class="chat-game-container" style="width: 100%; max-width: 450px; margin-top: 10px;">
-          <div class="chat-row teacher-row" style="display: flex; gap: 8px; margin-bottom: 12px; justify-content: flex-start;">
-            <div class="chat-avatar" style="font-size: 1.8rem;">👩‍🏫</div>
-            <div class="chat-bubble teacher-bubble" style="background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 10px 14px; border-radius: 18px 18px 18px 4px; font-size: 1.05rem; font-weight: 700; color: var(--dark-3); position: relative;">
+        <div class="chat-game-container">
+          <div class="chat-row teacher-row">
+            <div class="chat-avatar">👩‍🏫</div>
+            <div class="chat-bubble teacher-bubble">
               ${escapeHTML(q.questionText)}
-              <button class="chat-speak-btn" type="button" id="btn-speak-question" title="ฟังคุณครูพูด" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; margin-left: 6px; padding: 0; vertical-align: middle;">🔊</button>
-              <div class="chat-translation" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 500; margin-top: 4px;">(${escapeHTML(q.thaiQuestionText)})</div>
+              <button class="chat-speak-btn" type="button" id="btn-speak-question" title="ฟังคุณครูพูด">🔊</button>
+              <div class="chat-translation">(${escapeHTML(q.thaiQuestionText)})</div>
             </div>
           </div>
-          <div class="chat-row student-row" style="display: flex; gap: 8px; justify-content: flex-end;">
-            <div class="chat-bubble student-bubble empty-bubble" id="student-chat-bubble" style="background: #fff; border: 2px dashed #cbd5e1; padding: 10px 14px; border-radius: 18px 18px 4px 18px; font-size: 1.05rem; font-weight: 700; color: var(--text-muted);">
+          <div class="chat-row student-row">
+            <div class="chat-bubble student-bubble empty-bubble" id="student-chat-bubble">
               ....................
             </div>
-            <div class="chat-avatar" style="font-size: 1.8rem;">👦</div>
+            <div class="chat-avatar">👦</div>
           </div>
         </div>
       </div>
@@ -541,15 +545,14 @@ export function renderQuestion(index) {
       btn.className = 'option-btn';
 
       btn.innerHTML = `
-        <span style="font-size:1.3rem; font-weight:bold; margin-right:12px; color:var(--primary-dark);">${String.fromCharCode(65 + optIdx)}.</span>
-        <span class="option-word-only" style="font-size: 1.12rem; font-weight: 700;">${escapeHTML(opt.text)}</span>
+        <span class="option-prefix">${String.fromCharCode(65 + optIdx)}.</span>
+        <span class="option-word-only">${escapeHTML(opt.text)}</span>
       `;
 
       btn.onclick = () => {
         const studentBubble = document.getElementById('student-chat-bubble');
         if (studentBubble) {
           studentBubble.className = 'chat-bubble student-bubble';
-          studentBubble.style.cssText = 'background: var(--primary-light); border: 1.5px solid var(--primary); padding: 10px 14px; border-radius: 18px 18px 4px 18px; font-size: 1.05rem; font-weight: 700; color: var(--primary-hover);';
           studentBubble.textContent = opt.text;
         }
         selectOption(opt, btn);

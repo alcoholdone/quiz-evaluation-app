@@ -50,6 +50,7 @@ export const state = {
   currentTerm: 2,
   currentUnitId: 'unit_5',
   quizQuestionCount: 10,
+  learnCategoryFilter: 'all',
 
   // Rewards Store State
   currentParentLockAnswer: 0,
@@ -173,7 +174,10 @@ export function initNodes() {
     // Special Practice Elements
     tabSpecial: document.getElementById('tab-special'),
     panelSpecial: document.getElementById('special-panel'),
-    specialPlayArea: document.getElementById('special-play-area')
+    specialPlayArea: document.getElementById('special-play-area'),
+
+    // Learn Filter Bar
+    learnCategoryFilter: document.getElementById('learn-category-filter')
   });
   return nodes;
 }

@@ -43,19 +43,9 @@ export function updateDictationRound(roundKey) {
   Object.keys(DICTATION_ROUNDS).forEach(r => {
     const btn = document.getElementById(`btn-dictation-${r}`);
     if (btn) {
-      if (r === roundKey) {
-        btn.classList.add('active');
-        btn.style.border = '2px solid var(--primary)';
-        btn.style.background = 'var(--primary-light)';
-        btn.style.color = 'var(--primary-hover)';
-        btn.style.boxShadow = '0 4px 6px rgba(16, 185, 129, 0.1)';
-      } else {
-        btn.classList.remove('active');
-        btn.style.border = '2px solid #e2e8f0';
-        btn.style.background = 'white';
-        btn.style.color = 'var(--text-muted)';
-        btn.style.boxShadow = 'none';
-      }
+      const isSelected = r === roundKey;
+      btn.classList.toggle('active', isSelected);
+      btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
     }
   });
 
@@ -346,7 +336,7 @@ export function checkDictationSpelling(item) {
     // สะกดผิด
     if (dictationBox) dictationBox.classList.add('dictation-shake');
     if (nodes.dictationFeedback) {
-      nodes.dictationFeedback.innerHTML = `<span class="wrong" style="color: var(--danger);">❌ ยังไม่ถูกน้า ตัวสะกดคือ "${escapeHTML(item.word)}"</span>`;
+      nodes.dictationFeedback.innerHTML = `<span class="wrong">❌ ยังไม่ถูกน้า ตัวสะกดคือ "${escapeHTML(item.word)}"</span>`;
     }
 
     if (visualClueNode) {
@@ -453,15 +443,7 @@ export function renderDictationHistoryInDashboard() {
   const reversedHistory = [...history].reverse();
   reversedHistory.forEach(attempt => {
     const item = document.createElement('div');
-    item.className = 'mini-stat-card';
-    item.style.padding = '12px 16px';
-    item.style.borderRadius = '12px';
-    item.style.border = '1.5px solid #cbd5e1';
-    item.style.background = '#ffffff';
-    item.style.display = 'flex';
-    item.style.justifyContent = 'space-between';
-    item.style.alignItems = 'center';
-    item.style.margin = '0';
+    item.className = 'dictation-history-item';
 
     const totalQ = attempt.total || (attempt.round === 'r6' ? 8 : 5);
     let stars = '';
@@ -472,13 +454,13 @@ export function renderDictationHistoryInDashboard() {
     const roundName = DICTATION_ROUND_LABELS[attempt.round] || 'รอบที่ 1';
 
     item.innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-        <span style="font-weight: 700; color: var(--dark-2); font-size: 0.95rem;">เขียนตามคำบอก ${escapeHTML(roundName)}</span>
-        <span style="font-size: 0.75rem; color: var(--text-light);">${escapeHTML(attempt.date)} น.</span>
+      <div class="dictation-history-info">
+        <span class="dictation-history-title">เขียนตามคำบอก ${escapeHTML(roundName)}</span>
+        <span class="dictation-history-date">${escapeHTML(attempt.date)} น.</span>
       </div>
-      <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-        <span style="color: var(--accent-dark); font-weight: 700; font-size: 1.1rem; letter-spacing: 2px;">${stars}</span>
-        <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-hover);">${Number(attempt.score) || 0} / ${totalQ} คะแนน</span>
+      <div class="dictation-history-score-col">
+        <span class="dictation-history-stars">${stars}</span>
+        <span class="dictation-history-pts">${Number(attempt.score) || 0} / ${totalQ} คะแนน</span>
       </div>
     `;
     listNode.appendChild(item);
