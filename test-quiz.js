@@ -337,7 +337,7 @@ async function runTests() {
   state.hasCompletedAssessment = true;
   loadUnitVocab('unit_6');
   assert(state.challengeQuestions.length === 0 && state.hasCompletedAssessment === false, 'Bug #1: loadUnitVocab must reset previous unit challenge state');
-  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_6' || state.ORIGINAL_VOCAB_LIST.length !== 4) {
+  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_6' || state.ORIGINAL_VOCAB_LIST.length !== 6) {
     console.error(`❌ โหลด Unit 6 ไม่ถูกต้อง: term=${state.currentTerm}, unit=${state.currentUnitId}, count=${state.ORIGINAL_VOCAB_LIST ? state.ORIGINAL_VOCAB_LIST.length : 0}`);
     allPassed = false;
   } else {

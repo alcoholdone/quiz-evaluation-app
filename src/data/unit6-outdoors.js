@@ -157,5 +157,80 @@ export const unit6 = {
   <circle cx="77" cy="42" r="1.5" fill="#38bdf8"/>
 </svg>`,
         explanation: '💨 Windy สะกดว่า W - I - N - D - Y แปลว่า มีลมแรง วันที่มีสายลมพัดผ่านอย่างรวดเร็วและเย็นสบายจ้า'
+      },
+      {
+        word: 'Cloudy',
+        meaning: 'มีเมฆมาก',
+        syllable: 'cloud-y',
+        label: 'adj',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Soft overcast sky circle -->
+  <circle cx="50" cy="50" r="46" fill="#f1f5f9"/>
+  <!-- Small peeking sun behind clouds -->
+  <circle cx="72" cy="30" r="12" fill="#fde047" stroke="#f59e0b" stroke-width="1.5"/>
+  <!-- Back gray cloud -->
+  <ellipse cx="64" cy="46" rx="22" ry="13" fill="#cbd5e1"/>
+  <circle cx="54" cy="39" r="12" fill="#cbd5e1"/>
+  <circle cx="72" cy="40" r="11" fill="#cbd5e1"/>
+  <!-- Main puffy friendly cloud -->
+  <ellipse cx="46" cy="58" rx="28" ry="16" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+  <circle cx="32" cy="50" r="14" fill="#ffffff"/>
+  <circle cx="48" cy="44" r="17" fill="#ffffff"/>
+  <circle cx="64" cy="52" r="13" fill="#ffffff"/>
+  <!-- Soft cloud highlight & underside -->
+  <path d="M 24,66 Q 46,72 68,66" fill="none" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
+  <!-- Cute cloud face -->
+  <circle cx="38" cy="56" r="2.2" fill="#475569"/>
+  <circle cx="54" cy="56" r="2.2" fill="#475569"/>
+  <circle cx="33" cy="60" r="2.5" fill="#fda4af" opacity="0.5"/>
+  <circle cx="59" cy="60" r="2.5" fill="#fda4af" opacity="0.5"/>
+  <path d="M 43,61 Q 46,64 49,61" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>`,
+        explanation: '☁️ Cloudy สะกดว่า C - L - O - U - D - Y แปลว่า มีเมฆมาก วันที่ท้องฟ้ามีก้อนเมฆลอยอยู่เต็มไปหมดจ้า'
+      },
+      {
+        word: 'Snowy',
+        meaning: 'มีหิมะตก',
+        syllable: 'snow-y',
+        label: 'adj',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Chilly winter sky circle -->
+  <circle cx="50" cy="50" r="46" fill="#eff6ff"/>
+  <!-- Snowy ground hill -->
+  <path d="M 10,80 Q 50,68 90,80 A 46,46 0 0,1 10,80 Z" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <!-- Winter Cloud -->
+  <ellipse cx="50" cy="34" rx="25" ry="14" fill="#e0f2fe" stroke="#93c5fd" stroke-width="2"/>
+  <circle cx="38" cy="28" r="12" fill="#f0f9ff"/>
+  <circle cx="52" cy="23" r="14" fill="#ffffff"/>
+  <circle cx="64" cy="29" r="11" fill="#f0f9ff"/>
+  <!-- Cloud cozy face -->
+  <circle cx="44" cy="32" r="2" fill="#334155"/>
+  <circle cx="56" cy="32" r="2" fill="#334155"/>
+  <path d="M 47,36 Q 50,39 53,36" stroke="#334155" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- Snowflakes -->
+  <g stroke="#38bdf8" stroke-width="2" stroke-linecap="round">
+    <!-- Left snowflake -->
+    <line x1="26" y1="54" x2="26" y2="66"/>
+    <line x1="20" y1="60" x2="32" y2="60"/>
+    <line x1="22" y1="56" x2="30" y2="64"/>
+    <line x1="30" y1="56" x2="22" y2="64"/>
+    <!-- Center big snowflake -->
+    <line x1="50" y1="56" x2="50" y2="70"/>
+    <line x1="43" y1="63" x2="57" y2="63"/>
+    <line x1="45" y1="58" x2="55" y2="68"/>
+    <line x1="55" y1="58" x2="45" y2="68"/>
+    <!-- Right snowflake -->
+    <line x1="74" y1="52" x2="74" y2="64"/>
+    <line x1="68" y1="58" x2="80" y2="58"/>
+    <line x1="70" y1="54" x2="78" y2="62"/>
+    <line x1="78" y1="54" x2="70" y2="62"/>
+  </g>
+  <!-- Small falling snow dots -->
+  <circle cx="37" cy="70" r="2.2" fill="#93c5fd"/>
+  <circle cx="64" cy="72" r="2.2" fill="#93c5fd"/>
+  <circle cx="18" cy="74" r="1.8" fill="#bae6fd"/>
+  <circle cx="82" cy="72" r="1.8" fill="#bae6fd"/>
+</svg>`,
+        explanation: '❄️ Snowy สะกดว่า S - N - O - W - Y แปลว่า มีหิมะตก วันที่อากาศหนาวเย็นและมีเกล็ดหิมะสีขาวโปรยปรายลงมาจ้า'
       }
     ]};
