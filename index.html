@@ -770,15 +770,14 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="questions.js"></script>
-  <script src="app.js"></script>
-
-  <!-- Cloud sync (Google sign-in + Firestore). Loads after app.js so the
-       localStorage hook wraps the same storage the game already uses.
-       firebase-config.js is a classic script (runs first, sets window.FIREBASE_CONFIG);
-       sync.js is an ES module (Firebase modular SDK). -->
+  <!-- Firebase config (classic script setting window.FIREBASE_CONFIG) -->
   <script src="firebase-config.js"></script>
-  <script type="module" src="sync.js"></script>
+
+  <!-- App ES Modules (zero-build, GitHub Pages compatible) -->
+  <script type="module" src="./src/main.js"></script>
+
+  <!-- Cloud sync kept as a separate ES module so offline/blocked Firebase CDN
+       never blocks the core app module graph -->
+  <script type="module" src="./src/services/sync.js"></script>
 </body>
 </html>
