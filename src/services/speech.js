@@ -1,3 +1,6 @@
+import { registerTimeout, clearScopedTimers } from '../state/store.js';
+import { isSeparatorChar } from '../utils/word-helpers.js';
+
 // TEXT TO SPEECH (TTS) ENGINE
 let currentSpeechToken = null;
 let lastCancelTime = 0;
@@ -80,6 +83,7 @@ export function resetCardSpeechHighlight(cardElement) {
 
 export function stopAllSpeech() {
   currentSpeechToken = null;
+  clearScopedTimers('speech');
   activeUtterances = []; // Clear references to prevent GC leaks or stuck speech
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     // Only cancel when there is active speech — unconditional cancel breaks Chrome's engine
@@ -220,9 +224,9 @@ export function spellAndSpeak(item, cardElement = null, rate = 0.8) {
   }
 
   // Safari fix: fallback cleanup if onend never fires (last utterance bug)
-  const letterCount = item.word.replaceAll(' ', '').length;
+  const letterCount = item.word.split('').filter(c => !isSeparatorChar(c)).length;
   const estimatedMs = Math.round((letterCount * 700 + 2200) / (rate || 0.8));
-  let cleanupTimer = setTimeout(() => {
+  let cleanupTimer = registerTimeout('speech', () => {
     if (currentSpeechToken === token && cardElement) {
       resetCardSpeechHighlight(cardElement);
       cardElement.classList.remove('speaking');
@@ -270,7 +274,7 @@ export function spellAndSpeak(item, cardElement = null, rate = 0.8) {
     } else {
       // Queue each letter
       item.word.split('').forEach((letter, i) => {
-        if (letter === ' ') return;
+        if (isSeparatorChar(letter)) return;
         const charNode = cardElement ? cardElement.querySelector(`.spell-char[data-index="${i}"]`) : null;
         const u = makeUtterance(letter.toLowerCase(), 'en-US', rate * 0.7);
         u.onstart = () => {
@@ -322,7 +326,7 @@ export function spellAndSpeak(item, cardElement = null, rate = 0.8) {
   // First click has no prior cancel (lastCancelTime = 0), so sinceCancel is huge → no delay.
   const sinceCancel = Date.now() - lastCancelTime;
   if (sinceCancel < 200) {
-    setTimeout(queueAll, 80);
+    registerTimeout('speech', queueAll, 80);
   } else {
     queueAll();
   }

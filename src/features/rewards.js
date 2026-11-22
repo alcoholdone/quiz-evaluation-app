@@ -1,4 +1,5 @@
 import { state } from '../state/store.js';
+import { escapeHTML } from '../utils/sanitize.js';
 import {
   getTotalStars,
   subtractStars,
@@ -400,6 +401,28 @@ export function renderRedeemHistoryTable() {
   const emptyState = document.getElementById('rewards-history-empty');
   if (!tbody || !emptyState) return;
 
+  if (!tbody.dataset.delegatedBound) {
+    tbody.dataset.delegatedBound = 'true';
+    tbody.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-toggle-idx]');
+      if (!target) return;
+      const idx = Number(target.dataset.toggleIdx);
+      if (Number.isInteger(idx) && idx >= 0) {
+        toggleRedeemPaidStatus(idx);
+      }
+    });
+    tbody.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const target = e.target.closest('[data-toggle-idx]');
+      if (!target) return;
+      e.preventDefault();
+      const idx = Number(target.dataset.toggleIdx);
+      if (Number.isInteger(idx) && idx >= 0) {
+        toggleRedeemPaidStatus(idx);
+      }
+    });
+  }
+
   tbody.innerHTML = '';
   const log = getRedeemLog();
 
@@ -426,11 +449,11 @@ export function renderRedeemHistoryTable() {
     }
 
     tr.innerHTML = `
-      <td data-label="วันที่-เวลา" style="padding: 10px; color: var(--text-muted); font-size: 0.85rem;">${item.dateTime}</td>
-      <td data-label="ดาวที่แลก" style="padding: 10px; text-align: center; font-weight: 700; color: #d97706;">⭐ ${item.starsRedeemed} ดวง</td>
-      <td data-label="เงินที่ได้รับ" style="padding: 10px; text-align: center; font-weight: 800; color: #16a34a;">${item.amountEarned} บาท</td>
+      <td data-label="วันที่-เวลา" style="padding: 10px; color: var(--text-muted); font-size: 0.85rem;">${escapeHTML(item.dateTime)}</td>
+      <td data-label="ดาวที่แลก" style="padding: 10px; text-align: center; font-weight: 700; color: #d97706;">⭐ ${Number(item.starsRedeemed) || 0} ดวง</td>
+      <td data-label="เงินที่ได้รับ" style="padding: 10px; text-align: center; font-weight: 800; color: #16a34a;">${Number(item.amountEarned) || 0} บาท</td>
       <td data-label="สถานะคุณแม่" style="padding: 10px; text-align: center;">
-        <span class="${statusClass}" onclick="toggleRedeemPaidStatus(${idx})">${statusText}</span>
+        <span role="button" tabindex="0" class="${statusClass}" data-toggle-idx="${idx}">${statusText}</span>
       </td>
     `;
     tbody.appendChild(tr);

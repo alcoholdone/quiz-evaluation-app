@@ -1,4 +1,4 @@
-import { state, nodes, STORAGE_KEYS } from '../state/store.js';
+import { state, nodes, STORAGE_KEYS, clearScopedTimers } from '../state/store.js';
 import { VOCAB_UNITS, EXAM_COUNTS } from '../data/units.js';
 import { DICTATION_ROUNDS, DICTATION_ROUND_TERM } from '../data/dictation-rounds.js';
 import { getCustomVocabList } from '../services/storage.js';
@@ -8,6 +8,8 @@ import { renderCustomVocabTable } from './vocab-manager.js';
 import { updateDictationTermUI, updateDictationRound } from './dictation.js';
 import { initStarsSystem } from './rewards.js';
 import { switchTab } from './navigation.js';
+import { pauseTimer, clearTransitionTimeout } from './game.js';
+import { renderDashboard } from './dashboard.js';
 
 export function getTermForUnitId(unitId) {
   if (unitId === 'midterm_prep' || unitId === 'final_exam_prep') return 1;
@@ -26,6 +28,19 @@ export function getTermBtnStyle(isActive, termNum) {
   return 'padding: 7px 14px; font-size: 0.85rem; font-weight: 700; border-radius: 999px; border: 2px solid #cbd5e1; background: #ffffff; color: var(--text-muted); cursor: pointer; transition: all 0.2s;';
 }
 
+function formatTermUnitRange(termNum) {
+  const nums = VOCAB_UNITS
+    .filter(u => (u.term || 1) === termNum)
+    .map(u => {
+      const m = /^unit_(\d+)/.exec(u.id);
+      return m ? Number(m[1]) : null;
+    })
+    .filter(n => n !== null);
+  if (nums.length === 0) return '';
+  if (nums.length === 1) return `Unit ${nums[0]}`;
+  return `Unit ${Math.min(...nums)}–${Math.max(...nums)}`;
+}
+
 export function renderTermSelectors() {
   const containers = [
     document.getElementById('learn-term-selector'),
@@ -34,8 +49,8 @@ export function renderTermSelectors() {
   ];
 
   const terms = [
-    { num: 1, label: '📘 เทอม 1 (Unit 1–4)' },
-    { num: 2, label: '📗 เทอม 2 (Unit 5)' }
+    { num: 1, label: `📘 เทอม 1 (${formatTermUnitRange(1)})` },
+    { num: 2, label: `📗 เทอม 2 (${formatTermUnitRange(2)})` }
   ];
 
   containers.forEach(container => {
@@ -101,6 +116,19 @@ export function initCustomVocabData() {
 }
 
 export function loadUnitVocab(unitId) {
+  // Reset any in-progress game or previous unit's dashboard session state (Bug #1 fix)
+  pauseTimer();
+  clearTransitionTimeout();
+  clearScopedTimers('game');
+  clearScopedTimers('review');
+  state.challengeQuestions = [];
+  state.userAnswers = [];
+  state.questionTimeSpent = [];
+  state.currentQuestionIndex = 0;
+  state.gameTotalSeconds = 0;
+  state.questionStartTime = null;
+  state.hasCompletedAssessment = false;
+
   state.currentUnitId = unitId;
 
   // Keep term UI in sync whenever a unit/exam is loaded directly
@@ -158,6 +186,13 @@ export function loadUnitVocab(unitId) {
     if (!hasSpecial && state.activeTab === 'special') {
       switchTab('learn');
     }
+  }
+
+  if (state.activeTab === 'game' && nodes.gameStartScreen && nodes.gamePlayArea) {
+    nodes.gameStartScreen.style.display = 'block';
+    nodes.gamePlayArea.style.display = 'none';
+  } else if (state.activeTab === 'dashboard') {
+    renderDashboard();
   }
 }
 
@@ -319,8 +354,10 @@ export function updateGameStartMeta() {
     countSpan.textContent = state.VOCAB_LIST.length;
   }
 
-  const gameModeSetup = document.getElementById('game-mode-mixed') ? document.getElementById('game-mode-mixed').closest('div') : null;
-  const quizLengthSetup = document.getElementById('quiz-length-10') ? document.getElementById('quiz-length-10').closest('div') : null;
+  const gameModeSetup = document.getElementById('game-mode-group')
+    || (document.getElementById('game-mode-mixed') ? document.getElementById('game-mode-mixed').closest('div') : null);
+  const quizLengthSetup = document.getElementById('quiz-length-group')
+    || (document.getElementById('quiz-length-10') ? document.getElementById('quiz-length-10').closest('div') : null);
   const startMetaInfo = document.getElementById('game-start-meta');
   const startDesc = document.querySelector('#game-start-screen p');
   const startTitle = document.querySelector('#game-start-screen h2');

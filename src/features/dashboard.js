@@ -1,8 +1,9 @@
-import { state, nodes } from '../state/store.js';
-import { escapeHTML } from '../utils/escape.js';
+import { state, nodes, registerTimeout, clearScopedTimers } from '../state/store.js';
+import { escapeHTML, renderVisualHTML } from '../utils/sanitize.js';
 import { getSentenceQA } from '../utils/word-helpers.js';
 import { stopAllSpeech, speakEN, speakTH, spellAndSpeak } from '../services/speech.js';
 import { getHistory, getReviewSnapshot, clearUnitHistory } from '../services/storage.js';
+import { loadChartJS } from '../services/charts.js';
 import { renderDictationHistoryInDashboard } from './dictation.js';
 import { renderCustomVocabTable } from './vocab-manager.js';
 import {
@@ -10,6 +11,11 @@ import {
   updateTotalStarsBadgeUI,
   renderRewardsStore
 } from './rewards.js';
+
+export function calcSkillPct(skillObj) {
+  if (!skillObj || !skillObj.total || skillObj.total <= 0) return null;
+  return Math.round((skillObj.correct / skillObj.total) * 100);
+}
 
 // DASHBOARD SUBTAB SWITCHING
 export function switchDashboardTab(subtabId) {
@@ -77,21 +83,19 @@ export function switchDashboardTab(subtabId) {
 export function clearHistoryData() {
   if (confirm('คุณต้องการล้างประวัติการประเมินผลทั้งหมดของ Unit นี้ใช่หรือไม่?')) {
     clearUnitHistory();
+    clearScopedTimers('review');
+    state.hasCompletedAssessment = false;
+    state.challengeQuestions = [];
+    state.userAnswers = [];
+    state.questionTimeSpent = [];
+    state.currentQuestionIndex = 0;
     renderDashboard();
+    switchDashboardTab('overview');
   }
 }
 
 export function renderDashboard() {
   const history = getHistory();
-
-  // Restore standard single player dashboard items
-  const normalGrid = document.querySelector('.db-grid');
-  const normalCharts = document.querySelector('.db-charts-row');
-  const normalRec = document.getElementById('db-rec-wrapper');
-
-  if (normalGrid) normalGrid.style.display = 'grid';
-  if (normalCharts) normalCharts.style.display = 'grid';
-  if (normalRec) normalRec.style.display = 'block';
 
   if (history.length === 0 && !state.hasCompletedAssessment) {
     // Show empty state
@@ -263,55 +267,56 @@ export function renderDashboard() {
 
 export function generateRecommendationsForParents(skills) {
   const recContent = document.getElementById('rec-body-content');
+  if (!recContent) return;
 
-  const listenPct = (skills.Listening.correct / skills.Listening.total) * 100 || 100;
-  const wordPct = (skills["Word Recognition"].correct / skills["Word Recognition"].total) * 100 || 100;
-  const matchPct = (skills["Visual Matching"].correct / skills["Visual Matching"].total) * 100 || 100;
-  const spellingPct = skills["Spelling & Phonics"] ? ((skills["Spelling & Phonics"].correct / skills["Spelling & Phonics"].total) * 100) : 100;
-  const qaPct = skills["Sentence Q&A"] ? ((skills["Sentence Q&A"].correct / skills["Sentence Q&A"].total) * 100) : 100;
+  const listenPct = calcSkillPct(skills.Listening);
+  const wordPct = calcSkillPct(skills["Word Recognition"]);
+  const matchPct = calcSkillPct(skills["Visual Matching"]);
+  const spellingPct = calcSkillPct(skills["Spelling & Phonics"]);
+  const qaPct = calcSkillPct(skills["Sentence Q&A"]);
 
   const suggestions = [];
 
-  if (listenPct < 75) {
+  if (listenPct !== null && listenPct < 75) {
     suggestions.push(`
       <li>
-        <strong>📢 เสริมทักษะการฟัง (ทักษะการฟังของน้องคือ ${listenPct.toFixed(0)}%):</strong> 
+        <strong>📢 เสริมทักษะการฟัง (ทักษะการฟังของน้องคือ ${listenPct}%):</strong> 
         น้องมีปัญหาในการเลือกรูปเมื่อฟังเสียงคำศัพท์ แนะนำให้ผู้ปกครองชี้ไปที่สิ่งของจริงในบ้าน เช่น ปากกา หรือ เก้าอี้ แล้วออกเสียงคำศัพท์นั้นให้ฟังบ่อยๆ หรือกดปุ่ม 🔊 เพื่อฟังซ้ำในโหมดสะกดคำจ้า
       </li>
     `);
   }
 
-  if (wordPct < 75) {
+  if (wordPct !== null && wordPct < 75) {
     suggestions.push(`
       <li>
-        <strong>✏️ ทบทวนตัวอักษรและการสะกด (ทักษะการจำตัวอักษรคือ ${wordPct.toFixed(0)}%):</strong> 
+        <strong>✏️ ทบทวนตัวอักษรและการสะกด (ทักษะการจำตัวอักษรคือ ${wordPct}%):</strong> 
         น้องสะกดคำสับสน แนะนำให้ฝึกเขียนคำศัพท์โดยใช้สีสันช่วยแยกแยะ เช่น เขียนตัวอักษร Pen, Book ลงบนกระดาษวาดรูปเพื่อให้น้องจดจำภาพรวมของคำศัพท์ได้ดีขึ้น
       </li>
     `);
   }
 
-  if (matchPct < 75) {
+  if (matchPct !== null && matchPct < 75) {
     suggestions.push(`
       <li>
-        <strong>🧩 เชื่อมโยงความหมายกับภาพ (ทักษะการเชื่อมโยงคือ ${matchPct.toFixed(0)}%):</strong> 
+        <strong>🧩 เชื่อมโยงความหมายกับภาพ (ทักษะการเชื่อมโยงคือ ${matchPct}%):</strong> 
         น้องสับสนในการแปลความหมายภาษาไทยกับภาษาอังกฤษ แนะนำให้เล่นเกมชี้ภาพทายศัพท์ในชีวิตประจำวันเพื่อฝึกความคุ้นเคย
       </li>
     `);
   }
 
-  if (spellingPct < 75) {
+  if (spellingPct !== null && spellingPct < 75) {
     suggestions.push(`
       <li>
-        <strong>✏️ ทักษะการประกอบคำสะกด (ทักษะการต่ออักษรสะกดคำคือ ${spellingPct.toFixed(0)}%):</strong> 
+        <strong>✏️ ทักษะการประกอบคำสะกด (ทักษะการต่ออักษรสะกดคำคือ ${spellingPct}%):</strong> 
         น้องยังสับสนตำแหน่งตัวอักษรเวลาสะกดเอง แนะนำให้พาน้องเล่น "โหมดสะกดคำช้าๆ 🐢" หรือฝึกแตะทีละตัวอักษรในการ์ดทบทวนคำศัพท์บ่อยๆ เพื่อให้เสียงของแต่ละอักษรซึมซับเข้าไปจ้า
       </li>
     `);
   }
 
-  if (qaPct < 75) {
+  if (qaPct !== null && qaPct < 75) {
     suggestions.push(`
       <li>
-        <strong>💬 เสริมทักษะถาม-ตอบประโยค (ทักษะประโยคสนทนาของน้องคือ ${qaPct.toFixed(0)}%):</strong> 
+        <strong>💬 เสริมทักษะถาม-ตอบประโยค (ทักษะประโยคสนทนาของน้องคือ ${qaPct}%):</strong> 
         น้องยังไม่คุ้นเคยกับการเลือกและพูดตอบเป็นประโยค แนะนำให้ผู้ปกครองชวนออกเสียงประโยคถาม-ตอบภาษาอังกฤษง่ายๆ ในบ้าน เช่น ชี้ที่โต๊ะแล้วถามว่า "What is this?" และให้น้องลองตอบเต็มประโยค "It is a table." เพื่อฝึกพูดภาษาอังกฤษเป็นประโยคสนทนาจ้า
       </li>
     `);
@@ -332,72 +337,139 @@ export function generateRecommendationsForParents(skills) {
   }
 }
 
+const SKILL_DISPLAY_NAMES = {
+  Listening: 'ทักษะการฟังภาษาอังกฤษ (Listening)',
+  "Word Recognition": 'การจดจำคำศัพท์และตัวอักษร (Word Recognition)',
+  "Visual Matching": 'การเชื่อมโยงภาพและความหมาย (Visual Matching)',
+  "Spelling & Phonics": 'การสะกดคำศัพท์ด้วยตนเอง (Spelling & Phonics)',
+  "Sentence Q&A": 'การถาม-ตอบประโยคสนทนา (Sentence Q&A)'
+};
+
+const SKILL_RADAR_LABELS = {
+  Listening: 'การฟัง (Listening)',
+  "Word Recognition": 'การจำคำศัพท์ (Spelling)',
+  "Visual Matching": 'การเชื่อมโยงภาพ (Visual)',
+  "Spelling & Phonics": 'สะกดประกอบคำ (Phonics)',
+  "Sentence Q&A": 'ถาม-ตอบประโยค (Q&A)'
+};
+
 // RENDER CHARTS
-export function renderEvaluationCharts(skills, history) {
-  // Reset charts instances
-  if (state.skillsChart) state.skillsChart.destroy();
-  if (state.trendChart) state.trendChart.destroy();
+export async function renderEvaluationCharts(skills, history) {
+  // Destroy existing chart instances safely
+  if (state.skillsChart) {
+    state.skillsChart.destroy();
+    state.skillsChart = null;
+  }
+  if (state.trendChart) {
+    state.trendChart.destroy();
+    state.trendChart = null;
+  }
 
-  const listenPct = Math.round((skills.Listening.correct / skills.Listening.total) * 100) || 100;
-  const wordPct = Math.round((skills["Word Recognition"].correct / skills["Word Recognition"].total) * 100) || 100;
-  const matchPct = Math.round((skills["Visual Matching"].correct / skills["Visual Matching"].total) * 100) || 100;
-  const spellingPct = skills["Spelling & Phonics"] ? Math.round((skills["Spelling & Phonics"].correct / skills["Spelling & Phonics"].total) * 100) : 100;
-  const qaPct = skills["Sentence Q&A"] ? Math.round((skills["Sentence Q&A"].correct / skills["Sentence Q&A"].total) * 100) : 100;
+  // Compute assessed skills only (null means not tested in this attempt)
+  const assessedEntries = Object.entries(skills || {})
+    .map(([key, obj]) => ({ key, pct: calcSkillPct(obj) }))
+    .filter(item => item.pct !== null);
 
-  // 1. Radar chart of Skills
-  const radarCtx = document.getElementById('skillsRadarChart').getContext('2d');
-  state.skillsChart = new Chart(radarCtx, {
-    type: 'radar',
-    data: {
-      labels: ['การฟัง (Listening)', 'การจำคำศัพท์ (Spelling)', 'การเชื่อมโยงภาพ (Visual)', 'สะกดประกอบคำ (Phonics)', 'ถาม-ตอบประโยค (Q&A)'],
-      datasets: [{
-        label: 'สัดส่วนทักษะของน้อง (%)',
-        data: [listenPct, wordPct, matchPct, spellingPct, qaPct],
-        backgroundColor: 'rgba(34, 197, 94, 0.15)',
-        borderColor: '#22c55e',
-        pointBackgroundColor: '#3b82f6',
-        pointBorderColor: '#fff',
-        borderWidth: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        r: {
-          angleLines: { color: '#e2e8f0' },
-          grid: { color: '#e2e8f0' },
-          pointLabels: { color: '#475569', font: { family: 'Sarabun', size: 11, weight: 'bold' } },
-          ticks: { color: '#94a3b8', backdropColor: 'transparent', stepSize: 20 },
-          min: 0,
-          max: 100
-        }
+  const skillsInsightEl = document.getElementById('skills-insight-text');
+  if (skillsInsightEl) {
+    if (assessedEntries.length === 0) {
+      skillsInsightEl.textContent = 'ยังไม่มีข้อมูลการวัดทักษะในรอบนี้จ้า';
+    } else {
+      const lowest = assessedEntries.reduce((min, cur) => (cur.pct < min.pct ? cur : min), assessedEntries[0]);
+      const lowLabel = SKILL_DISPLAY_NAMES[lowest.key] || lowest.key;
+      skillsInsightEl.innerHTML = `
+        💡 <strong>จุดสังเกต:</strong> น้องทำคะแนนด้าน <span class="text-highlight" style="font-weight: 700;">${escapeHTML(lowLabel)}</span> ได้น้อยที่สุด (${lowest.pct}%) ผู้ปกครองสามารถร่วมฝึกทักษะนี้กับน้องได้จ้า
+      `;
+    }
+  }
+
+  const progressInsightEl = document.getElementById('progress-insight-text');
+  if (progressInsightEl) {
+    if (history.length <= 1) {
+      progressInsightEl.innerHTML = `
+        📈 <strong>ประวัติความก้าวหน้า:</strong> จะแสดงกราฟพัฒนาการคะแนน เมื่อเล่นโหมดท้าทายครบ 2 ครั้งขึ้นไปนะจ๊ะ
+      `;
+    } else {
+      const scores = history.map(h => h.score);
+      const cur = scores[scores.length - 1];
+      const prev = scores[scores.length - 2];
+      const diff = cur - prev;
+      if (diff > 0) {
+        progressInsightEl.innerHTML = `
+          🚀 <strong>พัฒนาการดีขึ้น:</strong> คะแนนเพิ่มขึ้นจากรอบที่แล้ว <span style="color: var(--primary-hover); font-weight: 700;">+${diff} คะแนน</span> เก่งขึ้นแบบก้าวกระโดดเลยจ้า!
+        `;
+      } else if (diff < 0) {
+        progressInsightEl.innerHTML = `
+          ⚠️ <strong>คำแนะนำประวัติ:</strong> คะแนนครั้งนี้ลดลงกว่ารอบที่แล้ว <span style="color: var(--danger); font-weight: 700;">${diff} คะแนน</span> ลองทบทวนคำศัพท์และไปสู้ใหม่อีกรอบนะจ๊ะ!
+        `;
+      } else {
+        progressInsightEl.innerHTML = `
+          📊 <strong>ความก้าวหน้า:</strong> คะแนนคงที่อยู่ที่ <span class="text-highlight" style="font-weight: 700;">${cur} คะแนน</span> รอบหน้าลองเร่งความเร็วในการตอบให้ไวขึ้นดูจ้า
+        `;
       }
     }
-  });
+  }
 
-  // Skills Insight text
-  let lowSkill = '';
-  let minPct = Math.min(listenPct, wordPct, matchPct, spellingPct, qaPct);
-  if (minPct === listenPct) lowSkill = 'ทักษะการฟังภาษาอังกฤษ (Listening)';
-  else if (minPct === wordPct) lowSkill = 'การจดจำคำศัพท์และตัวอักษร (Word Recognition)';
-  else if (minPct === matchPct) lowSkill = 'การเชื่อมโยงภาพและความหมาย (Visual Matching)';
-  else if (minPct === spellingPct) lowSkill = 'การสะกดคำศัพท์ด้วยตนเอง (Spelling & Phonics)';
-  else lowSkill = 'การถาม-ตอบประโยคสนทนา (Sentence Q&A)';
+  // Lazy-load Chart.js with SRI + graceful offline fallback (Bug #11 fix)
+  const ChartLib = await loadChartJS();
+  if (!ChartLib) {
+    if (progressInsightEl) {
+      progressInsightEl.textContent += ' (โหมดออฟไลน์: ไม่สามารถโหลดกราฟสถิติได้ในขณะนี้)';
+    }
+    return;
+  }
 
-  document.getElementById('skills-insight-text').innerHTML = `
-    💡 <strong>จุดสังเกต:</strong> น้องทำคะแนนด้าน <span class="text-highlight" style="font-weight: 700;">${lowSkill}</span> ได้น้อยที่สุด (${minPct}%) ผู้ปกครองสามารถร่วมฝึกทักษะนี้กับน้องได้จ้า
-  `;
+  // 1. Radar chart of Skills
+  const radarCanvas = document.getElementById('skillsRadarChart');
+  const radarCtx = radarCanvas && typeof radarCanvas.getContext === 'function' ? radarCanvas.getContext('2d') : null;
+  if (radarCtx) {
+    const standardKeys = ['Listening', 'Word Recognition', 'Visual Matching', 'Spelling & Phonics', 'Sentence Q&A'];
+    const useAssessedAxes = assessedEntries.length >= 3;
+    const radarLabels = useAssessedAxes
+      ? assessedEntries.map(e => SKILL_RADAR_LABELS[e.key] || e.key)
+      : standardKeys.map(k => SKILL_RADAR_LABELS[k]);
+    const radarData = useAssessedAxes
+      ? assessedEntries.map(e => e.pct)
+      : standardKeys.map(k => calcSkillPct(skills[k]) ?? 0);
+
+    state.skillsChart = new ChartLib(radarCtx, {
+      type: 'radar',
+      data: {
+        labels: radarLabels,
+        datasets: [{
+          label: 'สัดส่วนทักษะของน้อง (%)',
+          data: radarData,
+          backgroundColor: 'rgba(34, 197, 94, 0.15)',
+          borderColor: '#22c55e',
+          pointBackgroundColor: '#3b82f6',
+          pointBorderColor: '#fff',
+          borderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            angleLines: { color: '#e2e8f0' },
+            grid: { color: '#e2e8f0' },
+            pointLabels: { color: '#475569', font: { family: 'Sarabun', size: 11, weight: 'bold' } },
+            ticks: { color: '#94a3b8', backdropColor: 'transparent', stepSize: 20 },
+            min: 0,
+            max: 100
+          }
+        }
+      }
+    });
+  }
 
   // 2. Line Chart of History
-  const lineCtx = document.getElementById('progressLineChart').getContext('2d');
+  const lineCanvas = document.getElementById('progressLineChart');
+  const lineCtx = lineCanvas && typeof lineCanvas.getContext === 'function' ? lineCanvas.getContext('2d') : null;
+  if (!lineCtx) return;
 
   if (history.length <= 1) {
-    document.getElementById('progress-insight-text').innerHTML = `
-      📈 <strong>ประวัติความก้าวหน้า:</strong> จะแสดงกราฟพัฒนาการคะแนน เมื่อเล่นโหมดท้าทายครบ 2 ครั้งขึ้นไปนะจ๊ะ
-    `;
-
     // Fallback single dot chart
     const singleMode = (history[0] && history[0].isFinalTest !== undefined)
       ? (history[0].isFinalTest ? 'Final Test' : 'ฝึกรายวัน')
@@ -405,7 +477,7 @@ export function renderEvaluationCharts(skills, history) {
     const singleCount = history[0] && history[0].questionsCount ? history[0].questionsCount : 10;
     const labelText = `ครั้งที่ 1 (${singleMode} - ${singleCount} ข้อ)`;
 
-    state.trendChart = new Chart(lineCtx, {
+    state.trendChart = new ChartLib(lineCtx, {
       type: 'line',
       data: {
         labels: [labelText],
@@ -437,7 +509,7 @@ export function renderEvaluationCharts(skills, history) {
     });
     const scores = history.map(h => h.score);
 
-    state.trendChart = new Chart(lineCtx, {
+    state.trendChart = new ChartLib(lineCtx, {
       type: 'line',
       data: {
         labels: labels,
@@ -470,25 +542,6 @@ export function renderEvaluationCharts(skills, history) {
         }
       }
     });
-
-    // Insight comparison
-    const cur = scores[scores.length - 1];
-    const prev = scores[scores.length - 2];
-    const diff = cur - prev;
-
-    if (diff > 0) {
-      document.getElementById('progress-insight-text').innerHTML = `
-        🚀 <strong>พัฒนาการดีขึ้น:</strong> คะแนนเพิ่มขึ้นจากรอบที่แล้ว <span style="color: var(--primary-hover); font-weight: 700;">+${diff} คะแนน</span> เก่งขึ้นแบบก้าวกระโดดเลยจ้า!
-      `;
-    } else if (diff < 0) {
-      document.getElementById('progress-insight-text').innerHTML = `
-        ⚠️ <strong>คำแนะนำประวัติ:</strong> คะแนนครั้งนี้ลดลงกว่ารอบที่แล้ว <span style="color: var(--danger); font-weight: 700;">${diff} คะแนน</span> ลองทบทวนคำศัพท์และไปสู้ใหม่อีกรอบนะจ๊ะ!
-      `;
-    } else {
-      document.getElementById('progress-insight-text').innerHTML = `
-        📊 <strong>ความก้าวหน้า:</strong> คะแนนคงที่อยู่ที่ <span class="text-highlight" style="font-weight: 700;">${cur} คะแนน</span> รอบหน้าลองเร่งความเร็วในการตอบให้ไวขึ้นดูจ้า
-      `;
-    }
   }
 }
 
@@ -566,7 +619,7 @@ export function renderDetailedReview() {
       <div class="review-header-left">
         <div class="review-tag-row" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <span class="category-badge" style="font-size:0.75rem; font-weight:700; background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; padding:2px 8px; border-radius:50px;">
-            ${q.skill}
+            ${escapeHTML(q.skill)}
           </span>
           ${badgesHtml}
           <span class="question-tracker" style="font-size:0.8rem; font-weight:700;">ข้อที่ ${idx + 1}</span>
@@ -591,16 +644,16 @@ export function renderDetailedReview() {
       let optLabelStr = '';
       if (q.type === 'sentence_qa') {
         if (q.isYesNo) {
-          optLabelStr = `${label}. &nbsp; <strong>${opt.text}</strong> (${opt.thaiText})`;
+          optLabelStr = `${label}. &nbsp; <strong>${escapeHTML(opt.text)}</strong> (${escapeHTML(opt.thaiText)})`;
         } else {
           const optQA = getSentenceQA(opt);
-          optLabelStr = `${label}. &nbsp; <strong>${optQA.answer}</strong> (${optQA.thaiAnswer})`;
+          optLabelStr = `${label}. &nbsp; <strong>${escapeHTML(optQA.answer)}</strong> (${escapeHTML(optQA.thaiAnswer)})`;
         }
       } else if (q.type === 'grammar_an' || q.type === 'grammar_midterm') {
-        optLabelStr = `${label}. &nbsp; <strong>${opt.text}</strong>`;
+        optLabelStr = `${label}. &nbsp; <strong>${escapeHTML(opt.text)}</strong>`;
       } else {
-        const optRepresentation = (opt.image.startsWith('<svg') ? opt.image : opt.image);
-        optLabelStr = `${label}. &nbsp; ${optRepresentation} &nbsp; <strong>${opt.word}</strong> (${opt.meaning})`;
+        const optRepresentation = renderVisualHTML(opt.image, { trusted: !opt.isCustom });
+        optLabelStr = `${label}. &nbsp; ${optRepresentation} &nbsp; <strong>${escapeHTML(opt.word)}</strong> (${escapeHTML(opt.meaning)})`;
       }
 
       let optBadgesHtml = '';
@@ -641,9 +694,10 @@ export function renderDetailedReview() {
     // Explanation box
     const explanation = document.createElement('div');
     explanation.className = 'explanation-box';
+    const explanationMsg = q.targetWord.explanation || `ลองทบทวนคำว่า "${q.targetWord.word}" (${q.targetWord.meaning}) อีกครั้งนะจ๊ะ`;
     explanation.innerHTML = `
       <div class="explanation-title">💡 เกร็ดความรู้น่ารู้สำหรับเด็กๆ:</div>
-      <div class="explanation-text">${q.targetWord.explanation || `ลองทบทวนคำว่า "${q.targetWord.word}" (${q.targetWord.meaning}) อีกครั้งนะจ๊ะ`}</div>
+      <div class="explanation-text">${escapeHTML(explanationMsg)}</div>
     `;
 
     // Speaker trigger inside review to let kids listen to it again
@@ -654,15 +708,16 @@ export function renderDetailedReview() {
     speakButton.style.marginTop = '15px';
     speakButton.innerHTML = '🔊 กดฟังการออกเสียงและคำแปลอีกรอบ';
     speakButton.addEventListener('click', () => {
+      clearScopedTimers('review');
       if (q.type === 'sentence_qa') {
         stopAllSpeech();
         if (q.isYesNo) {
           speakEN(q.questionText, 0.85);
           const correctOpt = q.options.find(o => o.isCorrect);
-          setTimeout(() => {
+          registerTimeout('review', () => {
             if (state.activeTab === 'dashboard') {
               speakEN(correctOpt.text, 0.8);
-              setTimeout(() => {
+              registerTimeout('speech', () => {
                 if (state.activeTab === 'dashboard') speakTH(correctOpt.thaiText);
               }, 1200);
             }
@@ -672,10 +727,10 @@ export function renderDetailedReview() {
           // Queue question
           speakEN(qaData.question, 0.85);
           // Queue answer after a short pause
-          setTimeout(() => {
+          registerTimeout('review', () => {
             if (state.activeTab === 'dashboard') {
               speakEN(qaData.answer, 0.8);
-              setTimeout(() => {
+              registerTimeout('speech', () => {
                 if (state.activeTab === 'dashboard') speakTH(qaData.thaiAnswer);
               }, 1200);
             }
@@ -686,10 +741,10 @@ export function renderDetailedReview() {
         speakEN("What’s this?", 0.85);
         const correctOpt = q.options.find(o => o.isCorrect);
         if (correctOpt) {
-          setTimeout(() => {
+          registerTimeout('review', () => {
             if (state.activeTab === 'dashboard') {
               speakEN(correctOpt.text, 0.8);
-              setTimeout(() => {
+              registerTimeout('speech', () => {
                 if (state.activeTab === 'dashboard') speakTH(`มันคือ${q.targetWord.meaning}`);
               }, 1200);
             }

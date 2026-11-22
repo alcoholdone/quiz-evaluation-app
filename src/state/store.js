@@ -30,6 +30,7 @@ export const state = {
   currentPracticeItem: null,
   practiceSelectedLetters: [],
   isSpellingSuccess: false,
+  spellingSessionToken: 0,
 
   // Dictation Global State
   currentDictationIndex: 0,
@@ -37,6 +38,7 @@ export const state = {
   dictationSessionList: [],
   dictationSelectedLetters: [],
   selectedDictationRound: 'r6',
+  dictationSessionToken: 0,
 
   // Chart.js instances
   skillsChart: null,
@@ -64,6 +66,37 @@ export const state = {
   spAutoAdvanceTimer: null
 };
 
+// Scoped Timer Registry (prevents leaked timeouts across tabs/modals)
+const scopedTimers = new Map();
+
+export function registerTimeout(scope, fn, ms) {
+  if (!scopedTimers.has(scope)) {
+    scopedTimers.set(scope, new Set());
+  }
+  const bucket = scopedTimers.get(scope);
+  const id = setTimeout(() => {
+    bucket.delete(id);
+    fn();
+  }, ms);
+  bucket.add(id);
+  return id;
+}
+
+export function clearScopedTimers(scope) {
+  const bucket = scopedTimers.get(scope);
+  if (!bucket) return;
+  for (const id of bucket) {
+    clearTimeout(id);
+  }
+  bucket.clear();
+}
+
+export function clearAllScopedTimers() {
+  for (const scope of scopedTimers.keys()) {
+    clearScopedTimers(scope);
+  }
+}
+
 // Cached DOM nodes (populated during initNodes(), never at module load)
 export const nodes = {};
 
@@ -81,6 +114,7 @@ export function initNodes() {
     dbContent: document.getElementById('dashboard-content'),
 
     currentNum: document.getElementById('current-game-num'),
+    totalNum: document.getElementById('total-game-num'),
     liveTimer: document.getElementById('game-live-timer'),
     progressBar: document.getElementById('game-progress-bar'),
     gameBox: document.getElementById('gameBox'),

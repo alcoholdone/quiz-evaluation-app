@@ -1,21 +1,16 @@
-import { state } from '../state/store.js';
+import { state, registerTimeout, clearScopedTimers } from '../state/store.js';
 import { VOCAB_UNITS } from '../data/units.js';
 import { stopAllSpeech, speakEN, speakTH } from '../services/speech.js';
 import { saveSpecialScore, getSpecialScores } from '../services/storage.js';
+import { shuffle } from '../utils/shuffle.js';
+import { escapeHTML, renderVisualHTML } from '../utils/sanitize.js';
 
 // ============================================================
 //  SPECIAL PRACTICE — Unit 3 (What's this? / Plural / How many / Fill in the blank)
 // ============================================================
 
-// --- Helper: shuffle array ---
-export function spShuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+// --- Helper: shuffle array (Fisher-Yates) ---
+export const spShuffle = shuffle;
 
 // --- Get special practice vocab ---
 function getSpVocab() {
@@ -31,12 +26,13 @@ function getSpHowMany() {
 // --- Image helper: supports both emoji strings and inline SVG ---
 // Returns the full HTML to embed inside .sp-image-display
 function spImageHTML(image) {
-  if (typeof image === 'string' && image.trim().startsWith('<svg')) {
+  const visual = renderVisualHTML(image, { trusted: true });
+  if (typeof visual === 'string' && visual.trim().startsWith('<svg')) {
     // SVG: wrap so CSS can target it cleanly
-    return `<span class="sp-svg-wrap">${image}</span>`;
+    return `<span class="sp-svg-wrap">${visual}</span>`;
   }
   // Plain emoji / text
-  return image;
+  return visual;
 }
 
 // --- Init: called when tab is opened ---
@@ -47,6 +43,12 @@ export function initSpecialPanel() {
 
 // --- Switch between activities ---
 export function switchSpecialActivity(num) {
+  clearScopedTimers('special');
+  if (state.spAutoAdvanceTimer) {
+    clearTimeout(state.spAutoAdvanceTimer);
+    state.spAutoAdvanceTimer = null;
+  }
+  stopAllSpeech();
   state.spCurrentActivity = num;
   // Update selector buttons
   for (let i = 1; i <= 4; i++) {
@@ -110,6 +112,11 @@ function buildSpQuestions(activity) {
 
 // --- Render current question ---
 export function renderSpQuestion() {
+  clearScopedTimers('special');
+  if (state.spAutoAdvanceTimer) {
+    clearTimeout(state.spAutoAdvanceTimer);
+    state.spAutoAdvanceTimer = null;
+  }
   const area = document.getElementById('special-play-area');
   if (!area) return;
 
@@ -146,7 +153,7 @@ function renderSpSingular(area, q) {
       <div class="sp-options-grid" id="sp-opts-container">
         ${choices.map((c, i) => `
           <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
-            ${c}
+            ${escapeHTML(c)}
           </button>`).join('')}
       </div>
       <div class="sp-feedback" id="sp-feedback"></div>
@@ -159,7 +166,9 @@ function renderSpSingular(area, q) {
   state.spCurrentCorrect = correctText;
   attachSpOptionListeners(1);
   attachSpNextListener();
-  setTimeout(() => speakEN(`What's this?`, 0.85), 400);
+  registerTimeout('special', () => {
+    if (state.activeTab === 'special') speakEN(`What's this?`, 0.85);
+  }, 400);
 }
 
 // --- Activity 2: What are these? ---
@@ -181,7 +190,7 @@ function renderSpPlural(area, q) {
       <div class="sp-options-grid" id="sp-opts-container">
         ${choices.map((c, i) => `
           <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
-            ${c}
+            ${escapeHTML(c)}
           </button>`).join('')}
       </div>
       <div class="sp-feedback" id="sp-feedback"></div>
@@ -194,7 +203,9 @@ function renderSpPlural(area, q) {
   state.spCurrentCorrect = correctText;
   attachSpOptionListeners(2);
   attachSpNextListener();
-  setTimeout(() => speakEN(`What are these?`, 0.85), 400);
+  registerTimeout('special', () => {
+    if (state.activeTab === 'special') speakEN(`What are these?`, 0.85);
+  }, 400);
 }
 
 // --- Activity 3: How many? ---
@@ -218,19 +229,19 @@ function renderSpHowMany(area, q) {
 
   // Build emoji display
   let emojiRow = '';
-  for (let i = 0; i < count; i++) emojiRow += `<span class="sp-count-emoji">${q.item.image}</span>`;
+  for (let i = 0; i < count; i++) emojiRow += `<span class="sp-count-emoji">${renderVisualHTML(q.item.image, { trusted: true })}</span>`;
 
   area.innerHTML = `
     <div class="sp-question-card">
       <div class="sp-progress-bar"><div class="sp-progress-fill" style="width:${Math.round((state.spCurrentIndex / state.spTotal) * 100)}%"></div></div>
       <div class="sp-counter">${state.spCurrentIndex + 1} / ${state.spTotal}</div>
-      <div class="sp-question-label">🔢 How many ${q.item.plural}?</div>
+      <div class="sp-question-label">🔢 How many ${escapeHTML(q.item.plural)}?</div>
       <div class="sp-howmany-grid">${emojiRow}</div>
       <div class="sp-qa-answer-prompt">A: ___</div>
       <div class="sp-options-grid" id="sp-opts-container">
         ${choices.map((c, i) => `
           <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
-            ${c}
+            ${escapeHTML(c)}
           </button>`).join('')}
       </div>
       <div class="sp-feedback" id="sp-feedback"></div>
@@ -243,7 +254,9 @@ function renderSpHowMany(area, q) {
   state.spCurrentCorrect = correctText;
   attachSpOptionListeners(3);
   attachSpNextListener();
-  setTimeout(() => speakEN(`How many ${q.item.plural}?`, 0.85), 400);
+  registerTimeout('special', () => {
+    if (state.activeTab === 'special') speakEN(`How many ${q.item.plural}?`, 0.85);
+  }, 400);
 }
 
 // --- Activity 4: Fill in the blank ---
@@ -257,11 +270,11 @@ function renderSpFillBlank(area, q) {
       <div class="sp-counter">${state.spCurrentIndex + 1} / ${state.spTotal}</div>
       <div class="sp-question-label">🔄 Fill in the blank</div>
       <div class="sp-image-display">${spImageHTML(q.item.image)}</div>
-      <div class="sp-fillblank-sentence">${q.question.replace('___', '<span class="sp-blank">___</span>')}</div>
+      <div class="sp-fillblank-sentence">${escapeHTML(q.question).replace('___', '<span class="sp-blank">___</span>')}</div>
       <div class="sp-options-grid" id="sp-opts-container">
         ${choices.map((c, i) => `
           <button class="sp-option-btn" id="sp-opt-${i}" data-choice="${i}">
-            ${c}
+            ${escapeHTML(c)}
           </button>`).join('')}
       </div>
       <div class="sp-feedback" id="sp-feedback"></div>
@@ -328,15 +341,19 @@ function checkSpAnswerInternal(btn, selected, correct, activityNum) {
   const fb = document.getElementById('sp-feedback');
   if (fb) {
     if (isCorrect) {
-      fb.innerHTML = `<span class="sp-fb-correct">🌟 ถูกต้องมากเลย! <em>${correct}</em></span>`;
+      fb.innerHTML = `<span class="sp-fb-correct">🌟 ถูกต้องมากเลย! <em>${escapeHTML(correct)}</em></span>`;
       fb.classList.add('sp-fb-show');
       stopAllSpeech();
-      setTimeout(() => speakEN(correct, 0.85), 300);
+      registerTimeout('special', () => {
+        if (state.activeTab === 'special') speakEN(correct, 0.85);
+      }, 300);
     } else {
-      fb.innerHTML = `<span class="sp-fb-wrong">❌ คำตอบที่ถูกคือ: <em>${correct}</em></span>`;
+      fb.innerHTML = `<span class="sp-fb-wrong">❌ คำตอบที่ถูกคือ: <em>${escapeHTML(correct)}</em></span>`;
       fb.classList.add('sp-fb-show');
       stopAllSpeech();
-      setTimeout(() => speakEN(correct, 0.75), 300);
+      registerTimeout('special', () => {
+        if (state.activeTab === 'special') speakEN(correct, 0.75);
+      }, 300);
     }
   }
 
@@ -345,8 +362,8 @@ function checkSpAnswerInternal(btn, selected, correct, activityNum) {
   if (nextBtn) nextBtn.style.display = 'block';
 
   // Auto-advance after 2.5s
-  state.spAutoAdvanceTimer = setTimeout(() => {
-    if (state.spAnswered) {
+  state.spAutoAdvanceTimer = registerTimeout('special', () => {
+    if (state.spAnswered && state.activeTab === 'special') {
       state.spCurrentIndex++;
       state.spAnswered = false;
       renderSpQuestion();
@@ -356,6 +373,7 @@ function checkSpAnswerInternal(btn, selected, correct, activityNum) {
 
 // --- Next question (legacy, kept for compatibility) ---
 export function nextSpQuestion() {
+  clearScopedTimers('special');
   if (state.spAutoAdvanceTimer) clearTimeout(state.spAutoAdvanceTimer);
   state.spCurrentIndex++;
   state.spAnswered = false;
@@ -379,32 +397,44 @@ function renderSpResult() {
 
   const activityNames = ['', "What's this?", "What are these?", "How many...?", "Fill in the blank"];
   const stored = getSpecialScores();
+  const nextActivity = state.spCurrentActivity < 4 ? state.spCurrentActivity + 1 : 1;
 
   area.innerHTML = `
     <div class="sp-result-card">
       <div class="sp-result-emoji">${emoji}</div>
-      <h3 class="sp-result-title">${activityNames[state.spCurrentActivity]}</h3>
+      <h3 class="sp-result-title">${escapeHTML(activityNames[state.spCurrentActivity])}</h3>
       <div class="sp-result-score">${state.spScore} / ${state.spTotal}</div>
       <div class="sp-result-pct">${pct}%</div>
-      <p class="sp-result-msg">${msg}</p>
+      <p class="sp-result-msg">${escapeHTML(msg)}</p>
 
       <div class="sp-history-grid">
         ${Object.entries(stored).map(([key, val]) => `
           <div class="sp-history-item">
-            <div class="sp-history-act">${['', '🖼️', '👥', '🔢', '🔄'][parseInt(key.replace('activity', ''))]}</div>
-            <div class="sp-history-score">${val.score}/${val.total}</div>
-            <div class="sp-history-date">${val.date}</div>
+            <div class="sp-history-act">${['', '🖼️', '👥', '🔢', '🔄'][parseInt(key.replace('activity', ''), 10)] || '⭐'}</div>
+            <div class="sp-history-score">${Number(val.score) || 0}/${Number(val.total) || 0}</div>
+            <div class="sp-history-date">${escapeHTML(val.date)}</div>
           </div>`).join('')}
       </div>
 
       <div class="sp-result-actions">
-        <button class="sp-retry-btn" onclick="switchSpecialActivity(${state.spCurrentActivity})">🔄 ลองใหม่อีกครั้ง</button>
-        <button class="sp-next-act-btn" onclick="switchSpecialActivity(${state.spCurrentActivity < 4 ? state.spCurrentActivity + 1 : 1})">
+        <button type="button" class="sp-retry-btn" data-sp-action-activity="${state.spCurrentActivity}">🔄 ลองใหม่อีกครั้ง</button>
+        <button type="button" class="sp-next-act-btn" data-sp-action-activity="${nextActivity}">
           ${state.spCurrentActivity < 4 ? '➡️ กิจกรรมถัดไป' : '🏁 เริ่มใหม่ทั้งหมด'}
         </button>
       </div>
     </div>`;
 
+  area.querySelectorAll('[data-sp-action-activity]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetAct = Number(btn.dataset.spActionActivity);
+      if (targetAct >= 1 && targetAct <= 4) {
+        switchSpecialActivity(targetAct);
+      }
+    });
+  });
+
   stopAllSpeech();
-  setTimeout(() => speakTH(msg), 500);
+  registerTimeout('special', () => {
+    if (state.activeTab === 'special') speakTH(msg);
+  }, 500);
 }

@@ -2,6 +2,7 @@ import { state } from '../state/store.js';
 import { VOCAB_UNITS } from '../data/units.js';
 import { getCustomVocabList, getWeakWordList } from '../services/storage.js';
 import { SHAPE_COLOR_MAP, isConcreteNoun, isSpellable } from '../utils/word-helpers.js';
+import { shuffle } from '../utils/shuffle.js';
 
 export function selectTargetWords() {
   const customWords = getCustomVocabList();
@@ -10,7 +11,6 @@ export function selectTargetWords() {
 
   const targets = [];
   const isSelected = (item) => targets.some(t => t.word === item.word);
-  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
   const recentCount = Math.min(4, state.ORIGINAL_VOCAB_LIST.length);
   const recentWords = state.ORIGINAL_VOCAB_LIST.slice(-recentCount);
@@ -55,7 +55,6 @@ export function generateMidtermQuestions() {
 
   // 1. Vocabulary Questions (10 questions)
   const vocabCandidates = allWords.filter(w => w.type !== 'command' && !['fine', 'great', 'color', 'shape'].includes(w.word.toLowerCase()));
-  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
   const shuffledVocab = shuffle(vocabCandidates);
   const vocabTargets = shuffledVocab.slice(0, 10);
 
@@ -311,7 +310,6 @@ export function generateMidtermQuestions() {
 //               3 Is he/she · 2 Conversation · 3 Phonics
 // ============================================================
 export function generateFinalExamQuestions() {
-  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
   const list = [];
   let qId = 1;
 
@@ -606,7 +604,6 @@ export function getUnit5ExamWords() {
 }
 
 export function generateUnit5ExamQuestions() {
-  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
   const articleFor = (adj) => (/^[aeiou]/i.test(adj) ? 'an' : 'a');
   const list = [];
   let qId = 1;
@@ -913,13 +910,13 @@ export function generateQuestions() {
     ? ['sentence_qa']
     : ['audio', 'visual_word', 'thai_image', 'spelling_scrambled', 'sentence_qa', 'grammar_an'];
 
-  const questionTypes = [];
+  let questionTypes = [];
   for (let i = 0; i < state.quizQuestionCount; i++) {
     questionTypes.push(typesPool[i % typesPool.length]);
   }
   // Shuffle to randomize types (only if not QA mode since QA has only 1 type)
   if (state.selectedGameMode !== 'qa') {
-    questionTypes.sort(() => Math.random() - 0.5);
+    questionTypes = shuffle(questionTypes);
   }
 
   const usedGrammarNouns = new Set();
@@ -957,8 +954,7 @@ export function generateQuestions() {
         const correctText = `It’s ${isAn ? 'an' : 'a'} ${wordLower}.`;
         const incorrectArticleText = `It’s ${isAn ? 'a' : 'an'} ${wordLower}.`;
 
-        const otherNouns = state.VOCAB_LIST.filter(w => w.word.toLowerCase() !== wordLower && isConcreteNoun(w));
-        otherNouns.sort(() => Math.random() - 0.5);
+        const otherNouns = shuffle(state.VOCAB_LIST.filter(w => w.word.toLowerCase() !== wordLower && isConcreteNoun(w)));
 
         const incorrectNoun1 = otherNouns[0] || { word: 'Pen', meaning: 'ปากกา', image: '🖊️' };
         const incorrectNoun2 = otherNouns[1] || { word: 'Pencil', meaning: 'ดินสอ', image: '✏️' };
@@ -966,14 +962,12 @@ export function generateQuestions() {
         const isAn1 = ['eraser'].includes(incorrectNoun1.word.toLowerCase()) || /^[aeiou]/i.test(incorrectNoun1.word.toLowerCase());
         const isAn2 = ['eraser'].includes(incorrectNoun2.word.toLowerCase()) || /^[aeiou]/i.test(incorrectNoun2.word.toLowerCase());
 
-        const options = [
+        const options = shuffle([
           { isCorrect: true, text: correctText, word: targetNoun.word, meaning: targetNoun.meaning, image: targetNoun.image },
           { isCorrect: false, text: incorrectArticleText, word: targetNoun.word, meaning: targetNoun.meaning, image: targetNoun.image },
           { isCorrect: false, text: `It’s ${isAn1 ? 'an' : 'a'} ${incorrectNoun1.word.toLowerCase()}.`, word: incorrectNoun1.word, meaning: incorrectNoun1.meaning, image: incorrectNoun1.image },
           { isCorrect: false, text: `It’s ${isAn2 ? 'an' : 'a'} ${incorrectNoun2.word.toLowerCase()}.`, word: incorrectNoun2.word, meaning: incorrectNoun2.meaning, image: incorrectNoun2.image }
-        ];
-
-        options.sort(() => Math.random() - 0.5);
+        ]);
 
         list.push({
           id: i + 1,
@@ -1039,11 +1033,10 @@ export function generateQuestions() {
           ];
         }
 
-        const options = [
+        const options = shuffle([
           { text: correctAnswerText, thaiText: correctThaiText, isCorrect: true, word: targetWord.word, meaning: targetWord.meaning, image: targetWord.image },
           ...wrongAnswers.map(wa => ({ ...wa, word: targetWord.word, meaning: targetWord.meaning, image: targetWord.image }))
-        ];
-        options.sort(() => Math.random() - 0.5);
+        ]);
 
         list.push({
           id: i + 1,
@@ -1061,10 +1054,8 @@ export function generateQuestions() {
 
     // Generate options: correct word + 3 random ones
     let options = [targetWord];
-    let remaining = state.VOCAB_LIST.filter(w => w.word !== targetWord.word);
+    const remaining = shuffle(state.VOCAB_LIST.filter(w => w.word !== targetWord.word));
 
-    // Shuffle remaining and take 3
-    remaining.sort(() => Math.random() - 0.5);
     for (let o = 0; o < 3; o++) {
       if (remaining[o]) {
         options.push(remaining[o]);
@@ -1072,7 +1063,7 @@ export function generateQuestions() {
     }
 
     // Shuffle final options
-    options.sort(() => Math.random() - 0.5);
+    options = shuffle(options);
 
     // Skill categorization
     let skill = '';

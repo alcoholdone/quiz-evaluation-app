@@ -1,4 +1,4 @@
-import { state, nodes } from '../state/store.js';
+import { state, nodes, registerTimeout, clearScopedTimers } from '../state/store.js';
 import { VOCAB_UNITS } from '../data/units.js';
 import {
   DICTATION_ROUNDS,
@@ -14,6 +14,9 @@ import {
   removeWeakWord
 } from '../services/storage.js';
 import { renderTermSelectors, renderUnitSelectors } from './catalog.js';
+import { escapeHTML, renderVisualHTML } from '../utils/sanitize.js';
+import { shuffle, shuffleScrambled } from '../utils/shuffle.js';
+import { isSeparatorChar } from '../utils/word-helpers.js';
 
 export function updateDictationTermUI() {
   Object.keys(DICTATION_ROUNDS).forEach(r => {
@@ -26,6 +29,8 @@ export function updateDictationTermUI() {
 }
 
 export function updateDictationRound(roundKey) {
+  state.dictationSessionToken++;
+  clearScopedTimers('dictation');
   state.selectedDictationRound = roundKey;
   const roundTerm = DICTATION_ROUND_TERM[roundKey] || 1;
   if (roundTerm !== state.currentTerm) {
@@ -116,10 +121,10 @@ export function initDictationStudyMode() {
       const card = document.createElement('div');
       card.className = 'dictation-preview-card';
       card.innerHTML = `
-        <div class="dictation-preview-emoji">${item.image}</div>
+        <div class="dictation-preview-emoji">${renderVisualHTML(item.image, { trusted: !item.isCustom })}</div>
         <div class="dictation-preview-details">
-          <div class="dictation-preview-word">${item.word}</div>
-          <div class="dictation-preview-meaning">${item.meaning}</div>
+          <div class="dictation-preview-word">${escapeHTML(item.word)}</div>
+          <div class="dictation-preview-meaning">${escapeHTML(item.meaning)}</div>
         </div>
       `;
       card.onclick = () => {
@@ -134,6 +139,8 @@ export function initDictationStudyMode() {
 }
 
 export function showDictationStudyScreen() {
+  state.dictationSessionToken++;
+  clearScopedTimers('dictation');
   stopAllSpeech();
   if (nodes.dictationStartScreen) nodes.dictationStartScreen.style.display = 'block';
   if (nodes.dictationPlayArea) nodes.dictationPlayArea.style.display = 'none';
@@ -141,6 +148,8 @@ export function showDictationStudyScreen() {
 }
 
 export function startDictationTest() {
+  state.dictationSessionToken++;
+  clearScopedTimers('dictation');
   stopAllSpeech();
 
   if (nodes.dictationStartScreen) nodes.dictationStartScreen.style.display = 'none';
@@ -148,7 +157,7 @@ export function startDictationTest() {
   if (nodes.dictationResultScreen) nodes.dictationResultScreen.style.display = 'none';
 
   // สุ่มคำศัพท์เพื่อให้เด็กไม่ได้จำลำดับการทำแบบทดสอบ
-  state.dictationSessionList = [...state.dictationSessionList].sort(() => Math.random() - 0.5);
+  state.dictationSessionList = shuffle(state.dictationSessionList);
   state.currentDictationIndex = 0;
   state.dictationScore = 0;
 
@@ -156,6 +165,8 @@ export function startDictationTest() {
 }
 
 export function renderDictationQuestion() {
+  state.dictationSessionToken++;
+  clearScopedTimers('dictation');
   stopAllSpeech();
 
   // อัปเดตข้อมูล UI ข้อปัจจุบัน
@@ -194,6 +205,8 @@ export function renderDictationQuestion() {
 
 export function resetDictationSpelling(item) {
   if (!item) return;
+  state.dictationSessionToken++;
+  clearScopedTimers('dictation');
   stopAllSpeech();
 
   state.dictationSelectedLetters = [];
@@ -208,14 +221,21 @@ export function resetDictationSpelling(item) {
     dictationBox.classList.remove('dictation-bounce');
   }
 
-  // สร้างช่องว่างสะกดคำ (Slots)
+  // สร้างช่องว่างสะกดคำ (Slots) รองรับทั้งเว้นวรรคและเครื่องหมายขีด (-)
   if (nodes.dictationSlots) {
     nodes.dictationSlots.innerHTML = '';
     for (let i = 0; i < item.word.length; i++) {
+      const ch = item.word[i];
       const slot = document.createElement('div');
-      if (item.word[i] === ' ') {
+      if (ch === ' ') {
         slot.className = 'spelling-slot-space';
         slot.innerHTML = '&nbsp;';
+        slot.dataset.fixedChar = ' ';
+        slot.dataset.isSpace = 'true';
+      } else if (ch === '-') {
+        slot.className = 'spelling-slot-space spelling-slot-hyphen';
+        slot.textContent = '-';
+        slot.dataset.fixedChar = '-';
         slot.dataset.isSpace = 'true';
       } else {
         slot.className = 'spelling-slot';
@@ -228,8 +248,8 @@ export function resetDictationSpelling(item) {
   // สร้างปุ่มกดตัวอักษรแบบสุ่มสลับ (Scrambled Letters)
   if (nodes.dictationLetters) {
     nodes.dictationLetters.innerHTML = '';
-    const correctLetters = item.word.split('').filter(c => c !== ' ');
-    const scrambled = [...correctLetters].sort(() => Math.random() - 0.5);
+    const correctLetters = item.word.split('').filter(c => !isSeparatorChar(c));
+    const scrambled = shuffleScrambled(correctLetters);
     scrambled.forEach((letter) => {
       const btn = document.createElement('button');
       btn.className = 'letter-btn';
@@ -243,6 +263,8 @@ export function resetDictationSpelling(item) {
 export function handleDictationLetterTap(letter, btn, item) {
   if (btn.disabled) return;
 
+  const sessionToken = state.dictationSessionToken;
+
   // เล่นเสียงอักษรทันที
   const letterU = speakEN(letter.toLowerCase(), 0.55);
 
@@ -251,7 +273,7 @@ export function handleDictationLetterTap(letter, btn, item) {
 
   // เอาตัวอักษรไปใส่ในช่องว่างที่ว่างอยู่
   const unfilledSlots = Array.from(nodes.dictationSlots.children).filter(
-    slot => !slot.dataset.isSpace && !slot.classList.contains('filled')
+    slot => slot.dataset.fixedChar === undefined && !slot.dataset.isSpace && !slot.classList.contains('filled')
   );
 
   if (unfilledSlots.length > 0) {
@@ -261,25 +283,34 @@ export function handleDictationLetterTap(letter, btn, item) {
   }
 
   // ตรวจสอบจำนวนอักษรที่กดสะกดเรียง
-  const correctLettersCount = item.word.split('').filter(c => c !== ' ').length;
+  const correctLettersCount = item.word.split('').filter(c => !isSeparatorChar(c)).length;
   if (state.dictationSelectedLetters.length === correctLettersCount) {
     // รอให้เสียงตัวอักษรสุดท้ายเล่นจบก่อนค่อยเฉลย (เดิมหน่วงคงที่ 600ms ไม่พอ)
-    const reveal = () => checkDictationSpelling(item);
+    const reveal = () => {
+      if (state.dictationSessionToken !== sessionToken || state.activeTab !== 'dictation') return;
+      checkDictationSpelling(item);
+    };
     if (letterU && typeof window !== 'undefined' && 'speechSynthesis' in window) {
       let fired = false;
-      const fire = (d) => { if (fired) return; fired = true; setTimeout(reveal, d); };
+      const fire = (d) => {
+        if (fired) return;
+        fired = true;
+        registerTimeout('dictation', reveal, d);
+      };
       letterU.addEventListener('end', () => fire(350));
       letterU.addEventListener('error', () => fire(150));
-      setTimeout(() => fire(0), 4000); // safety cap if 'end' never fires
+      registerTimeout('dictation', () => fire(0), 4000); // safety cap if 'end' never fires
     } else {
-      setTimeout(reveal, 600);
+      registerTimeout('dictation', reveal, 600);
     }
   }
 }
 
 export function checkDictationSpelling(item) {
+  const sessionToken = state.dictationSessionToken;
   // รวบรวมตัวอักษรจากกล่อง Slots เพื่อนำมารวมกันเป็นคำศัพท์
   const spelledWord = Array.from(nodes.dictationSlots.children).map(slot => {
+    if (slot.dataset.fixedChar !== undefined) return slot.dataset.fixedChar;
     if (slot.dataset.isSpace) return ' ';
     return slot.textContent;
   }).join('');
@@ -306,7 +337,7 @@ export function checkDictationSpelling(item) {
     }
 
     if (visualClueNode) {
-      visualClueNode.innerHTML = item.image;
+      visualClueNode.innerHTML = renderVisualHTML(item.image, { trusted: !item.isCustom });
     }
 
     speakEN(item.word, 0.8);
@@ -315,11 +346,11 @@ export function checkDictationSpelling(item) {
     // สะกดผิด
     if (dictationBox) dictationBox.classList.add('dictation-shake');
     if (nodes.dictationFeedback) {
-      nodes.dictationFeedback.innerHTML = `<span class="wrong" style="color: var(--danger);">❌ ยังไม่ถูกน้า ตัวสะกดคือ "${item.word}"</span>`;
+      nodes.dictationFeedback.innerHTML = `<span class="wrong" style="color: var(--danger);">❌ ยังไม่ถูกน้า ตัวสะกดคือ "${escapeHTML(item.word)}"</span>`;
     }
 
     if (visualClueNode) {
-      visualClueNode.innerHTML = item.image;
+      visualClueNode.innerHTML = renderVisualHTML(item.image, { trusted: !item.isCustom });
     }
 
     // สะกดให้ฟังอย่างละเอียด
@@ -334,7 +365,8 @@ export function checkDictationSpelling(item) {
   if (progressBarNode) progressBarNode.style.width = `${progressPct}%`;
 
   // หน่วงเวลา 4.2 วินาที ก่อนขยับข้อถัดไป เพื่อให้เด็กสังเกตคำสะกดเฉลยและฟังเสียงสะกดจนเสร็จสิ้น
-  setTimeout(() => {
+  registerTimeout('dictation', () => {
+    if (state.dictationSessionToken !== sessionToken || state.activeTab !== 'dictation') return;
     state.currentDictationIndex++;
     if (state.currentDictationIndex < totalQuestions) {
       renderDictationQuestion();
@@ -356,8 +388,10 @@ export function playDictationAudio(slowMode = false) {
   } else {
     // ออกเสียงทั้งคำภาษาอังกฤษและตามด้วยความหมายไทยเป็นคำใบ้
     speakEN(currentItem.word, 0.75);
-    setTimeout(() => {
-      speakTH(currentItem.meaning);
+    registerTimeout('speech', () => {
+      if (state.activeTab === 'dictation') {
+        speakTH(currentItem.meaning);
+      }
     }, 1200);
   }
 }
@@ -439,12 +473,12 @@ export function renderDictationHistoryInDashboard() {
 
     item.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-        <span style="font-weight: 700; color: var(--dark-2); font-size: 0.95rem;">เขียนตามคำบอก ${roundName}</span>
-        <span style="font-size: 0.75rem; color: var(--text-light);">${attempt.date} น.</span>
+        <span style="font-weight: 700; color: var(--dark-2); font-size: 0.95rem;">เขียนตามคำบอก ${escapeHTML(roundName)}</span>
+        <span style="font-size: 0.75rem; color: var(--text-light);">${escapeHTML(attempt.date)} น.</span>
       </div>
       <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
         <span style="color: var(--accent-dark); font-weight: 700; font-size: 1.1rem; letter-spacing: 2px;">${stars}</span>
-        <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-hover);">${attempt.score} / ${totalQ} คะแนน</span>
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-hover);">${Number(attempt.score) || 0} / ${totalQ} คะแนน</span>
       </div>
     `;
     listNode.appendChild(item);

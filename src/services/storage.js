@@ -67,7 +67,11 @@ export function getCustomVocabList() {
   const data = localStorage.getItem(`${STORAGE_KEYS.CUSTOM_VOCAB}_${state.currentUnitId}`);
   if (!data) return [];
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(item => item && typeof item === 'object' && typeof item.word === 'string')
+      .map(item => ({ ...item, isCustom: true }));
   } catch (e) {
     console.error('Custom list parse error', e);
     return [];

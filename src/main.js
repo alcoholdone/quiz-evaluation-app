@@ -17,18 +17,55 @@ import {
   resetDictationSpelling,
   playDictationAudio
 } from './features/dictation.js';
-import { switchSpecialActivity, nextSpQuestion } from './features/special.js';
+import { switchSpecialActivity } from './features/special.js';
 import { switchDashboardTab, clearHistoryData } from './features/dashboard.js';
-import { setupVocabAddForm, deleteCustomVocab } from './features/vocab-manager.js';
-import { celebrateStars, toggleRedeemPaidStatus } from './features/rewards.js';
+import { setupVocabAddForm } from './features/vocab-manager.js';
+import { celebrateStars } from './features/rewards.js';
 
 export function setupEventListeners() {
+  // Header Utility Buttons (no inline onclick)
+  const btnVoiceTest = document.getElementById('btn-voice-test');
+  if (btnVoiceTest) {
+    btnVoiceTest.addEventListener('click', testAndResetVoice);
+  }
+  const starsBadge = document.getElementById('total-stars-badge');
+  if (starsBadge) {
+    starsBadge.addEventListener('click', celebrateStars);
+    starsBadge.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        celebrateStars();
+      }
+    });
+  }
+
   // Main Tab Navigation
   nodes.tabLearn.addEventListener('click', () => switchTab('learn'));
   nodes.tabGame.addEventListener('click', () => switchTab('game'));
   nodes.tabDashboard.addEventListener('click', () => switchTab('dashboard'));
   if (nodes.tabSpecial) nodes.tabSpecial.addEventListener('click', () => switchTab('special'));
   if (nodes.tabDictation) nodes.tabDictation.addEventListener('click', () => switchTab('dictation'));
+
+  // Cross-module tab switch event (used by sync.js on sign-out)
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('aura:switch-tab', (e) => {
+      const targetTab = e?.detail?.tab;
+      if (targetTab) switchTab(targetTab);
+    });
+  }
+
+  // Special Practice Activity Selector (delegated, no inline onclick)
+  const spSelector = document.getElementById('special-activity-selector');
+  if (spSelector) {
+    spSelector.addEventListener('click', (e) => {
+      const btn = e.target.closest('.special-act-btn[data-activity]');
+      if (!btn) return;
+      const actNum = Number(btn.dataset.activity);
+      if (actNum >= 1 && actNum <= 4) {
+        switchSpecialActivity(actNum);
+      }
+    });
+  }
 
   // Dashboard Subtabs
   nodes.subtabOverview.addEventListener('click', () => switchDashboardTab('overview'));
@@ -94,9 +131,6 @@ export function setupEventListeners() {
   setupVocabAddForm();
 
   // Dictation Listeners
-  if (nodes.tabDictation) {
-    nodes.tabDictation.addEventListener('click', () => switchTab('dictation'));
-  }
   if (nodes.btnStartDictation) {
     nodes.btnStartDictation.addEventListener('click', startDictationTest);
   }
@@ -156,15 +190,8 @@ export function bootstrapApp() {
   initNodes();
   initSpeechEngine();
 
-  // Compatibility bridges for inline HTML onclick handlers and src/services/sync.js
   if (typeof window !== 'undefined') {
     window.switchTab = switchTab;
-    window.testAndResetVoice = testAndResetVoice;
-    window.celebrateStars = celebrateStars;
-    window.deleteCustomVocab = deleteCustomVocab;
-    window.toggleRedeemPaidStatus = toggleRedeemPaidStatus;
-    window.switchSpecialActivity = switchSpecialActivity;
-    window.nextSpQuestion = nextSpQuestion;
   }
 
   initCustomVocabData();

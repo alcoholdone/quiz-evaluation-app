@@ -35,6 +35,11 @@ export function isConcreteNoun(item) {
   return !CATEGORY_NOUNS.includes(item.word.trim().toLowerCase());
 }
 
+// Separator characters that do not get spelled out or turned into letter tiles
+export function isSeparatorChar(ch) {
+  return ch === ' ' || ch === '-';
+}
+
 // A word is suitable for the letter-arranging spelling game only if it is a
 // single, purely alphabetic word. Long nouns (e.g. "Wastebasket") are fine, but
 // phrases and commands with spaces/punctuation are not (e.g. "Open your book.",
@@ -215,6 +220,89 @@ export function getSentenceQA(item) {
       answer: "It’s the weather.",
       thaiQuestion: "นี่คืออะไร?",
       thaiAnswer: "มันคือสภาพอากาศ"
+    };
+  } else if (['grandmother', 'mother', 'sister', 'baby sister'].includes(wordLower)) {
+    return {
+      question: "Who’s she?",
+      answer: `She’s my ${wordLower}.`,
+      thaiQuestion: "เธอคือใคร?",
+      thaiAnswer: `เธอคือ${item.meaning}ของฉัน`
+    };
+  } else if (['grandfather', 'father', 'brother', 'baby brother'].includes(wordLower)) {
+    return {
+      question: "Who’s he?",
+      answer: `He’s my ${wordLower}.`,
+      thaiQuestion: "เขาคือใคร?",
+      thaiAnswer: `เขาคือ${item.meaning}ของฉัน`
+    };
+  } else if (wordLower === 'pretty') {
+    return {
+      question: "What does she look like?",
+      answer: "She’s pretty.",
+      thaiQuestion: "เธอดูเป็นอย่างไร?",
+      thaiAnswer: `เธอ${item.meaning}`
+    };
+  } else if (wordLower === 'handsome') {
+    return {
+      question: "What does he look like?",
+      answer: "He’s handsome.",
+      thaiQuestion: "เขาดูเป็นอย่างไร?",
+      thaiAnswer: `เขา${item.meaning}`
+    };
+  } else if (['tall', 'young'].includes(wordLower)) {
+    return {
+      question: "What does he look like?",
+      answer: `He’s ${wordLower}.`,
+      thaiQuestion: "เขาดูเป็นอย่างไร?",
+      thaiAnswer: `เขา${item.meaning}`
+    };
+  } else if (
+    ['big', 'little', 'new', 'old', 'long', 'short', 'round', 'square'].includes(wordLower) ||
+    item.label === 'adj'
+  ) {
+    return {
+      question: "What does it look like?",
+      answer: `It’s ${wordLower}.`,
+      thaiQuestion: "มันมีลักษณะอย่างไร?",
+      thaiAnswer: `มัน${item.meaning}`
+    };
+  } else if (
+    ['ride', 'throw', 'catch', 'draw', 'point', 'find', 'count', 'say', 'read', 'write', 'ask', 'answer', 'pick up', 'look'].includes(wordLower) ||
+    ['v', 'v.t', 'v.i'].includes(item.label)
+  ) {
+    return {
+      question: "What can you do?",
+      answer: `I can ${wordLower}.`,
+      thaiQuestion: "คุณทำอะไรได้บ้าง?",
+      thaiAnswer: `ฉันสามารถ${item.meaning}ได้`
+    };
+  } else if (wordLower === 'how many') {
+    return {
+      question: "How do we ask about numbers?",
+      answer: "How many?",
+      thaiQuestion: "ถ้าจะถามจำนวน เราถามว่าอะไร?",
+      thaiAnswer: "มีจำนวนเท่าไหร่?"
+    };
+  } else if (wordLower === 'birthday') {
+    return {
+      question: "What do we say on a birthday?",
+      answer: "Happy birthday!",
+      thaiQuestion: "วันเกิดเราพูดว่าอะไร?",
+      thaiAnswer: "สุขสันต์วันเกิด!"
+    };
+  } else if (wordLower === 'year') {
+    return {
+      question: "How old is it?",
+      answer: "It’s one year.",
+      thaiQuestion: "นานกี่ปี?",
+      thaiAnswer: "หนึ่งปี"
+    };
+  } else if (wordLower === 'shape') {
+    return {
+      question: "What’s this?",
+      answer: "It’s a shape.",
+      thaiQuestion: "นี่คืออะไร?",
+      thaiAnswer: "มันคือรูปร่าง"
     };
   } else {
     // Default fallback based on vowel detection

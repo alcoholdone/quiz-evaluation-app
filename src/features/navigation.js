@@ -1,4 +1,4 @@
-import { state, nodes } from '../state/store.js';
+import { state, nodes, clearScopedTimers } from '../state/store.js';
 import { stopAllSpeech } from '../services/speech.js';
 import { clearTransitionTimeout, pauseTimer, resumeTimer } from './game.js';
 import { updateGameStartMeta } from './catalog.js';
@@ -9,6 +9,14 @@ import { renderDashboard } from './dashboard.js';
 // MAIN TAB SWITCHING
 export function switchTab(tabId) {
   clearTransitionTimeout();
+  clearScopedTimers('dictation');
+  clearScopedTimers('special');
+  clearScopedTimers('spelling');
+  clearScopedTimers('review');
+  if (state.spAutoAdvanceTimer) {
+    clearTimeout(state.spAutoAdvanceTimer);
+    state.spAutoAdvanceTimer = null;
+  }
   stopAllSpeech();
   state.activeTab = tabId;
 

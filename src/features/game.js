@@ -1,5 +1,7 @@
-import { state, nodes } from '../state/store.js';
-import { getSentenceQA } from '../utils/word-helpers.js';
+import { state, nodes, registerTimeout, clearScopedTimers } from '../state/store.js';
+import { getSentenceQA, isSeparatorChar } from '../utils/word-helpers.js';
+import { escapeHTML, renderVisualHTML } from '../utils/sanitize.js';
+import { shuffleScrambled } from '../utils/shuffle.js';
 import {
   stopAllSpeech, speakEN, speakTH, makeUtterance,
   playFeedbackSounds, getLastFeedbackUtterance
@@ -11,11 +13,14 @@ import { generateQuestions } from './quiz-generator.js';
 import { switchTab } from './navigation.js';
 import { calculateStarsEarned, updateTotalStarsBadgeUI, celebrateQuizResult } from './rewards.js';
 
+let currentQuestionAnswered = false;
+
 export function clearTransitionTimeout() {
   if (state.questionTransitionTimeout) {
     clearTimeout(state.questionTransitionTimeout);
     state.questionTransitionTimeout = null;
   }
+  clearScopedTimers('game');
 }
 
 // START NEW GAME CHALLENGE
@@ -92,6 +97,7 @@ export function renderQuestion(index) {
 
   saveCurrentQuestionTime();
   state.currentQuestionIndex = index;
+  currentQuestionAnswered = false;
 
   if (nodes.btnSkip) {
     nodes.btnSkip.disabled = false;
@@ -103,12 +109,9 @@ export function renderQuestion(index) {
   nodes.gameBox.className = 'game-box';
   nodes.feedback.innerHTML = '';
 
-  // Update counter & progress bar
-  nodes.currentNum.textContent = index + 1;
-  const tracker = document.querySelector('.game-tracker');
-  if (tracker) {
-    tracker.innerHTML = `ภารกิจข้อที่ <span id="current-game-num" class="text-highlight">${index + 1}</span> จาก ${state.challengeQuestions.length} ข้อ`;
-  }
+  // Update counter & progress bar without detaching cached DOM nodes (Bug #12 fix)
+  if (nodes.currentNum) nodes.currentNum.textContent = index + 1;
+  if (nodes.totalNum) nodes.totalNum.textContent = state.challengeQuestions.length;
   const percent = ((index + 1) / state.challengeQuestions.length) * 100;
   nodes.progressBar.style.width = `${percent}%`;
 
@@ -133,7 +136,7 @@ export function renderQuestion(index) {
     });
 
     // Auto speak sound initially after short pause
-    setTimeout(() => {
+    registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
         speakEN(q.targetWord.word, 0.8);
       }
@@ -144,8 +147,8 @@ export function renderQuestion(index) {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.innerHTML = `
-        <div class="option-img">${opt.image}</div>
-        <div class="option-label">${opt.meaning}</div>
+        <div class="option-img">${renderVisualHTML(opt.image, { trusted: !opt.isCustom })}</div>
+        <div class="option-label">${escapeHTML(opt.meaning)}</div>
       `;
       btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
@@ -156,15 +159,15 @@ export function renderQuestion(index) {
 
     // Show image + meaning
     nodes.questionArea.innerHTML = `
-      <div class="question-visual">${q.targetWord.image}</div>
-      <div class="question-hint" style="font-size: 1rem; color: var(--text-muted); margin-top: 8px;">${q.targetWord.meaning}</div>
+      <div class="question-visual">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
+      <div class="question-hint" style="font-size: 1rem; color: var(--text-muted); margin-top: 8px;">${escapeHTML(q.targetWord.meaning)}</div>
     `;
 
     // Options: English words
     q.options.forEach(opt => {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
-      btn.innerHTML = `<div class="option-word-only">${opt.word}</div>`;
+      btn.innerHTML = `<div class="option-word-only">${escapeHTML(opt.word)}</div>`;
       btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
     });
@@ -174,20 +177,20 @@ export function renderQuestion(index) {
     nodes.gameModeTitle.innerHTML = '🔤 ภารกิจ: ดูภาพแล้วเรียงตัวอักษรสะกดคำให้ถูกต้อง!';
 
     nodes.questionArea.innerHTML = `
-      <div class="question-visual">${q.targetWord.image}</div>
-      <div class="question-hint" style="font-size: 1rem; color: var(--text-muted); margin-top: 8px;">${q.targetWord.meaning}</div>
+      <div class="question-visual">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
+      <div class="question-hint" style="font-size: 1rem; color: var(--text-muted); margin-top: 8px;">${escapeHTML(q.targetWord.meaning)}</div>
     `;
 
     // Auto speak the word so kids hear it
-    setTimeout(() => {
+    registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
         speakEN(q.targetWord.word, 0.7);
       }
     }, 500);
 
     const correctWord = q.targetWord.word;
-    const correctLetters = correctWord.split('').filter(c => c !== ' ');
-    const scrambled = correctLetters.sort(() => Math.random() - 0.5);
+    const correctLetters = correctWord.split('').filter(c => !isSeparatorChar(c));
+    const scrambled = shuffleScrambled(correctLetters);
 
     let selectedLetters = [];
 
@@ -195,10 +198,17 @@ export function renderQuestion(index) {
     const slotsContainer = document.createElement('div');
     slotsContainer.className = 'spelling-slots-container';
     for (let i = 0; i < correctWord.length; i++) {
+      const ch = correctWord[i];
       const slot = document.createElement('div');
-      if (correctWord[i] === ' ') {
+      if (ch === ' ') {
         slot.className = 'spelling-slot-space';
         slot.innerHTML = '&nbsp;';
+        slot.dataset.fixedChar = ' ';
+        slot.dataset.isSpace = 'true';
+      } else if (ch === '-') {
+        slot.className = 'spelling-slot-space spelling-slot-hyphen';
+        slot.textContent = '-';
+        slot.dataset.fixedChar = '-';
         slot.dataset.isSpace = 'true';
       } else {
         slot.className = 'spelling-slot';
@@ -219,13 +229,15 @@ export function renderQuestion(index) {
       btn.textContent = letter;
       btn.dataset.originalIndex = idx;
       btn.addEventListener('click', () => {
-        if (btn.disabled) return;
+        if (btn.disabled || currentQuestionAnswered || state.currentQuestionIndex !== index) return;
 
         selectedLetters.push({ letter, btnEl: btn });
         btn.disabled = true;
 
-        // Find the next non-space unfilled slot
-        const unfilledSlots = Array.from(slotsContainer.children).filter(slot => !slot.dataset.isSpace && !slot.classList.contains('filled'));
+        // Find the next non-separator unfilled slot
+        const unfilledSlots = Array.from(slotsContainer.children).filter(
+          slot => slot.dataset.fixedChar === undefined && !slot.dataset.isSpace && !slot.classList.contains('filled')
+        );
         if (unfilledSlots.length > 0) {
           const targetSlot = unfilledSlots[0];
           targetSlot.textContent = letter;
@@ -238,23 +250,31 @@ export function renderQuestion(index) {
         // Check answer when all actual letters placed
         if (selectedLetters.length === correctLetters.length) {
           if (undoBtn) undoBtn.disabled = true;
-          // Build full word including spaces from slots to check
+          // Build full word including spaces/hyphens from slots to check
           const spelled = Array.from(slotsContainer.children).map(slot => {
+            if (slot.dataset.fixedChar !== undefined) return slot.dataset.fixedChar;
             if (slot.dataset.isSpace) return ' ';
             return slot.textContent;
           }).join('');
 
-          const reveal = () => selectOption({ word: spelled, meaning: q.targetWord.meaning, image: q.targetWord.image });
+          const reveal = () => {
+            if (state.activeTab !== 'game' || state.currentQuestionIndex !== index || currentQuestionAnswered) return;
+            selectOption({ word: spelled, meaning: q.targetWord.meaning, image: q.targetWord.image });
+          };
           // Wait for the LAST letter to finish speaking before revealing, so its
           // sound isn't cut off. Fixed delay was too short for the slow rate.
           if (letterU && typeof window !== 'undefined' && 'speechSynthesis' in window) {
             let fired = false;
-            const fire = (delay) => { if (fired) return; fired = true; setTimeout(reveal, delay); };
+            const fire = (delay) => {
+              if (fired) return;
+              fired = true;
+              registerTimeout('game', reveal, delay);
+            };
             letterU.addEventListener('end', () => fire(350));
             letterU.addEventListener('error', () => fire(150));
-            setTimeout(() => fire(0), 4000); // safety cap if 'end' never fires
+            registerTimeout('game', () => fire(0), 4000); // safety cap if 'end' never fires
           } else {
-            setTimeout(reveal, 600);
+            registerTimeout('game', reveal, 600);
           }
         }
       });
@@ -271,8 +291,10 @@ export function renderQuestion(index) {
       const last = selectedLetters.pop();
       last.btnEl.disabled = false;
 
-      // Find the last filled non-space slot and clear it
-      const filledSlots = Array.from(slotsContainer.children).filter(slot => !slot.dataset.isSpace && slot.classList.contains('filled'));
+      // Find the last filled non-separator slot and clear it
+      const filledSlots = Array.from(slotsContainer.children).filter(
+        slot => slot.dataset.fixedChar === undefined && !slot.dataset.isSpace && slot.classList.contains('filled')
+      );
       if (filledSlots.length > 0) {
         const lastFilledSlot = filledSlots[filledSlots.length - 1];
         lastFilledSlot.textContent = '';
@@ -303,9 +325,9 @@ export function renderQuestion(index) {
     nodes.gameModeTitle.innerHTML = '🧩 ภารกิจ: ดูคำภาษาไทยแล้วเลือกรูปภาพให้ถูกต้อง!';
 
     // Show Thai word
-    nodes.questionArea.innerHTML = `<div class="question-visual" style="font-size: 3rem; font-weight: 800; color: #1e3a8a;">${q.targetWord.meaning}</div>`;
+    nodes.questionArea.innerHTML = `<div class="question-visual" style="font-size: 3rem; font-weight: 800; color: #1e3a8a;">${escapeHTML(q.targetWord.meaning)}</div>`;
 
-    setTimeout(() => {
+    registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
         speakTH(q.targetWord.meaning);
       }
@@ -316,8 +338,8 @@ export function renderQuestion(index) {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.innerHTML = `
-        <div class="option-img">${opt.image}</div>
-        <div class="option-word-only" style="font-size: 1.2rem;">${opt.word}</div>
+        <div class="option-img">${renderVisualHTML(opt.image, { trusted: !opt.isCustom })}</div>
+        <div class="option-word-only" style="font-size: 1.2rem;">${escapeHTML(opt.word)}</div>
       `;
       btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
@@ -333,14 +355,14 @@ export function renderQuestion(index) {
     // UI Layout: Image + Chat Game Container
     nodes.questionArea.innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-        <div class="question-visual" style="height:100px; font-size:75px; margin: 5px 0;">${q.targetWord.image}</div>
+        <div class="question-visual" style="height:100px; font-size:75px; margin: 5px 0;">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
         <div class="chat-game-container">
           <div class="chat-row teacher-row">
             <div class="chat-avatar">👩‍🏫</div>
             <div class="chat-bubble teacher-bubble">
-              ${qaQuestion}
+              ${escapeHTML(qaQuestion)}
               <button class="chat-speak-btn" type="button" id="btn-speak-question" title="ฟังคุณครูพูด">🔊</button>
-              <div class="chat-translation">${qaThaiQuestion}</div>
+              <div class="chat-translation">${escapeHTML(qaThaiQuestion)}</div>
             </div>
           </div>
           <div class="chat-row student-row">
@@ -361,7 +383,7 @@ export function renderQuestion(index) {
     });
 
     // Auto speak question
-    setTimeout(() => {
+    registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
         speakEN(qaQuestion, 0.85);
       }
@@ -379,7 +401,7 @@ export function renderQuestion(index) {
 
       btn.innerHTML = `
         <span style="font-size:1.3rem; font-weight:bold; margin-right:12px; color:var(--primary-dark);">${String.fromCharCode(65 + optIdx)}.</span>
-        <span class="option-word-only" style="font-size: 1.15rem; font-weight: 700;">${optText}</span>
+        <span class="option-word-only" style="font-size: 1.15rem; font-weight: 700;">${escapeHTML(optText)}</span>
       `;
 
       btn.onclick = () => {
@@ -388,8 +410,8 @@ export function renderQuestion(index) {
         if (studentBubble) {
           studentBubble.classList.remove('empty-bubble');
           studentBubble.innerHTML = `
-            ${optText}
-            <div class="chat-translation">${optThaiText}</div>
+            ${escapeHTML(optText)}
+            <div class="chat-translation">${escapeHTML(optThaiText)}</div>
           `;
         }
         selectOption(opt, btn);
@@ -403,14 +425,14 @@ export function renderQuestion(index) {
     // Show image + question
     nodes.questionArea.innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-        <div class="question-visual" style="font-size: 4.5rem; margin-bottom: 8px;">${q.targetWord.image}</div>
+        <div class="question-visual" style="font-size: 4.5rem; margin-bottom: 8px;">${renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom })}</div>
         <div style="font-size: 1.4rem; font-weight: 700; color: var(--dark-2); margin-bottom: 4px;">What’s this?</div>
-        <div class="question-hint" style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">(คำแปล: ${q.targetWord.meaning})</div>
+        <div class="question-hint" style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">(คำแปล: ${escapeHTML(q.targetWord.meaning)})</div>
       </div>
     `;
 
     // Auto speak question
-    setTimeout(() => {
+    registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
         speakEN("What’s this?", 0.85);
       }
@@ -425,7 +447,7 @@ export function renderQuestion(index) {
 
       btn.innerHTML = `
         <span style="font-size:1.3rem; font-weight:bold; margin-right:12px; color:var(--primary-dark);">${String.fromCharCode(65 + optIdx)}.</span>
-        <span class="option-word-only" style="font-size: 1.15rem; font-weight: 700;">${opt.text}</span>
+        <span class="option-word-only" style="font-size: 1.15rem; font-weight: 700;">${escapeHTML(opt.text)}</span>
       `;
 
       btn.onclick = () => selectOption(opt, btn);
@@ -437,7 +459,7 @@ export function renderQuestion(index) {
     nodes.questionArea.innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
         <div class="question-visual" style="font-size: 5rem; margin-bottom: 8px;">❓</div>
-        <div style="font-size: 1.4rem; font-weight: 700; color: var(--dark-2); margin-bottom: 4px; text-align: center; max-width: 90%;">Which word starts with the "${q.phonicsLetter.toLowerCase()}" sound?</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: var(--dark-2); margin-bottom: 4px; text-align: center; max-width: 90%;">Which word starts with the "${escapeHTML(q.phonicsLetter.toLowerCase())}" sound?</div>
         <button class="play-btn" id="btn-speak-phonics" style="margin-top: 5px;">🔊 ฟังเสียงตัวอักษร</button>
       </div>
     `;
@@ -448,7 +470,7 @@ export function renderQuestion(index) {
       speakEN(speakText, 0.85);
     });
 
-    setTimeout(() => {
+    registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
         speakEN(speakText, 0.85);
       }
@@ -458,11 +480,11 @@ export function renderQuestion(index) {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
 
-      const imgHtml = `<div class="option-img">${opt.image}</div>`;
+      const imgHtml = `<div class="option-img">${renderVisualHTML(opt.image, { trusted: !opt.isCustom })}</div>`;
       btn.innerHTML = `
         ${imgHtml}
-        <div class="option-word-only" style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">${opt.word}</div>
-        <div class="option-label" style="font-size: 0.8rem; color: var(--text-muted);">${opt.meaning}</div>
+        <div class="option-word-only" style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">${escapeHTML(opt.word)}</div>
+        <div class="option-label" style="font-size: 0.8rem; color: var(--text-muted);">${escapeHTML(opt.meaning)}</div>
       `;
       btn.onclick = () => selectOption(opt, btn);
       nodes.optionsGrid.appendChild(btn);
@@ -470,11 +492,12 @@ export function renderQuestion(index) {
   } else if (q.type === 'grammar_midterm') {
     nodes.gameModeTitle.innerHTML = '💬 ภารกิจ: เติมบทสนทนาและตอบคำถามไวยากรณ์ให้ถูกต้อง!';
 
+    const renderedTargetVisual = renderVisualHTML(q.targetWord.image, { trusted: !q.targetWord.isCustom });
     let imgHtml = '';
-    if (q.targetWord.image.startsWith('<div')) {
-      imgHtml = q.targetWord.image;
+    if (renderedTargetVisual.startsWith('<div')) {
+      imgHtml = renderedTargetVisual;
     } else {
-      imgHtml = `<div class="question-visual" style="min-height: 125px; margin: 8px 0;">${q.targetWord.image}</div>`;
+      imgHtml = `<div class="question-visual" style="min-height: 125px; margin: 8px 0;">${renderedTargetVisual}</div>`;
     }
 
     nodes.questionArea.innerHTML = `
@@ -484,9 +507,9 @@ export function renderQuestion(index) {
           <div class="chat-row teacher-row" style="display: flex; gap: 8px; margin-bottom: 12px; justify-content: flex-start;">
             <div class="chat-avatar" style="font-size: 1.8rem;">👩‍🏫</div>
             <div class="chat-bubble teacher-bubble" style="background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 10px 14px; border-radius: 18px 18px 18px 4px; font-size: 1.05rem; font-weight: 700; color: var(--dark-3); position: relative;">
-              ${q.questionText}
+              ${escapeHTML(q.questionText)}
               <button class="chat-speak-btn" type="button" id="btn-speak-question" title="ฟังคุณครูพูด" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; margin-left: 6px; padding: 0; vertical-align: middle;">🔊</button>
-              <div class="chat-translation" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 500; margin-top: 4px;">(${q.thaiQuestionText})</div>
+              <div class="chat-translation" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 500; margin-top: 4px;">(${escapeHTML(q.thaiQuestionText)})</div>
             </div>
           </div>
           <div class="chat-row student-row" style="display: flex; gap: 8px; justify-content: flex-end;">
@@ -505,7 +528,7 @@ export function renderQuestion(index) {
       speakEN(q.questionText, 0.85);
     });
 
-    setTimeout(() => {
+    registerTimeout('game', () => {
       if (state.activeTab === 'game' && state.currentQuestionIndex === index) {
         speakEN(q.questionText, 0.85);
       }
@@ -519,7 +542,7 @@ export function renderQuestion(index) {
 
       btn.innerHTML = `
         <span style="font-size:1.3rem; font-weight:bold; margin-right:12px; color:var(--primary-dark);">${String.fromCharCode(65 + optIdx)}.</span>
-        <span class="option-word-only" style="font-size: 1.12rem; font-weight: 700;">${opt.text}</span>
+        <span class="option-word-only" style="font-size: 1.12rem; font-weight: 700;">${escapeHTML(opt.text)}</span>
       `;
 
       btn.onclick = () => {
@@ -527,7 +550,7 @@ export function renderQuestion(index) {
         if (studentBubble) {
           studentBubble.className = 'chat-bubble student-bubble';
           studentBubble.style.cssText = 'background: var(--primary-light); border: 1.5px solid var(--primary); padding: 10px 14px; border-radius: 18px 18px 4px 18px; font-size: 1.05rem; font-weight: 700; color: var(--primary-hover);';
-          studentBubble.innerHTML = opt.text;
+          studentBubble.textContent = opt.text;
         }
         selectOption(opt, btn);
       };
@@ -539,6 +562,9 @@ export function renderQuestion(index) {
 
 // SELECT ANSWER OPTION
 export function selectOption(selectedOpt, clickedBtn) {
+  if (currentQuestionAnswered || state.hasCompletedAssessment) return;
+  currentQuestionAnswered = true;
+
   // Disable options grid to prevent double-clicks
   const optionBtns = nodes.optionsGrid.querySelectorAll('.option-btn');
   optionBtns.forEach(btn => btn.disabled = true);
@@ -621,7 +647,7 @@ export function selectOption(selectedOpt, clickedBtn) {
     if (q.type === 'sentence_qa') {
       if (q.isYesNo) {
         const correctOpt = q.options.find(o => o.isCorrect);
-        nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. ประโยคที่ถูกคือ <strong>${correctOpt.text}</strong> (${correctOpt.thaiText})</span>`;
+        nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. ประโยคที่ถูกคือ <strong>${escapeHTML(correctOpt.text)}</strong> (${escapeHTML(correctOpt.thaiText)})</span>`;
 
         stopAllSpeech();
         playFeedbackSounds([
@@ -631,7 +657,7 @@ export function selectOption(selectedOpt, clickedBtn) {
         ]);
       } else {
         const qaData = getSentenceQA(q.targetWord);
-        nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. ประโยคที่ถูกคือ <strong>${qaData.answer}</strong> (${qaData.thaiAnswer})</span>`;
+        nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. ประโยคที่ถูกคือ <strong>${escapeHTML(qaData.answer)}</strong> (${escapeHTML(qaData.thaiAnswer)})</span>`;
 
         stopAllSpeech();
         playFeedbackSounds([
@@ -642,7 +668,7 @@ export function selectOption(selectedOpt, clickedBtn) {
       }
     } else if (q.type === 'grammar_an' || q.type === 'grammar_midterm') {
       const correctOpt = q.options.find(o => o.isCorrect);
-      nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. ประโยคที่ถูกคือ <strong>${correctOpt.text}</strong></span>`;
+      nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. ประโยคที่ถูกคือ <strong>${escapeHTML(correctOpt.text)}</strong></span>`;
 
       stopAllSpeech();
       playFeedbackSounds([
@@ -650,7 +676,7 @@ export function selectOption(selectedOpt, clickedBtn) {
         makeUtterance(correctOpt.text, 'en-US', 0.8)
       ]);
     } else {
-      nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. คำตอบที่ถูกคือ <strong>${q.targetWord.word}</strong> (${q.targetWord.meaning}) ลองพยายามใหม่ข้อถัดไปนะ</span>`;
+      nodes.feedback.innerHTML = `<span class="wrong">❌ อ๊ะ.. คำตอบที่ถูกคือ <strong>${escapeHTML(q.targetWord.word)}</strong> (${escapeHTML(q.targetWord.meaning)}) ลองพยายามใหม่ข้อถัดไปนะ</span>`;
 
       stopAllSpeech();
       playFeedbackSounds([makeUtterance('ลองใหม่อีกทีนะจ๊ะ', 'th-TH', 1)]);

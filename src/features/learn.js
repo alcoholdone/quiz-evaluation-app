@@ -1,5 +1,8 @@
-import { state, nodes } from '../state/store.js';
+import { state, nodes, registerTimeout, clearScopedTimers } from '../state/store.js';
 import { stopAllSpeech, speakEN, speakTH, spellAndSpeak } from '../services/speech.js';
+import { escapeHTML, renderVisualHTML } from '../utils/sanitize.js';
+import { shuffleScrambled } from '../utils/shuffle.js';
+import { isSeparatorChar } from '../utils/word-helpers.js';
 
 // INIT LEARN MODE CARDS
 export function initLearnMode() {
@@ -17,25 +20,28 @@ export function initLearnMode() {
     let slowBtnText = '🐢 สะกดช้าๆ';
 
     if (item.type === 'command') {
-      lettersHtml = `<span class="word-text-full" style="font-size: 1.5rem; font-weight: 700; color: var(--dark-2);">${item.word}</span>`;
+      lettersHtml = `<span class="word-text-full" style="font-size: 1.5rem; font-weight: 700; color: var(--dark-2);">${escapeHTML(item.word)}</span>`;
       hasPracticeBtn = false;
       slowBtnText = '🐢 อ่านช้าๆ';
     } else {
       lettersHtml = item.word.split('').map((char, index) => {
         if (char === ' ') return '<span>&nbsp;</span>';
-        return `<span class="spell-char manual-letter-btn" data-index="${index}">${char}</span>`;
+        if (char === '-') return '<span class="spell-separator">-</span>';
+        return `<span class="spell-char manual-letter-btn" data-index="${index}">${escapeHTML(char)}</span>`;
       }).join('');
-      spellingFormatted = `(${item.word.split('').join(' - ')})`;
+      const spellableChars = item.word.split('').filter(c => !isSeparatorChar(c)).map(c => escapeHTML(c));
+      spellingFormatted = `(${spellableChars.join(' - ')})`;
     }
 
     const posBadge = item.label
-      ? `<span class="pos-badge" title="ชนิดของคำ">${item.label}</span>`
+      ? `<span class="pos-badge" title="ชนิดของคำ">${escapeHTML(item.label)}</span>`
       : '';
+    const visualHtml = renderVisualHTML(item.image, { trusted: !item.isCustom });
     card.innerHTML = `
-      <div class="vocab-image">${item.image}</div>
+      <div class="vocab-image">${visualHtml}</div>
       <div class="word">${lettersHtml}</div>
       <div class="spelling" style="min-height: 20px;">${spellingFormatted}</div>
-      <div class="meaning">${posBadge}${item.meaning}</div>
+      <div class="meaning">${posBadge}${escapeHTML(item.meaning)}</div>
       <div class="vocab-card-actions">
         <button class="slow-spell-btn" type="button">${slowBtnText}</button>
         ${hasPracticeBtn ? '<button class="spelling-practice-btn" type="button">🔤 ฝึกสะกดคำ</button>' : ''}
@@ -77,6 +83,8 @@ export function initLearnMode() {
 // ============================================================
 export function openSpellingPractice(item) {
   stopAllSpeech();
+  clearScopedTimers('spelling');
+  state.spellingSessionToken++;
   state.currentPracticeItem = item;
   state.isSpellingSuccess = false;
   nodes.spellingModalOverlay.style.display = 'flex';
@@ -85,7 +93,7 @@ export function openSpellingPractice(item) {
   nodes.spellingModalFeedback.className = 'spelling-modal-feedback';
 
   // Set Visuals
-  nodes.spellingModalImage.innerHTML = item.image;
+  nodes.spellingModalImage.innerHTML = renderVisualHTML(item.image, { trusted: !item.isCustom });
   nodes.spellingModalMeaning.textContent = item.meaning;
 
   resetSpellingPractice(item);
@@ -94,6 +102,8 @@ export function openSpellingPractice(item) {
 export function resetSpellingPractice(item) {
   if (!item) return;
   stopAllSpeech();
+  clearScopedTimers('spelling');
+  state.spellingSessionToken++;
   state.isSpellingSuccess = false;
   state.practiceSelectedLetters = [];
 
@@ -107,13 +117,20 @@ export function resetSpellingPractice(item) {
     contentBox.classList.remove('success');
   }
 
-  // Create empty slots (handling space)
+  // Create empty slots (handling spaces and hyphens as fixed separators)
   nodes.spellingModalSlots.innerHTML = '';
   for (let i = 0; i < item.word.length; i++) {
+    const ch = item.word[i];
     const slot = document.createElement('div');
-    if (item.word[i] === ' ') {
+    if (ch === ' ') {
       slot.className = 'spelling-slot-space';
       slot.innerHTML = '&nbsp;';
+      slot.dataset.fixedChar = ' ';
+      slot.dataset.isSpace = 'true';
+    } else if (ch === '-') {
+      slot.className = 'spelling-slot-space spelling-slot-hyphen';
+      slot.textContent = '-';
+      slot.dataset.fixedChar = '-';
       slot.dataset.isSpace = 'true';
     } else {
       slot.className = 'spelling-slot';
@@ -122,10 +139,10 @@ export function resetSpellingPractice(item) {
     nodes.spellingModalSlots.appendChild(slot);
   }
 
-  // Create scrambled letters (excluding space)
+  // Create scrambled letters (excluding spaces & hyphens)
   nodes.spellingModalLetters.innerHTML = '';
-  const correctLetters = item.word.split('').filter(c => c !== ' ');
-  const scrambled = correctLetters.sort(() => Math.random() - 0.5);
+  const correctLetters = item.word.split('').filter(c => !isSeparatorChar(c));
+  const scrambled = shuffleScrambled(correctLetters);
   scrambled.forEach((letter) => {
     const btn = document.createElement('button');
     btn.className = 'letter-btn';
@@ -140,11 +157,14 @@ export function resetSpellingPractice(item) {
 export function handlePracticeLetterTap(letter, btn, item) {
   if (state.isSpellingSuccess || btn.disabled) return;
 
+  const sessionToken = state.spellingSessionToken;
   state.practiceSelectedLetters.push({ letter, btnEl: btn });
   btn.disabled = true;
 
-  // Find next non-space slot
-  const unfilledSlots = Array.from(nodes.spellingModalSlots.children).filter(slot => !slot.dataset.isSpace && !slot.classList.contains('filled'));
+  // Find next non-separator unfilled slot
+  const unfilledSlots = Array.from(nodes.spellingModalSlots.children).filter(
+    slot => slot.dataset.fixedChar === undefined && !slot.dataset.isSpace && !slot.classList.contains('filled')
+  );
   if (unfilledSlots.length > 0) {
     const targetSlot = unfilledSlots[0];
     targetSlot.textContent = letter;
@@ -154,26 +174,35 @@ export function handlePracticeLetterTap(letter, btn, item) {
   // Always speak the tapped letter immediately
   const letterU = speakEN(letter.toLowerCase(), 0.55);
 
-  const correctLettersCount = item.word.split('').filter(c => c !== ' ').length;
+  const correctLettersCount = item.word.split('').filter(c => !isSeparatorChar(c)).length;
   if (state.practiceSelectedLetters.length === correctLettersCount) {
     // Wait for the last letter to finish speaking before checking (fixed 600ms
     // was too short for the slow rate and cut the sound off).
-    const reveal = () => checkPracticeSpelling(item);
+    const reveal = () => {
+      if (state.spellingSessionToken !== sessionToken || state.currentPracticeItem !== item) return;
+      checkPracticeSpelling(item);
+    };
     if (letterU && typeof window !== 'undefined' && 'speechSynthesis' in window) {
       let fired = false;
-      const fire = (d) => { if (fired) return; fired = true; setTimeout(reveal, d); };
+      const fire = (d) => {
+        if (fired) return;
+        fired = true;
+        registerTimeout('spelling', reveal, d);
+      };
       letterU.addEventListener('end', () => fire(350));
       letterU.addEventListener('error', () => fire(150));
-      setTimeout(() => fire(0), 4000); // safety cap if 'end' never fires
+      registerTimeout('spelling', () => fire(0), 4000); // safety cap if 'end' never fires
     } else {
-      setTimeout(reveal, 600);
+      registerTimeout('spelling', reveal, 600);
     }
   }
 }
 
 export function checkPracticeSpelling(item) {
-  // Reconstruct spelled word from slots to retain space correctly
+  const sessionToken = state.spellingSessionToken;
+  // Reconstruct spelled word from slots to retain spaces/hyphens correctly
   const spelledWord = Array.from(nodes.spellingModalSlots.children).map(slot => {
+    if (slot.dataset.fixedChar !== undefined) return slot.dataset.fixedChar;
     if (slot.dataset.isSpace) return ' ';
     return slot.textContent;
   }).join('');
@@ -183,7 +212,7 @@ export function checkPracticeSpelling(item) {
     // Success
     state.isSpellingSuccess = true;
     contentBox.classList.add('success');
-    nodes.spellingModalFeedback.innerHTML = `🎉 เก่งมากเลยจ้า! <b>${item.word}</b>`;
+    nodes.spellingModalFeedback.innerHTML = `🎉 เก่งมากเลยจ้า! <b>${escapeHTML(item.word)}</b>`;
     nodes.btnRepeatSound.style.display = 'inline-flex';
 
     // Play full explanation
@@ -195,8 +224,8 @@ export function checkPracticeSpelling(item) {
     speakTH('ลองใหม่อีกครั้งนะจ๊ะ');
 
     // Auto reset after 1.5s
-    setTimeout(() => {
-      if (state.currentPracticeItem === item && !state.isSpellingSuccess) {
+    registerTimeout('spelling', () => {
+      if (state.spellingSessionToken === sessionToken && state.currentPracticeItem === item && !state.isSpellingSuccess) {
         resetSpellingPractice(item);
       }
     }, 1500);
@@ -204,6 +233,8 @@ export function checkPracticeSpelling(item) {
 }
 
 export function closeSpellingPractice() {
+  state.spellingSessionToken++;
+  clearScopedTimers('spelling');
   nodes.spellingModalOverlay.style.display = 'none';
   stopAllSpeech();
   state.currentPracticeItem = null;

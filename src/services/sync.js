@@ -10,28 +10,24 @@
 //  Firestore เป็นแค่ "ท่อ sync" เท่านั้น  →  เล่น offline ได้ปกติ
 // =============================================================================
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
-  getRedirectResult, signOut, onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  initializeFirestore, persistentLocalCache, doc, getDoc, setDoc, onSnapshot, serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+const FIREBASE_VERSION = "10.12.0";
 const APP_PREFIX = "aura_kids_";
 // meta keys อยู่ในเครื่องเท่านั้น ไม่ sync
 const META_KEYS = new Set(["aura_kids_client_id", "aura_kids_last_sync_ms"]);
 const PUSH_DEBOUNCE_MS = 1500;
 
-const cfg = window.FIREBASE_CONFIG || {};
-const configured = cfg.apiKey && !String(cfg.apiKey).startsWith("PASTE_");
-
 // แท็บที่ต้องล็อกอินก่อนถึงใช้ได้ (โหมดฝึกสะกดคำ = tab-learn เปิดให้เล่นได้เลย)
-const LOCKED_TABS = ["tab-game", "tab-dictation", "tab-dashboard"];
+export const LOCKED_TABS = ["tab-game", "tab-dictation", "tab-special", "tab-dashboard"];
+
+function getFirebaseConfig() {
+  const cfg = (typeof window !== "undefined" && window.FIREBASE_CONFIG) || {};
+  const configured = Boolean(cfg.apiKey && !String(cfg.apiKey).startsWith("PASTE_"));
+  return { cfg, configured };
+}
 
 // ---- per-browser id (เพื่อไม่ apply echo การเขียนของตัวเอง) -----------------
 function clientId() {
+  if (typeof localStorage === "undefined") return "c_test";
   let id = localStorage.getItem("aura_kids_client_id");
   if (!id) {
     id = "c_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -39,15 +35,18 @@ function clientId() {
   }
   return id;
 }
-const CLIENT = clientId();
 
 // ---- state ------------------------------------------------------------------
+let fbApp = null;
+let fbAuth = null;
+let fbFirestore = null;
 let db = null, auth = null, userDocRef = null, unsub = null;
 let currentUser = null;
 let skipHook = false;          // true ระหว่าง apply remote (กัน loop)
 let pushTimer = null;
 let initialPullDone = false;
 let cloudBlobStr = null;       // เนื้อหา blob ล่าสุดที่รู้ว่าอยู่บน cloud (stable JSON) — ใช้กัน push ซ้ำ
+let clientToken = null;
 
 // =============================================================================
 //  localStorage blob helpers
@@ -70,20 +69,26 @@ function stableStringify(obj) {
   return JSON.stringify(out);
 }
 
-function applyBlob(blob) {
-  if (!blob) return;
+export function applyBlob(blob) {
+  if (!blob || typeof blob !== "object" || Array.isArray(blob)) return;
+
+  // Allowlist: ยอมรับเฉพาะ key ที่ขึ้นต้น "aura_kids_", ไม่อยู่ใน META_KEYS, และค่าเป็น string
+  const safeEntries = Object.entries(blob).filter(
+    ([k, v]) => typeof k === "string" && k.startsWith(APP_PREFIX) && !META_KEYS.has(k) && typeof v === "string"
+  );
+
   skipHook = true;
   try {
     // ลบ key เดิมที่ไม่มีใน remote (เคารพการลบจากอีกเครื่อง)
-    const keep = new Set(Object.keys(blob));
+    const keep = new Set(safeEntries.map(([k]) => k));
     const toRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
       if (k && k.startsWith(APP_PREFIX) && !META_KEYS.has(k) && !keep.has(k)) toRemove.push(k);
     }
     toRemove.forEach((k) => localStorage.removeItem(k));
-    // เขียนค่าจาก remote
-    for (const [k, v] of Object.entries(blob)) localStorage.setItem(k, v);
+    // เขียนค่าที่ผ่านการตรวจสอบแล้วจาก remote
+    for (const [k, v] of safeEntries) localStorage.setItem(k, v);
   } finally {
     skipHook = false;
   }
@@ -99,16 +104,16 @@ function schedulePush() {
 }
 
 async function pushNow() {
-  if (!currentUser || !userDocRef) return;
+  if (!currentUser || !userDocRef || !fbFirestore) return;
   const nowMs = Date.now();
   try {
     const localStr = stableStringify(gatherBlob());
     if (localStr === cloudBlobStr) { setStatus("synced"); return; } // เนื้อหาตรงกับ cloud แล้ว → ไม่ต้องเขียนซ้ำ
-    await setDoc(userDocRef, {
+    await fbFirestore.setDoc(userDocRef, {
       blob: JSON.parse(localStr),
       updatedAtMs: nowMs,
-      updatedBy: CLIENT,
-      updatedAt: serverTimestamp(),
+      updatedBy: clientToken || clientId(),
+      updatedAt: fbFirestore.serverTimestamp(),
     });
     cloudBlobStr = localStr;
     localStorage.setItem("aura_kids_last_sync_ms", String(nowMs));
@@ -145,8 +150,8 @@ function installHook() {
 //  realtime subscription
 // =============================================================================
 function subscribe() {
-  if (!userDocRef) return;
-  unsub = onSnapshot(userDocRef, (snap) => {
+  if (!userDocRef || !fbFirestore) return;
+  unsub = fbFirestore.onSnapshot(userDocRef, (snap) => {
     if (!snap.exists()) {
       // ยังไม่เคยมีข้อมูลบน cloud → push ของเครื่องนี้ขึ้นไปเป็นชุดแรก
       cloudBlobStr = null;
@@ -228,18 +233,22 @@ function reportAuthError(e) {
 }
 
 async function doSignIn() {
-  const provider = new GoogleAuthProvider();
+  if (!auth || !fbAuth) {
+    alert("ไม่สามารถเชื่อมต่อระบบเข้าสู่ระบบได้ในขณะนี้ (โหมดออฟไลน์)");
+    return;
+  }
+  const provider = new fbAuth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
   // popup-first ทุกแพลตฟอร์ม: เสถียรกว่า redirect บน iOS/Safari (ITP บล็อก storage ข้ามโดเมน
   // ทำให้ redirect กลับมาแล้ว auth หาย → เด้งให้ล็อกอินวนไป)
   try {
-    await signInWithPopup(auth, provider);
+    await fbAuth.signInWithPopup(auth, provider);
   } catch (e) {
     const code = e?.code || "";
     const popupIssue = ["auth/popup-blocked", "auth/operation-not-supported-in-this-environment",
       "auth/cancelled-popup-request"].includes(code);
     if (popupIssue) {
-      try { await signInWithRedirect(auth, provider); return; } catch (e2) { reportAuthError(e2); return; }
+      try { await fbAuth.signInWithRedirect(auth, provider); return; } catch (e2) { reportAuthError(e2); return; }
     }
     reportAuthError(e); // unauthorized-domain / operation-not-allowed ฯลฯ → แจ้งสาเหตุชัดๆ
   }
@@ -268,7 +277,9 @@ async function doSignOut() {
   if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
   clearLocalAppData();
   try {
-    await signOut(auth);
+    if (auth && fbAuth) {
+      await fbAuth.signOut(auth);
+    }
   } finally {
     location.reload(); // โหลดใหม่ให้ UI กลับเป็นสถานะเปล่า (ดาวหาย, แท็บล็อก)
   }
@@ -277,35 +288,53 @@ async function doSignOut() {
 // =============================================================================
 //  init
 // =============================================================================
-function init() {
+async function init() {
+  clientToken = clientId();
   installHook();
   buildUI();
   installTabGate();
   updateTabLocks(); // ล็อกไว้ก่อนจนกว่า auth จะยืนยันว่าล็อกอินอยู่
 
+  const { cfg, configured } = getFirebaseConfig();
   if (!configured) {
     setStatus("offline");
     setBar("☁️ โหมดออฟไลน์ (ยังไม่ได้ตั้งค่า cloud)", false);
     return;
   }
 
-  const app = initializeApp(cfg);
-  auth = getAuth(app);
-  // เปิด offline cache ของ Firestore เพื่อให้ push ที่ค้างไว้ส่งเองเมื่อกลับมาออนไลน์
   try {
-    db = initializeFirestore(app, { localCache: persistentLocalCache() });
-  } catch {
-    db = initializeFirestore(app, {});
+    const [appMod, authMod, fsMod] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-auth.js`),
+      import(`https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-firestore.js`),
+    ]);
+    fbApp = appMod;
+    fbAuth = authMod;
+    fbFirestore = fsMod;
+  } catch (err) {
+    console.warn("[sync] offline / firebase load failed", err);
+    setStatus("offline");
+    setBar("☁️ โหมดออฟไลน์ (ไม่สามารถเชื่อม cloud ได้)", false);
+    return;
   }
 
-  getRedirectResult(auth).catch((e) => reportAuthError(e));
+  const app = fbApp.initializeApp(cfg);
+  auth = fbAuth.getAuth(app);
+  // เปิด offline cache ของ Firestore เพื่อให้ push ที่ค้างไว้ส่งเองเมื่อกลับมาออนไลน์
+  try {
+    db = fbFirestore.initializeFirestore(app, { localCache: fbFirestore.persistentLocalCache() });
+  } catch {
+    db = fbFirestore.initializeFirestore(app, {});
+  }
 
-  onAuthStateChanged(auth, (user) => {
+  fbAuth.getRedirectResult(auth).catch((e) => reportAuthError(e));
+
+  fbAuth.onAuthStateChanged(auth, (user) => {
     if (unsub) { unsub(); unsub = null; }
     currentUser = user;
     initialPullDone = false;
     if (user) {
-      userDocRef = doc(db, "users", user.uid);
+      userDocRef = fbFirestore.doc(db, "users", user.uid);
       const name = user.displayName || user.email || "ผู้ใช้";
       setBar(`☁️ ซิงค์อยู่ · ${name}`, true);
       setStatus("synced");
@@ -321,9 +350,10 @@ function init() {
 
 // =============================================================================
 //  Feature gate — ยังไม่ล็อกอิน = ใช้ได้แค่ "โหมดฝึกสะกดคำ"
-//  ทำงานนอก app.js: ดักคลิกแท็บที่ล็อกในช่วง capture เพื่อบล็อกก่อน handler เดิม
+//  ทำงานนอก app: ดักคลิกแท็บที่ล็อกในช่วง capture เพื่อบล็อกก่อน handler เดิม
 // =============================================================================
 function tabLocked() {
+  const { configured } = getFirebaseConfig();
   return configured && !currentUser; // offline build (ไม่ตั้งค่า cloud) = ไม่ล็อกอะไร
 }
 
@@ -337,7 +367,7 @@ function gateClickHandler(e) {
 function installTabGate() {
   LOCKED_TABS.forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener("click", gateClickHandler, true); // capture = รันก่อน listener ของ app.js
+    if (el) el.addEventListener("click", gateClickHandler, true); // capture = รันก่อน listener ของ app
   });
 }
 
@@ -353,9 +383,15 @@ function updateTabLocks() {
   const badge = document.getElementById("total-stars-badge");
   if (badge) badge.style.display = locked ? "none" : "flex";
   // ถ้าเพิ่ง logout ขณะอยู่บนแท็บที่ล็อก → เด้งกลับมาโหมดฝึกสะกดคำ
-  if (locked && typeof window.switchTab === "function") {
+  if (locked) {
     const active = document.querySelector(".tab-btn.active");
-    if (active && LOCKED_TABS.includes(active.id)) window.switchTab("learn");
+    if (active && LOCKED_TABS.includes(active.id)) {
+      if (typeof window !== "undefined" && typeof window.dispatchEvent === "function" && typeof CustomEvent === "function") {
+        window.dispatchEvent(new CustomEvent("aura:switch-tab", { detail: { tab: "learn" } }));
+      } else if (typeof window.switchTab === "function") {
+        window.switchTab("learn");
+      }
+    }
   }
 }
 
@@ -389,6 +425,7 @@ function buildUI() {
   statusDot = wrap.querySelector("#cs-dot");
 
   btnEl.addEventListener("click", () => {
+    const { configured } = getFirebaseConfig();
     if (!configured) {
       alert("ยังไม่ได้ตั้งค่า Firebase\n\nเปิดไฟล์ firebase-config.js แล้วใส่ค่าจาก Firebase Console ก่อน (ดูขั้นตอนใน README)");
       return;
@@ -425,8 +462,10 @@ function showUpdateToast(onApply) {
 }
 
 // ---- go ----------------------------------------------------------------------
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
+if (typeof document !== "undefined" && typeof window !== "undefined" && !window.__QUIZ_TEST_ENV__) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 }
