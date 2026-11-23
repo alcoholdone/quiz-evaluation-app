@@ -232,5 +232,57 @@ export const unit6 = {
   <circle cx="82" cy="72" r="1.8" fill="#bae6fd"/>
 </svg>`,
         explanation: '❄️ Snowy สะกดว่า S - N - O - W - Y แปลว่า มีหิมะตก วันที่อากาศหนาวเย็นและมีเกล็ดหิมะสีขาวโปรยปรายลงมาจ้า'
+      },
+      {
+        word: 'Flower',
+        meaning: 'ดอกไม้',
+        syllable: 'flow-er',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#fff1f2"/>
+  <!-- Stem & Leaves -->
+  <path d="M 50,50 Q 48,70 50,90" fill="none" stroke="#16a34a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 50,74 Q 32,66 28,74 Q 36,84 50,78 Z" fill="#22c55e" stroke="#15803d" stroke-width="1.5"/>
+  <path d="M 50,68 Q 68,60 72,68 Q 64,78 50,72 Z" fill="#22c55e" stroke="#15803d" stroke-width="1.5"/>
+  <!-- Petals -->
+  <g fill="#f43f5e" stroke="#e11d48" stroke-width="1.5">
+    <circle cx="50" cy="24" r="11"/>
+    <circle cx="67" cy="36" r="11"/>
+    <circle cx="60" cy="54" r="11"/>
+    <circle cx="40" cy="54" r="11"/>
+    <circle cx="33" cy="36" r="11"/>
+  </g>
+  <!-- Center -->
+  <circle cx="50" cy="41" r="12" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="46" cy="39" r="1.8" fill="#78350f"/>
+  <circle cx="54" cy="39" r="1.8" fill="#78350f"/>
+  <path d="M 47,44 Q 50,47 53,44" fill="none" stroke="#78350f" stroke-width="1.8" stroke-linecap="round"/>
+</svg>`,
+        explanation: '🌸 Flower สะกดว่า F - L - O - W - E - R แปลว่า ดอกไม้ ดอกไม้สีสันสวยงามในสวนจ้า'
+      },
+      {
+        word: 'Tree',
+        meaning: 'ต้นไม้',
+        syllable: 'tree',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfdf5"/>
+  <!-- Ground -->
+  <ellipse cx="50" cy="88" rx="30" ry="5" fill="#86efac"/>
+  <!-- Trunk -->
+  <path d="M 43,54 L 41,87 L 59,87 L 57,54 Z" fill="#92400e" stroke="#78350f" stroke-width="1.5"/>
+  <path d="M 48,66 L 38,56" stroke="#92400e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 52,62 L 62,53" stroke="#92400e" stroke-width="4" stroke-linecap="round"/>
+  <!-- Canopy -->
+  <circle cx="34" cy="46" r="17" fill="#16a34a"/>
+  <circle cx="66" cy="46" r="17" fill="#16a34a"/>
+  <circle cx="50" cy="28" r="20" fill="#22c55e"/>
+  <circle cx="50" cy="46" r="18" fill="#22c55e"/>
+  <!-- Little apples / fruits -->
+  <circle cx="38" cy="42" r="3.2" fill="#ef4444"/>
+  <circle cx="60" cy="36" r="3.2" fill="#ef4444"/>
+  <circle cx="54" cy="50" r="3.2" fill="#ef4444"/>
+</svg>`,
+        explanation: '🌳 Tree สะกดว่า T - R - E - E แปลว่า ต้นไม้ ต้นไม้ใหญ่ที่มีใบสีเขียวร่มรื่นจ้า'
       }
     ]};
