@@ -301,11 +301,11 @@ async function runTests() {
   // B. ทดสอบระบบแยกเทอม & Bugfixes (#1, #2, #3, #6, #9, #11, #13, #14)
   // ==========================================================
   console.log('📅 กำลังทดสอบระบบแยกเทอม (Term 1 / Term 2) และ Bugfixes...');
-  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_5' || state.selectedDictationRound !== 'r6') {
+  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_6' || state.selectedDictationRound !== 'r6') {
     console.error(`❌ ค่าเริ่มต้นไม่ถูกต้อง: term=${state.currentTerm}, unit=${state.currentUnitId}, dictation=${state.selectedDictationRound}`);
     allPassed = false;
   } else {
-    console.log('✅ ค่าเริ่มต้นถูกต้อง: เทอม 2 (Unit 5 + Dictation ยูนิต 5)');
+    console.log('✅ ค่าเริ่มต้นถูกต้อง: เทอม 2 (Unit 6 บทล่าสุด + Dictation ยูนิต 5)');
   }
 
   // Bug #6: ป้ายเทอม 2 ต้องรวม Unit 6
@@ -337,7 +337,7 @@ async function runTests() {
   state.hasCompletedAssessment = true;
   loadUnitVocab('unit_6');
   assert(state.challengeQuestions.length === 0 && state.hasCompletedAssessment === false, 'Bug #1: loadUnitVocab must reset previous unit challenge state');
-  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_6' || state.ORIGINAL_VOCAB_LIST.length !== 8) {
+  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_6' || state.ORIGINAL_VOCAB_LIST.length !== 10) {
     console.error(`❌ โหลด Unit 6 ไม่ถูกต้อง: term=${state.currentTerm}, unit=${state.currentUnitId}, count=${state.ORIGINAL_VOCAB_LIST ? state.ORIGINAL_VOCAB_LIST.length : 0}`);
     allPassed = false;
   } else {

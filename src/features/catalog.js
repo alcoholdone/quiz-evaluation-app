@@ -92,7 +92,7 @@ export function initCustomVocabData() {
     localStorage.removeItem(STORAGE_KEYS.CUSTOM_VOCAB);
   }
 
-  // Render term & unit shelf selectors initially (default: Term 2 -> Unit 5)
+  // Render term & unit shelf selectors initially (default: latest unit -> Term 2 -> Unit 6)
   renderTermSelectors();
   renderUnitSelectors();
 

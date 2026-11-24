@@ -284,5 +284,47 @@ export const unit6 = {
   <circle cx="54" cy="50" r="3.2" fill="#ef4444"/>
 </svg>`,
         explanation: '🌳 Tree สะกดว่า T - R - E - E แปลว่า ต้นไม้ ต้นไม้ใหญ่ที่มีใบสีเขียวร่มรื่นจ้า'
+      },
+      {
+        word: 'Cloud',
+        meaning: 'ก้อนเมฆ',
+        syllable: 'cloud',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#e0f2fe"/>
+  <!-- Fluffy White Cloud -->
+  <ellipse cx="50" cy="58" rx="30" ry="16" fill="#ffffff" stroke="#7dd3fc" stroke-width="2"/>
+  <circle cx="34" cy="49" r="14" fill="#ffffff"/>
+  <circle cx="51" cy="42" r="18" fill="#ffffff"/>
+  <circle cx="68" cy="50" r="13" fill="#ffffff"/>
+  <!-- Cute Cloud Face -->
+  <circle cx="42" cy="55" r="2.2" fill="#334155"/>
+  <circle cx="58" cy="55" r="2.2" fill="#334155"/>
+  <circle cx="36" cy="59" r="2.6" fill="#fda4af" opacity="0.6"/>
+  <circle cx="64" cy="59" r="2.6" fill="#fda4af" opacity="0.6"/>
+  <path d="M 46,60 Q 50,64 54,60" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+</svg>`,
+        explanation: '☁️ Cloud สะกดว่า C - L - O - U - D แปลว่า ก้อนเมฆ ก้อนเมฆสีขาวนุ่มฟูที่ลอยอยู่บนท้องฟ้าจ้า'
+      },
+      {
+        word: 'Puddle',
+        meaning: 'แอ่งน้ำ',
+        syllable: 'pud-dle',
+        label: 'n',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#f0f9ff"/>
+  <!-- Outer & Inner Water Puddle -->
+  <path d="M 16,66 Q 14,52 36,52 Q 52,44 68,52 Q 86,54 84,68 Q 82,82 54,82 Q 20,82 16,66 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
+  <ellipse cx="48" cy="66" rx="22" ry="8" fill="#7dd3fc" opacity="0.7"/>
+  <!-- Ripple rings -->
+  <ellipse cx="50" cy="64" rx="12" ry="4" fill="none" stroke="#ffffff" stroke-width="2"/>
+  <!-- Splash droplets -->
+  <path d="M 50,34 Q 53,41 50,45 Q 47,41 50,34 Z" fill="#0ea5e9"/>
+  <path d="M 32,42 Q 35,47 32,50 Q 29,47 32,42 Z" fill="#38bdf8"/>
+  <path d="M 68,40 Q 71,45 68,48 Q 65,45 68,40 Z" fill="#38bdf8"/>
+  <circle cx="40" cy="48" r="2" fill="#7dd3fc"/>
+  <circle cx="60" cy="47" r="2" fill="#7dd3fc"/>
+</svg>`,
+        explanation: '💧 Puddle สะกดว่า P - U - D - D - L - E แปลว่า แอ่งน้ำ แอ่งน้ำขังบนพื้นเวลาฝนตกจ้า'
       }
     ]};

@@ -48,7 +48,7 @@ export const state = {
   ORIGINAL_VOCAB_LIST: [],
   VOCAB_LIST: [],
   currentTerm: 2,
-  currentUnitId: 'unit_5',
+  currentUnitId: 'unit_6',
   quizQuestionCount: 10,
   learnCategoryFilter: 'all',
 
