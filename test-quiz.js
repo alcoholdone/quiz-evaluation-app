@@ -337,11 +337,11 @@ async function runTests() {
   state.hasCompletedAssessment = true;
   loadUnitVocab('unit_6');
   assert(state.challengeQuestions.length === 0 && state.hasCompletedAssessment === false, 'Bug #1: loadUnitVocab must reset previous unit challenge state');
-  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_6' || state.ORIGINAL_VOCAB_LIST.length !== 10) {
+  if (state.currentTerm !== 2 || state.currentUnitId !== 'unit_6' || state.ORIGINAL_VOCAB_LIST.length !== 14) {
     console.error(`❌ โหลด Unit 6 ไม่ถูกต้อง: term=${state.currentTerm}, unit=${state.currentUnitId}, count=${state.ORIGINAL_VOCAB_LIST ? state.ORIGINAL_VOCAB_LIST.length : 0}`);
     allPassed = false;
   } else {
-    console.log(`✅ โหลด Unit 6 + Cross-Unit State Reset สำเร็จ (รวม ${VOCAB_UNITS.length} ยูนิต)`);
+    console.log(`✅ โหลด Unit 6 + Cross-Unit State Reset สำเร็จ (14 คำหลัก, รวม ${VOCAB_UNITS.length} ยูนิต)`);
   }
 
   // Bug #2 & #11: Radar / Recommendations Math + Offline Chart.js
@@ -388,12 +388,16 @@ async function runTests() {
   }
   assert(shuffle([1, 2, 3]).sort().join(',') === '1,2,3', 'shuffle must preserve all elements');
 
-  // Bug #14: Sentence Q&A grammar for adjectives/verbs/family
+  // Bug #14: Sentence Q&A grammar for adjectives/verbs/family/prepositions
   assert(!getSentenceQA({ word: 'Tall', meaning: 'สูง', label: 'adj' }).answer.includes('a tall'), 'Bug #14: Tall must not use article a');
   assert(getSentenceQA({ word: 'Mother', meaning: 'แม่', label: 'n' }).answer === 'She’s my mother.', 'Bug #14: Mother QA check');
   assert(getSentenceQA({ word: 'Big', meaning: 'ใหญ่', label: 'adj' }).answer === 'It’s big.', 'Bug #14: Big QA check');
   assert(getSentenceQA({ word: 'Ride', meaning: 'ขี่', label: 'v' }).answer === 'I can ride.', 'Bug #14: Ride QA check');
-  console.log('✅ Bugfixes ทั้งหมด (#1, #2, #3, #6, #9, #10, #11, #13, #14) ผ่านฉลุย!\n');
+  assert(getSentenceQA({ word: 'In', meaning: 'ใน', label: 'prep' }).question === 'Where’s the ball?' && getSentenceQA({ word: 'In', meaning: 'ใน', label: 'prep' }).answer === 'It’s in the box.', 'Prep QA check: In');
+  assert(getSentenceQA({ word: 'On', meaning: 'บน', label: 'prep' }).question === 'Where’s the ball?' && getSentenceQA({ word: 'On', meaning: 'บน', label: 'prep' }).answer === 'It’s on the box.', 'Prep QA check: On');
+  assert(getSentenceQA({ word: 'Under', meaning: 'ใต้', label: 'prep' }).question === 'Where’s the ball?' && getSentenceQA({ word: 'Under', meaning: 'ใต้', label: 'prep' }).answer === 'It’s under the table.', 'Prep QA check: Under');
+  assert(getSentenceQA({ word: 'By', meaning: 'ข้างๆ', label: 'prep' }).question === 'Where’s the ball?' && getSentenceQA({ word: 'By', meaning: 'ข้างๆ', label: 'prep' }).answer === 'It’s by the box.', 'Prep QA check: By');
+  console.log('✅ Bugfixes ทั้งหมด (#1, #2, #3, #6, #9, #10, #11, #13, #14) และ Prep Q&A ผ่านฉลุย!\n');
 
   // ==========================================================
   // C. ทดสอบการสร้างข้อสอบและ Render ในแต่ละโหมด (9 Units/Exams)
@@ -445,6 +449,34 @@ async function runTests() {
       allPassed = false;
     }
   });
+
+  // ทดสอบ Unit 6 ในโหมด Q&A (Prepositions in / on / under / by)
+  try {
+    loadUnitVocab('unit_6');
+    state.selectedGameMode = 'qa';
+    startNewChallenge();
+    const qaQs = state.challengeQuestions;
+    assert(qaQs.length === 10, `Unit 6 QA mode expected 10 questions, got ${qaQs.length}`);
+    const prepQs = qaQs.filter(q => q.type === 'grammar_midterm');
+    assert(prepQs.length >= 4, `Unit 6 QA mode expected >= 4 preposition questions, got ${prepQs.length}`);
+    prepQs.forEach((pq, idx) => {
+      assert(pq.options.length === 4, `Prep Q${idx + 1} expected 4 options`);
+      const texts = pq.options.map(o => o.text);
+      assert(new Set(texts).size === 4, `Prep Q${idx + 1} options must be unique: ${texts.join(', ')}`);
+      const correctCount = pq.options.filter(o => o.isCorrect).length;
+      assert(correctCount === 1, `Prep Q${idx + 1} expected exactly 1 correct option, got ${correctCount}`);
+      assert(['in', 'on', 'under', 'by'].every(p => texts.some(t => t.includes(` ${p} `))), `Prep Q${idx + 1} must cover all 4 prepositions`);
+    });
+    for (let i = 0; i < qaQs.length; i++) {
+      renderQuestion(i);
+    }
+    state.selectedGameMode = 'mixed';
+    console.log(`✅ Unit 6: Outdoors (โหมด Q&A เฉพาะทาง Prepositions ${prepQs.length} ข้อ) ผ่านฉลุย!`);
+  } catch (err) {
+    state.selectedGameMode = 'mixed';
+    console.error('❌ Unit 6 QA mode พบ Error:', err.message);
+    allPassed = false;
+  }
 
   // ==========================================================
   // D. ทดสอบโหมดเขียนตามคำบอก (Dictation)
@@ -530,9 +562,16 @@ async function runTests() {
   assert(getWordCategory({ word: 'Sing', label: 'v.i' }) === 'verb', 'getWordCategory failed for v.i');
   assert(getWordCategory({ word: 'Run', label: 'v' }) === 'verb', 'getWordCategory failed for v');
   assert(getWordCategory({ word: 'Big', label: 'adj' }) === 'adj', 'getWordCategory failed for adj');
+  assert(getWordCategory({ word: 'In', label: 'prep' }) === 'prep', 'getWordCategory failed for prep');
   assert(getWordCategory({ word: 'Stand up', type: 'command' }) === 'command', 'getWordCategory failed for command');
   assert(getWordCategory({ word: "Here you are", label: 'phrase' }) === 'command', 'getWordCategory failed for phrase');
   assert(getWordCategory({ word: 'Custom' }) === 'other', 'getWordCategory failed for custom/unlabeled');
+
+  loadUnitVocab('unit_6');
+  setLearnCategoryFilter('prep');
+  const prepCards = getMockById('vocabGrid').children;
+  assert(prepCards.length === 4, `Unit 6 prep filter expected 4 cards, got ${prepCards.length}`);
+  setLearnCategoryFilter('all');
 
   loadUnitVocab('unit_5');
   setLearnCategoryFilter('adj');

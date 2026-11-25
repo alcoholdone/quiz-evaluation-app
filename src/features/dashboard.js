@@ -744,6 +744,20 @@ export function renderDetailedReview() {
             }
           }, 1800);
         }
+      } else if (q.type === 'grammar_midterm') {
+        stopAllSpeech();
+        speakEN(q.questionText, 0.85);
+        const correctOpt = q.options.find(o => o.isCorrect);
+        if (correctOpt) {
+          registerTimeout('review', () => {
+            if (state.activeTab === 'dashboard') {
+              speakEN(correctOpt.text, 0.8);
+              registerTimeout('speech', () => {
+                if (state.activeTab === 'dashboard') speakTH(q.targetWord.meaning);
+              }, 1200);
+            }
+          }, 1800);
+        }
       } else {
         spellAndSpeak(q.targetWord);
       }

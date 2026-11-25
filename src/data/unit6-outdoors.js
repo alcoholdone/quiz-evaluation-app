@@ -326,5 +326,94 @@ export const unit6 = {
   <circle cx="60" cy="47" r="2" fill="#7dd3fc"/>
 </svg>`,
         explanation: '💧 Puddle สะกดว่า P - U - D - D - L - E แปลว่า แอ่งน้ำ แอ่งน้ำขังบนพื้นเวลาฝนตกจ้า'
+      },
+      {
+        word: 'In',
+        meaning: 'ใน',
+        syllable: 'in',
+        label: 'prep',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#fef3c7"/>
+  <ellipse cx="50" cy="84" rx="30" ry="5" fill="#92400e" opacity="0.2"/>
+  <!-- Open Box Back & Side Flaps -->
+  <polygon points="24,42 50,32 76,42 76,56 24,56" fill="#92400e"/>
+  <polygon points="24,42 15,34 41,24 50,32" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/>
+  <polygon points="76,42 85,34 59,24 50,32" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+  <!-- Red Ball INSIDE the box (bottom obscured by front box wall) -->
+  <circle cx="50" cy="44" r="15" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 38,39 Q 50,45 62,39" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="44" cy="36" r="3" fill="#ffffff" opacity="0.55"/>
+  <!-- Open Box Front Wall -->
+  <rect x="24" y="46" width="52" height="34" rx="2" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  <polygon points="24,46 16,55 68,55 76,46" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+  <!-- Tape / Seam line -->
+  <line x1="50" y1="55" x2="50" y2="80" stroke="#b45309" stroke-width="1.5" stroke-dasharray="3,2"/>
+</svg>`,
+        explanation: '📦 In สะกดว่า I - N แปลว่า ใน (อยู่ข้างใน) เช่น ลูกบอลอยู่ในกล่อง (It’s in the box.) จ้า'
+      },
+      {
+        word: 'On',
+        meaning: 'บน',
+        syllable: 'on',
+        label: 'prep',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfeff"/>
+  <ellipse cx="50" cy="86" rx="30" ry="5" fill="#0e7490" opacity="0.2"/>
+  <!-- Closed Wooden Box -->
+  <polygon points="24,52 50,42 76,52 50,62" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>
+  <polygon points="24,52 50,62 50,84 24,74" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  <polygon points="76,52 50,62 50,84 76,74" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+  <!-- Ball shadow on top of box -->
+  <ellipse cx="50" cy="52" rx="11" ry="3.5" fill="#78350f" opacity="0.35"/>
+  <!-- Red Ball ON TOP of the box -->
+  <circle cx="50" cy="36" r="15" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 38,31 Q 50,37 62,31" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="44" cy="28" r="3.2" fill="#ffffff" opacity="0.6"/>
+</svg>`,
+        explanation: '📦 On สะกดว่า O - N แปลว่า บน (อยู่ข้างบน) เช่น ลูกบอลอยู่บนกล่อง (It’s on the box.) จ้า'
+      },
+      {
+        word: 'Under',
+        meaning: 'ใต้',
+        syllable: 'un-der',
+        label: 'prep',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#f3e8ff"/>
+  <ellipse cx="50" cy="84" rx="34" ry="5" fill="#581c87" opacity="0.16"/>
+  <!-- 4-legged Wooden Table -->
+  <rect x="22" y="42" width="6" height="38" rx="1.5" fill="#92400e"/>
+  <rect x="72" y="42" width="6" height="38" rx="1.5" fill="#92400e"/>
+  <rect x="30" y="44" width="5" height="32" rx="1.5" fill="#78350f"/>
+  <rect x="65" y="44" width="5" height="32" rx="1.5" fill="#78350f"/>
+  <rect x="14" y="34" width="72" height="10" rx="3" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  <rect x="18" y="36" width="64" height="3" rx="1.5" fill="#fbbf24" opacity="0.5"/>
+  <!-- Red Ball UNDER the table -->
+  <ellipse cx="50" cy="81" rx="12" ry="3.5" fill="#581c87" opacity="0.25"/>
+  <circle cx="50" cy="67" r="14" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 38,63 Q 50,69 62,63" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="44" cy="59" r="3" fill="#ffffff" opacity="0.55"/>
+</svg>`,
+        explanation: '🪑 Under สะกดว่า U - N - D - E - R แปลว่า ใต้ (อยู่ข้างใต้) เช่น ลูกบอลอยู่ใต้โต๊ะ (It’s under the table.) จ้า'
+      },
+      {
+        word: 'By',
+        meaning: 'ข้างๆ',
+        syllable: 'by',
+        label: 'prep',
+        image: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfdf5"/>
+  <ellipse cx="50" cy="82" rx="36" ry="5" fill="#065f46" opacity="0.16"/>
+  <!-- Wooden Box on the left -->
+  <polygon points="18,46 36,38 54,46 36,54" fill="#fbbf24" stroke="#b45309" stroke-width="1.8"/>
+  <polygon points="18,46 36,54 36,78 18,70" fill="#d97706" stroke="#92400e" stroke-width="1.8"/>
+  <polygon points="54,46 36,54 36,78 54,70" fill="#b45309" stroke="#78350f" stroke-width="1.8"/>
+  <!-- Proximity double-arrow indicator -->
+  <path d="M 55,66 L 61,66" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+  <!-- Red Ball NEXT TO (BY) the box -->
+  <circle cx="74" cy="64" r="14" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 62,60 Q 74,66 86,60" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="68" cy="56" r="3" fill="#ffffff" opacity="0.55"/>
+</svg>`,
+        explanation: '📦 By สะกดว่า B - Y แปลว่า ข้างๆ (อยู่ติดกัน) เช่น ลูกบอลอยู่ข้างๆ กล่อง (It’s by the box.) จ้า'
       }
     ]};

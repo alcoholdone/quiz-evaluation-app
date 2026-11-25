@@ -13,13 +13,20 @@ export const SHAPE_COLOR_MAP = {
 
 // --- Word classification helpers (single source of truth) ---
 // Words that are NOT singular countable nouns: action verbs, adjectives,
-// greetings and colors. They must never get "a/an" or "Is this a ___?" framing.
-export const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many', 'tall', 'short', 'young', 'old', 'pretty', 'handsome', 'say', 'read', 'write', 'ask', 'answer', 'big', 'little', 'new', 'long', 'round', 'square', 'ride', 'throw', 'catch', 'sunny', 'rainy', 'windy'];
+// greetings, colors and prepositions. They must never get "a/an" or "Is this a ___?" framing.
+export const PREPOSITION_WORDS = ['in', 'on', 'under', 'by'];
+
+export const NON_NOUN_WORDS = ['sing', 'act', 'listen', 'look', 'open', 'close', 'fine', 'great', 'take out', 'put away', 'pick up', 'draw', 'play', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'yellow', 'blue', 'red', 'green', 'purple', 'orange', 'brown', 'pink', 'black', 'white', 'point', 'find', 'count', 'how many', 'tall', 'short', 'young', 'old', 'pretty', 'handsome', 'say', 'read', 'write', 'ask', 'answer', 'big', 'little', 'new', 'long', 'round', 'square', 'ride', 'throw', 'catch', 'sunny', 'rainy', 'windy', ...PREPOSITION_WORDS];
 
 // "color" and "shape" ARE nouns, but they are abstract category headers whose
 // picture is a generic icon — so we never frame them as "Is this a ___?" /
 // "It's a ___" or use them as a picture quiz target.
 export const CATEGORY_NOUNS = ['color', 'shape', 'birthday', 'year', 'weather'];
+
+export function isPrepositionWord(item) {
+  if (!item) return false;
+  return item.label === 'prep' || PREPOSITION_WORDS.includes(item.word.trim().toLowerCase());
+}
 
 // True for any noun (used to decide part-of-speech style behavior).
 export function isNounWord(item) {
@@ -303,6 +310,34 @@ export function getSentenceQA(item) {
       answer: "It’s a shape.",
       thaiQuestion: "นี่คืออะไร?",
       thaiAnswer: "มันคือรูปร่าง"
+    };
+  } else if (wordLower === 'in') {
+    return {
+      question: "Where’s the ball?",
+      answer: "It’s in the box.",
+      thaiQuestion: "ลูกบอลอยู่ที่ไหน?",
+      thaiAnswer: "มันอยู่ในกล่อง"
+    };
+  } else if (wordLower === 'on') {
+    return {
+      question: "Where’s the ball?",
+      answer: "It’s on the box.",
+      thaiQuestion: "ลูกบอลอยู่ที่ไหน?",
+      thaiAnswer: "มันอยู่บนกล่อง"
+    };
+  } else if (wordLower === 'under') {
+    return {
+      question: "Where’s the ball?",
+      answer: "It’s under the table.",
+      thaiQuestion: "ลูกบอลอยู่ที่ไหน?",
+      thaiAnswer: "มันอยู่ใต้โต๊ะ"
+    };
+  } else if (wordLower === 'by') {
+    return {
+      question: "Where’s the ball?",
+      answer: "It’s by the box.",
+      thaiQuestion: "ลูกบอลอยู่ที่ไหน?",
+      thaiAnswer: "มันอยู่ข้างๆ กล่อง"
     };
   } else {
     // Default fallback based on vowel detection

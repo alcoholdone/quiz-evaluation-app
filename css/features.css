@@ -247,6 +247,12 @@
   border-color: var(--coral-border);
 }
 
+.pos-badge--prep {
+  color: var(--gold-dark);
+  background: var(--gold-light);
+  border-color: var(--gold-border);
+}
+
 .vocab-card-actions {
   display: flex;
   flex-direction: column;

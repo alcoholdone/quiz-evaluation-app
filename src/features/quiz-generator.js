@@ -1,7 +1,7 @@
 import { state } from '../state/store.js';
 import { VOCAB_UNITS } from '../data/units.js';
 import { getCustomVocabList, getWeakWordList } from '../services/storage.js';
-import { SHAPE_COLOR_MAP, isConcreteNoun, isSpellable } from '../utils/word-helpers.js';
+import { SHAPE_COLOR_MAP, PREPOSITION_WORDS, isConcreteNoun, isPrepositionWord, isSpellable } from '../utils/word-helpers.js';
 import { shuffle } from '../utils/shuffle.js';
 
 export function selectTargetWords() {
@@ -890,6 +890,231 @@ export function generateUnit5ExamQuestions() {
   return list;
 }
 
+// ── PREPOSITION SPATIAL Q&A SCENARIOS (Unit 6: in / on / under / by) ───────────
+const PREPOSITION_SCENARIOS = [
+  {
+    key: 'in-puddle',
+    prep: 'in',
+    subject: 'ball',
+    landmark: 'puddle',
+    question: 'Where’s the ball?',
+    thaiQuestion: 'ลูกบอลอยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ลูกบอลอยู่ในแอ่งน้ำ',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#f0f9ff"/>
+  <!-- Water puddle base -->
+  <path d="M 16,66 Q 14,52 38,52 Q 52,46 66,52 Q 86,54 84,68 Q 82,82 50,82 Q 20,82 16,66 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
+  <!-- Red ball sitting IN the puddle -->
+  <circle cx="50" cy="54" r="15" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 38,49 Q 50,55 62,49" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="44" cy="46" r="3" fill="#ffffff" opacity="0.6"/>
+  <!-- Water ripple ring wrapping around the bottom of the ball -->
+  <path d="M 30,61 Q 50,70 70,61 Q 72,74 50,76 Q 28,74 30,61 Z" fill="#0ea5e9" opacity="0.88"/>
+  <path d="M 33,63 Q 50,70 67,63" fill="none" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round"/>
+</svg>`
+  },
+  {
+    key: 'in-box',
+    prep: 'in',
+    subject: 'ball',
+    landmark: 'box',
+    question: 'Where’s the ball?',
+    thaiQuestion: 'ลูกบอลอยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ลูกบอลอยู่ในกล่อง',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#fef3c7"/>
+  <ellipse cx="50" cy="84" rx="30" ry="5" fill="#92400e" opacity="0.2"/>
+  <polygon points="24,42 50,32 76,42 76,56 24,56" fill="#92400e"/>
+  <polygon points="24,42 15,34 41,24 50,32" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/>
+  <polygon points="76,42 85,34 59,24 50,32" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+  <circle cx="50" cy="44" r="15" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 38,39 Q 50,45 62,39" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="44" cy="36" r="3" fill="#ffffff" opacity="0.55"/>
+  <rect x="24" y="46" width="52" height="34" rx="2" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  <polygon points="24,46 16,55 68,55 76,46" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+</svg>`
+  },
+  {
+    key: 'on-tree',
+    prep: 'on',
+    subject: 'kite',
+    landmark: 'tree',
+    question: 'Where’s the kite?',
+    thaiQuestion: 'ว่าวอยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ว่าวอยู่บนต้นไม้',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfdf5"/>
+  <ellipse cx="50" cy="88" rx="30" ry="5" fill="#86efac"/>
+  <path d="M 43,58 L 41,87 L 59,87 L 57,58 Z" fill="#92400e" stroke="#78350f" stroke-width="1.5"/>
+  <circle cx="34" cy="52" r="16" fill="#16a34a"/>
+  <circle cx="66" cy="52" r="16" fill="#16a34a"/>
+  <circle cx="50" cy="36" r="19" fill="#22c55e"/>
+  <circle cx="50" cy="52" r="17" fill="#22c55e"/>
+  <!-- Kite resting ON TOP of the tree canopy -->
+  <polygon points="50,8 62,20 50,32 38,20" fill="#f43f5e" stroke="#be123c" stroke-width="1.8"/>
+  <polygon points="50,8 62,20 50,20" fill="#fb7185"/>
+  <polygon points="38,20 50,20 50,32" fill="#fda4af"/>
+  <path d="M 50,32 Q 56,37 52,42" fill="none" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/>
+</svg>`
+  },
+  {
+    key: 'on-box',
+    prep: 'on',
+    subject: 'ball',
+    landmark: 'box',
+    question: 'Where’s the ball?',
+    thaiQuestion: 'ลูกบอลอยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ลูกบอลอยู่บนกล่อง',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfeff"/>
+  <ellipse cx="50" cy="86" rx="30" ry="5" fill="#0e7490" opacity="0.2"/>
+  <polygon points="24,52 50,42 76,52 50,62" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>
+  <polygon points="24,52 50,62 50,84 24,74" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  <polygon points="76,52 50,62 50,84 76,74" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+  <ellipse cx="50" cy="52" rx="11" ry="3.5" fill="#78350f" opacity="0.35"/>
+  <circle cx="50" cy="36" r="15" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 38,31 Q 50,37 62,31" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="44" cy="28" r="3.2" fill="#ffffff" opacity="0.6"/>
+</svg>`
+  },
+  {
+    key: 'under-tree',
+    prep: 'under',
+    subject: 'ball',
+    landmark: 'tree',
+    question: 'Where’s the ball?',
+    thaiQuestion: 'ลูกบอลอยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ลูกบอลอยู่ใต้ต้นไม้',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfdf5"/>
+  <ellipse cx="50" cy="86" rx="32" ry="6" fill="#86efac"/>
+  <path d="M 43,48 L 41,85 L 59,85 L 57,48 Z" fill="#92400e" stroke="#78350f" stroke-width="1.5"/>
+  <circle cx="32" cy="40" r="16" fill="#16a34a"/>
+  <circle cx="68" cy="40" r="16" fill="#16a34a"/>
+  <circle cx="50" cy="24" r="19" fill="#22c55e"/>
+  <circle cx="50" cy="40" r="17" fill="#22c55e"/>
+  <!-- Red Ball UNDER the tree canopy next to trunk base -->
+  <ellipse cx="32" cy="85" rx="10" ry="3" fill="#15803d" opacity="0.28"/>
+  <circle cx="32" cy="74" r="12" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 22,70 Q 32,76 42,70" fill="none" stroke="#fecaca" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="27" cy="67" r="2.5" fill="#ffffff" opacity="0.6"/>
+</svg>`
+  },
+  {
+    key: 'under-table',
+    prep: 'under',
+    subject: 'ball',
+    landmark: 'table',
+    question: 'Where’s the ball?',
+    thaiQuestion: 'ลูกบอลอยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ลูกบอลอยู่ใต้โต๊ะ',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#f3e8ff"/>
+  <ellipse cx="50" cy="84" rx="34" ry="5" fill="#581c87" opacity="0.16"/>
+  <rect x="22" y="42" width="6" height="38" rx="1.5" fill="#92400e"/>
+  <rect x="72" y="42" width="6" height="38" rx="1.5" fill="#92400e"/>
+  <rect x="30" y="44" width="5" height="32" rx="1.5" fill="#78350f"/>
+  <rect x="65" y="44" width="5" height="32" rx="1.5" fill="#78350f"/>
+  <rect x="14" y="34" width="72" height="10" rx="3" fill="#d97706" stroke="#92400e" stroke-width="2"/>
+  <ellipse cx="50" cy="81" rx="12" ry="3.5" fill="#581c87" opacity="0.25"/>
+  <circle cx="50" cy="67" r="14" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 38,63 Q 50,69 62,63" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="44" cy="59" r="3" fill="#ffffff" opacity="0.55"/>
+</svg>`
+  },
+  {
+    key: 'by-tree',
+    prep: 'by',
+    subject: 'flower',
+    landmark: 'tree',
+    question: 'Where’s the flower?',
+    thaiQuestion: 'ดอกไม้อยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ดอกไม้อยู่ข้างๆ ต้นไม้',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfdf5"/>
+  <ellipse cx="50" cy="86" rx="36" ry="5" fill="#86efac"/>
+  <!-- Tree on the left -->
+  <path d="M 30,52 L 28,85 L 42,85 L 40,52 Z" fill="#92400e" stroke="#78350f" stroke-width="1.5"/>
+  <circle cx="22" cy="44" r="14" fill="#16a34a"/>
+  <circle cx="48" cy="44" r="14" fill="#16a34a"/>
+  <circle cx="35" cy="28" r="17" fill="#22c55e"/>
+  <circle cx="35" cy="44" r="15" fill="#22c55e"/>
+  <!-- Flower BY (beside) the tree on the right -->
+  <path d="M 72,56 Q 71,72 72,85" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 72,74 Q 60,68 58,74 Q 63,80 72,77 Z" fill="#22c55e"/>
+  <g fill="#f43f5e" stroke="#e11d48" stroke-width="1.2">
+    <circle cx="72" cy="41" r="7"/>
+    <circle cx="83" cy="49" r="7"/>
+    <circle cx="79" cy="61" r="7"/>
+    <circle cx="65" cy="61" r="7"/>
+    <circle cx="61" cy="49" r="7"/>
+  </g>
+  <circle cx="72" cy="52" r="7.5" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+</svg>`
+  },
+  {
+    key: 'by-box',
+    prep: 'by',
+    subject: 'ball',
+    landmark: 'box',
+    question: 'Where’s the ball?',
+    thaiQuestion: 'ลูกบอลอยู่ที่ไหน? (ดูภาพตำแหน่งแล้วเลือก in / on / under / by)',
+    thaiAnswer: 'ลูกบอลอยู่ข้างๆ กล่อง',
+    svg: `<svg viewBox="0 0 100 100" class="svg-icon" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="46" fill="#ecfdf5"/>
+  <ellipse cx="50" cy="82" rx="36" ry="5" fill="#065f46" opacity="0.16"/>
+  <polygon points="18,46 36,38 54,46 36,54" fill="#fbbf24" stroke="#b45309" stroke-width="1.8"/>
+  <polygon points="18,46 36,54 36,78 18,70" fill="#d97706" stroke="#92400e" stroke-width="1.8"/>
+  <polygon points="54,46 36,54 36,78 54,70" fill="#b45309" stroke="#78350f" stroke-width="1.8"/>
+  <path d="M 55,66 L 61,66" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="74" cy="64" r="14" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+  <path d="M 62,60 Q 74,66 86,60" fill="none" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="68" cy="56" r="3" fill="#ffffff" opacity="0.55"/>
+</svg>`
+  }
+];
+
+const PREP_EXPLANATION_TH = {
+  in: 'in แปลว่า "ใน" (อยู่ข้างใน)',
+  on: 'on แปลว่า "บน" (อยู่ข้างบน)',
+  under: 'under แปลว่า "ใต้" (อยู่ข้างใต้)',
+  by: 'by แปลว่า "ข้างๆ" (อยู่ติดกัน)'
+};
+
+function buildPrepositionQuestion(id, targetWord, usedScenarioKeys) {
+  const prepLower = targetWord.word.trim().toLowerCase();
+  const candidates = PREPOSITION_SCENARIOS.filter(s => s.prep === prepLower);
+  const unused = candidates.filter(s => !usedScenarioKeys.has(s.key));
+  const pool = unused.length > 0 ? unused : (candidates.length > 0 ? candidates : PREPOSITION_SCENARIOS);
+  const scenario = pool[Math.floor(Math.random() * pool.length)];
+  usedScenarioKeys.add(scenario.key);
+
+  const correctAns = `It’s ${scenario.prep} the ${scenario.landmark}.`;
+  const options = shuffle(
+    PREPOSITION_WORDS.map(p => ({
+      text: `It’s ${p} the ${scenario.landmark}.`,
+      isCorrect: p === scenario.prep,
+      word: targetWord.word,
+      meaning: scenario.thaiAnswer
+    }))
+  );
+
+  return {
+    id,
+    type: 'grammar_midterm',
+    targetWord: {
+      word: targetWord.word,
+      meaning: scenario.thaiAnswer,
+      image: scenario.svg,
+      explanation: `📍 ${PREP_EXPLANATION_TH[scenario.prep]} → "${correctAns}" (${scenario.thaiAnswer}) จ้า`
+    },
+    questionText: scenario.question,
+    thaiQuestionText: scenario.thaiQuestion,
+    options,
+    skill: 'Sentence Q&A'
+  };
+}
+
 // GENERATE CHALLENGE QUESTIONS DYNAMICALLY
 export function generateQuestions() {
   if (state.currentUnitId === 'midterm_prep') {
@@ -920,6 +1145,7 @@ export function generateQuestions() {
   }
 
   const usedGrammarNouns = new Set();
+  const usedPrepScenarios = new Set();
 
   for (let i = 0; i < state.quizQuestionCount; i++) {
     const targetWord = targets[i] || state.VOCAB_LIST[i % state.VOCAB_LIST.length];
@@ -932,6 +1158,14 @@ export function generateQuestions() {
     }
 
     if (type === 'grammar_an') {
+      const targetIsPrep = isPrepositionWord(targetWord);
+      const hasUnusedPrep = targetIsPrep && PREPOSITION_SCENARIOS.some(
+        s => s.prep === targetWord.word.trim().toLowerCase() && !usedPrepScenarios.has(s.key)
+      );
+      if (state.selectedGameMode !== 'qa' && hasUnusedPrep) {
+        list.push(buildPrepositionQuestion(i + 1, targetWord, usedPrepScenarios));
+        continue;
+      }
       // Fallback if the unit has no concrete nouns to frame with a/an
       if (!state.VOCAB_LIST.some(isConcreteNoun)) {
         type = 'visual_word';
@@ -981,6 +1215,11 @@ export function generateQuestions() {
     }
 
     if (type === 'sentence_qa') {
+      if (isPrepositionWord(targetWord)) {
+        list.push(buildPrepositionQuestion(i + 1, targetWord, usedPrepScenarios));
+        continue;
+      }
+
       // 50% chance to make it a Yes/No question
       const isYesNo = Math.random() < 0.5;
       const targetWordLower = targetWord.word.toLowerCase();

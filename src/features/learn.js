@@ -10,6 +10,7 @@ const CATEGORY_DEFS = [
   { key: 'noun', label: 'คำนาม (n)' },
   { key: 'verb', label: 'คำกริยา (v)' },
   { key: 'adj', label: 'คำคุณศัพท์ (adj)' },
+  { key: 'prep', label: 'คำบุพบท (prep)' },
   { key: 'command', label: 'ประโยคคำสั่ง' },
   { key: 'other', label: 'เพิ่มเติม' }
 ];
@@ -20,6 +21,7 @@ export function getWordCategory(item) {
   if (item.label === 'n') return 'noun';
   if (item.label && item.label.startsWith('v')) return 'verb';
   if (item.label === 'adj') return 'adj';
+  if (item.label === 'prep') return 'prep';
   return 'other';
 }
 
@@ -38,6 +40,7 @@ export function renderLearnCategoryFilter(weakSet) {
     noun: 0,
     verb: 0,
     adj: 0,
+    prep: 0,
     command: 0,
     other: 0,
     weak: 0
@@ -75,6 +78,7 @@ function getPosBadgeClass(item) {
   const cat = getWordCategory(item);
   if (cat === 'verb') return 'pos-badge pos-badge--verb';
   if (cat === 'adj') return 'pos-badge pos-badge--adj';
+  if (cat === 'prep') return 'pos-badge pos-badge--prep';
   if (cat === 'command') return 'pos-badge pos-badge--cmd';
   return 'pos-badge';
 }
